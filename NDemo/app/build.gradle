@@ -19,11 +19,48 @@ android {
     }
 }
 
+/***** greenDao****/
+apply plugin: 'org.greenrobot.greendao'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.1'
+    }
+}
+
+greendao {
+    schemaVersion 1
+    daoPackage 'com.example.well.ndemo.net.rxretrofit.gen'
+    targetGenDir 'src/main/java'
+}
+/******************************/
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+
+//    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {//因为报Execution failed for task ':app:prepareDebugAndroidTest 所以注释掉
+//        exclude group: 'com.android.support', module: 'support-annotations'
+//    })
+//    testCompile 'junit:junit:4.12'
+
     compile 'com.android.support:appcompat-v7:25.1.1'
-    testCompile 'junit:junit:4.12'
+
+    /***** retrofit + rxJava 网络请求****/
+    /*greenDao*/
+    compile 'org.greenrobot:greendao:3.2.0'
+    /*rx-android-java*/
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+    compile 'com.trello:rxlifecycle:1.0'
+    compile 'com.trello:rxlifecycle-components:1.0'
+    /*rotrofit*/
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'//日志输出
+    /******************************/
+
+    /***** butterknife:****/
+    compile 'com.jakewharton:butterknife:7.0.1'
+    /******************************/
 }
