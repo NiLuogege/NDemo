@@ -1,6 +1,7 @@
 package com.example.well.ndemo.net.rxretrofit.service;
 
 
+import com.example.well.ndemo.net.entity.resulte.GankMeiziReponse;
 import com.example.well.ndemo.net.entity.resulte.RetrofitEntity;
 import com.example.well.ndemo.net.entity.resulte.ServiceInfoResulte;
 import com.example.well.ndemo.net.entity.resulte.SubjectResulte;
@@ -13,6 +14,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Observable;
 
@@ -35,5 +37,14 @@ public interface HttpPostService {
 
     @GET("females/temps")
     Observable<BaseResultEntity<List<Temp>>> getTemp(@Query("cellphone") String cellphone, @Query("beginTime") long beginTime, @Query("endTime") long endTime, @Query("unit") String day);
+
+    @GET("data/福利/10/{page}")
+    Observable<BaseResultEntity<List<GankMeiziReponse>>> getGankMeizi(@Path("page") int page);
+
+
+
+
+
+
 
 }

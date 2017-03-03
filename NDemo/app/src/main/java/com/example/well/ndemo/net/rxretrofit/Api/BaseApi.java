@@ -28,8 +28,7 @@ public abstract class BaseApi<T> implements Func1<BaseResultEntity<T>, T> {
     /*是否需要缓存处理*/
     private boolean cache;
     /*基础url*/
-//    private  String baseUrl="http://www.izaodao.com/Api/";
-    private String baseUrl="http://192.168.121.250:20000/";
+    private String baseUrl="http://gank.io/api/";
     /*方法-如果需要缓存必须设置这个参数；不需要不用設置------>会与baseURL合并后当成键存入数据库*/
     private String mothed;
     /*超时时间-默认6秒*/
@@ -146,8 +145,8 @@ public abstract class BaseApi<T> implements Func1<BaseResultEntity<T>, T> {
 
     @Override
     public T call(BaseResultEntity<T> httpResult) {
-        if(!httpResult.isSuccess()){
-            throw new HttpTimeException(httpResult.getErrorCode());
+        if(!httpResult.isError()){
+            throw new HttpTimeException(0);
         }
         return httpResult.getResult();
     }

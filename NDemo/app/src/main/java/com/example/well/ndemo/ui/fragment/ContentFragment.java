@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.well.ndemo.R;
+import com.example.well.ndemo.ui.activity.BaseActivity;
 
 import butterknife.ButterKnife;
 
@@ -18,11 +19,17 @@ import butterknife.ButterKnife;
 
 public class ContentFragment extends Fragment {
 
+    private BaseActivity mActivity;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_content, null);
         ButterKnife.bind(this,view);
+        mActivity = (BaseActivity) this.getActivity();
+
         return view;
     }
+
+
 }
