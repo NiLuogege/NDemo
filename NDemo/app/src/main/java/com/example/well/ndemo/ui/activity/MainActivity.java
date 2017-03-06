@@ -28,9 +28,14 @@ public class MainActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         ContentFragment contentFragment = new ContentFragment();
-        getSupportFragmentManager().beginTransaction().add(contentId,contentFragment,TAG_CONTENTFRAGMENT).commitAllowingStateLoss();
+        if(!contentFragment.isAdded()){
+            getSupportFragmentManager().beginTransaction().add(contentId,contentFragment,TAG_CONTENTFRAGMENT).commitAllowingStateLoss();
+        }
+
         LeftFragment leftFragment = new LeftFragment();
-        getSupportFragmentManager().beginTransaction().add(leftId,leftFragment,TAG_LEFTFRAGMENT).commitAllowingStateLoss();
+        if(!leftFragment.isAdded()){
+            getSupportFragmentManager().beginTransaction().add(leftId,leftFragment,TAG_LEFTFRAGMENT).commitAllowingStateLoss();
+        }
 
     }
 
