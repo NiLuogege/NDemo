@@ -8,7 +8,7 @@ public class BaseResultEntity<T> {
     private boolean error;
 
     //显示数据（用户需要关心的数据）
-    private T result;
+    private T results;
 
     public boolean isError() {
         return error;
@@ -19,10 +19,18 @@ public class BaseResultEntity<T> {
     }
 
     public T getResult() {
-        return result;
+        return results;
     }
 
     public void setResult(T result) {
-        this.result = result;
+        this.results = result;
+    }
+
+    @Override
+    public String toString() {
+        return "BaseResultEntity{" +
+                "error=" + error +
+                ", result=" + results +
+                '}';
     }
 }

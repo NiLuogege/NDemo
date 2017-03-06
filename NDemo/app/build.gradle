@@ -38,15 +38,12 @@ greendao {
 /******************************/
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
-//    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {//因为报Execution failed for task ':app:prepareDebugAndroidTest 所以注释掉
-//        exclude group: 'com.android.support', module: 'support-annotations'
-//    })
-//    testCompile 'junit:junit:4.12'
-
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    //    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {//因为报Execution failed for task ':app:prepareDebugAndroidTest 所以注释掉
+    //        exclude group: 'com.android.support', module: 'support-annotations'
+    //    })
+    //    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:25.1.1'
-
     /***** retrofit + rxJava 网络请求****/
     /*greenDao*/
     compile 'org.greenrobot:greendao:3.2.0'
@@ -57,12 +54,17 @@ dependencies {
     /*rotrofit*/
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'//日志输出
-    /******************************/
-
-    /***** butterknife:****/
+    compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
+    //日志输出
+    /** ****************************/
+    //butterknife
     compile 'com.jakewharton:butterknife:7.0.1'
-    /******************************/
-
+    //提取主要颜色的支持库
     compile 'com.android.support:palette-v7:25.0.0'
+    //recyclerView支持库
+    compile 'com.android.support:recyclerview-v7:25.1.1'
+    //design支持库
+    compile 'com.android.support:design:25.1.1'
+    compile 'com.android.support:cardview-v7:25.1.1'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
 }
