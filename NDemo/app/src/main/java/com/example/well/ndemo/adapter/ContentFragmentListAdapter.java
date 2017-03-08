@@ -1,6 +1,7 @@
 package com.example.well.ndemo.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.example.well.ndemo.R;
 import com.example.well.ndemo.net.entity.resulte.GankMeiziReponse;
+import com.example.well.ndemo.ui.activity.MeiziDetialActivity;
 import com.example.well.ndemo.utils.SnackbarUtils;
 
 import java.util.List;
@@ -87,7 +89,8 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
 
         @OnClick(R.id.iv)
         void showImageDetial() {
-
+            Intent intent = new Intent(context,MeiziDetialActivity.class);
+            context.startActivity(intent);
         }
 
         @OnClick(R.id.tv)

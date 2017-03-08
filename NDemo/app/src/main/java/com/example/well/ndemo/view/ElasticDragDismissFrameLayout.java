@@ -33,7 +33,9 @@ import com.example.well.ndemo.utils.ViewUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * 使用的时候必须要包含一个可以滑动的控件
+ */
 public class ElasticDragDismissFrameLayout extends FrameLayout {
 
     // configurable attribs
