@@ -16,6 +16,8 @@
         android:transitionGroup="false"
         android:transitionName="shot_background">
 
+
+
         <com.example.well.ndemo.view.ParallaxScrimageView
             android:id="@+id/shot"
             android:layout_width="match_parent"
@@ -43,6 +45,15 @@
 
         </android.support.v4.widget.NestedScrollView>
 
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?android:actionBarSize"
+            android:popupTheme="@style/Theme.AppCompat.Light"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
+        </android.support.v7.widget.Toolbar>
 
     </FrameLayout>
 </com.example.well.ndemo.view.ElasticDragDismissFrameLayout>
