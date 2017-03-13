@@ -1,7 +1,9 @@
 package com.example.well.ndemo.adapter;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -29,10 +31,10 @@ import butterknife.ButterKnife;
 public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFragmentListAdapter.InnerViewHolder> {
 
     private static final int LIMIT = 48;
-    private Context context;
+    private Activity context;
     private List<GankMeiziReponse> data = null;
 
-    public ContentFragmentListAdapter(Context context, List<GankMeiziReponse> data) {
+    public ContentFragmentListAdapter(Activity context, List<GankMeiziReponse> data) {
         this.data = data;
         this.context = context;
     }
@@ -69,14 +71,17 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
         bindListener(holder,reponse);
     }
 
-    private void bindListener(InnerViewHolder holder,  final GankMeiziReponse reponse) {
+    private void bindListener(final InnerViewHolder holder, final GankMeiziReponse reponse) {
         final InnerViewHolder innerHolder=holder;
         holder.mIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context,MeiziDetialActivity.class);
                 intent.putExtra(MeiziDetialActivity.URL,reponse.url);
-                context.startActivity(intent);
+//                ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(context, Pair.create((View)holder.mIv,R.string.share_meizi_detial_activity));
+                ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeClipRevealAnimation(holder.mIv, (int) holder.mIv.getX(), (int) holder.mIv.getY(),holder.mIv.getWidth(),holder.mIv.getHeight());
+                Bundle bundle = optionsCompat.toBundle();
+                context.startActivity(intent,bundle);
             }
         });
 

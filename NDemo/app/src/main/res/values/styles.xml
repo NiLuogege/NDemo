@@ -28,6 +28,17 @@
 
     </style>
 
+
+
+
+
+
+
+
+
+
+
+    <!--下面是Look的style-->
     <style name="Look.Translucent.Look.Image">
         <item name="android:windowSharedElementEnterTransition">@transition/dribbble_shot_shared_enter</item>
         <item name="android:windowSharedElementReturnTransition">@transition/dribbble_shot_shared_return</item>

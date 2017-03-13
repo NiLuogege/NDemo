@@ -1,6 +1,18 @@
 <resources>
     <string name="app_name">NDemo</string>
 
+    <string name="share_meizi_detial_activity">share_meizi_detial_activity</string>
+
+
+
+
+
+
+
+
+
+    <!--下面是look的-->
+
 
     <string name="one_text">Be kind one another</string>
 
