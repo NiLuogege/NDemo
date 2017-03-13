@@ -20,7 +20,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * Created by ${LuoChen} on 2017/3/6 13:56.
@@ -66,6 +65,27 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
                 }
             }
         });
+
+        bindListener(holder,reponse);
+    }
+
+    private void bindListener(InnerViewHolder holder,  final GankMeiziReponse reponse) {
+        final InnerViewHolder innerHolder=holder;
+        holder.mIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context,MeiziDetialActivity.class);
+                intent.putExtra(MeiziDetialActivity.URL,reponse.url);
+                context.startActivity(intent);
+            }
+        });
+
+        holder.mTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SnackbarUtils.showDefaultShortSnackbar(innerHolder.mCv, "正在开发");
+            }
+        });
     }
 
     @Override
@@ -86,17 +106,5 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
             ButterKnife.bind(this, itemView);
 
         }
-
-        @OnClick(R.id.iv)
-        void showImageDetial() {
-            Intent intent = new Intent(context,MeiziDetialActivity.class);
-            context.startActivity(intent);
-        }
-
-        @OnClick(R.id.tv)
-        void show() {
-            SnackbarUtils.showDefaultShortSnackbar(mCv, "正在开发");
-        }
-
     }
 }

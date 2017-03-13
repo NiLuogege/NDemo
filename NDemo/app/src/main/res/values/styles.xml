@@ -20,6 +20,12 @@
         <item name="android:windowSharedElementReturnTransition">@transition/dribbble_shot_shared_return</item>
         <item name="android:windowEnterTransition">@transition/dribbble_shot_enter</item>
         <item name="android:windowReturnTransition">@transition/dribbble_shot_return</item>
+
+       <!-- 设置Activity为透明-->
+        <item name="android:windowBackground">@color/scrim</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+
     </style>
 
     <style name="Look.Translucent.Look.Image">

@@ -1,5 +1,8 @@
 package com.example.well.ndemo.ui.activity;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 /**
@@ -8,4 +11,11 @@ import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
  */
 
 public class BaseActivity extends RxAppCompatActivity {
+    protected BaseActivity context;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.context=this;
+    }
 }
