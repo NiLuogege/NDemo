@@ -9,9 +9,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.transition.Transition;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 
 import com.bumptech.glide.Glide;
@@ -51,21 +53,36 @@ public class MeiziDetialActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activiy_meizidetial);
         ButterKnife.bind(this);
-        chromeFader = new ElasticDragDismissFrameLayout.SystemChromeFader(this);
-
-
+        initView();
         initListener();
         initData();
     }
 
+    private void initView() {
+        chromeFader = new ElasticDragDismissFrameLayout.SystemChromeFader(this);//这个监听会随着控件的拖动设置statusBar的颜色
+        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        mToolbar.setTitle(R.string.app_name);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MeiziDetialActivity.this.finish();
+            }
+        });
+
+    }
+
     private void initData() {
         Intent intent = getIntent();
-        String url = intent.getStringExtra(URL);
-        Glide
-                .with(context)
-                .load(url)
-                .listener(mRequestListener)
-                .into(mShot);
+        if(intent!=null){
+            String url = intent.getStringExtra(URL);
+            if(!TextUtils.isEmpty(url)){
+                Glide
+                        .with(context)
+                        .load(url)
+                        .listener(mRequestListener)
+                        .into(mShot);
+            }
+        }
     }
 
     private void initListener() {

@@ -49,7 +49,6 @@
             android:layout_width="match_parent"
             android:layout_height="?android:actionBarSize"
             android:background="#3b000000"
-
             android:elevation="1dp">
         </android.support.v7.widget.Toolbar>
 
