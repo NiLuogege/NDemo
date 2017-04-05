@@ -5,44 +5,51 @@
     android:id="@+id/draggable_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:dragDismissDistance="300dp"
-    app:dragDismissScale="0.7">
-
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/white"
-        android:transitionGroup="false"
-        android:transitionName="shot_background">
-
-
-        <com.example.well.ndemo.view.ParallaxScrimageView
-            android:id="@+id/shot"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:foreground="@drawable/mid_grey_ripple"
-            android:minHeight="168dp"
-            android:transitionName="@string/share_meizi_detial_activity"
-            android:scaleType="centerCrop"
-            app:maxScrimAlpha="0.4"
-            app:parallaxFactor="-0.5"
-            app:scrimAlpha="0"
-            app:scrimColor="@color/scrim"/>
+    app:dragDismissDistance="200dp"
+    app:dragDismissScale="0.8">
 
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/nest"
             android:layout_width="match_parent"
+            android:background="@android:color/white"
             android:layout_height="match_parent">
 
-            <!--解决nestView无法滑倒低端-->
-            <View
+            <LinearLayout
+                android:id="@+id/container"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:transitionGroup="false"
+                android:transitionName="shot_background">
+
+            <com.example.well.ndemo.view.ParallaxScrimageView
+                android:id="@+id/shot"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:foreground="@drawable/mid_grey_ripple"
+                android:minHeight="168dp"
+                android:transitionName="@string/share_meizi_detial_activity"
+                android:scaleType="centerCrop"
+                app:maxScrimAlpha="0.4"
+                app:parallaxFactor="-0.5"
+                app:scrimAlpha="0"
+                app:scrimColor="@color/scrim"/>
+
+            <WebView
+                android:id="@+id/webWv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@color/background_light"/>
 
-        </android.support.v4.widget.NestedScrollView>
+            <!--&lt;!&ndash;解决nestView无法滑倒低端&ndash;&gt;-->
+            <!--<View-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="250dp"-->
+                <!--android:background="@color/background_light"/>-->
 
+            </LinearLayout>
+
+        </android.support.v4.widget.NestedScrollView>
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -50,6 +57,4 @@
             android:background="#3b000000"
             android:elevation="1dp">
         </android.support.v7.widget.Toolbar>
-
-    </FrameLayout>
 </com.example.well.ndemo.view.ElasticDragDismissFrameLayout>

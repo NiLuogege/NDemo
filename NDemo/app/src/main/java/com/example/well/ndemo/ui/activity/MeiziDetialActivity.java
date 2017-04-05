@@ -15,6 +15,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
+import android.webkit.WebView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -43,6 +44,8 @@ public class MeiziDetialActivity extends BaseActivity {
     Toolbar mToolbar;
     @Bind(R.id.shot)
     ParallaxScrimageView mShot;
+    @Bind(R.id.webWv)
+    WebView webWv;
 
     private ElasticDragDismissFrameLayout.SystemChromeFader chromeFader;
     public static final String URL = "url";
@@ -68,6 +71,8 @@ public class MeiziDetialActivity extends BaseActivity {
                 MeiziDetialActivity.this.finish();
             }
         });
+
+        webWv.loadUrl("file:///android_asset/text.html");
 
     }
 
