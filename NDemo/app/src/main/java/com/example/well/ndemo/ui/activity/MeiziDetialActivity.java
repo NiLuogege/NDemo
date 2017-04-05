@@ -72,7 +72,7 @@ public class MeiziDetialActivity extends BaseActivity {
             }
         });
 
-        webWv.loadUrl("file:///android_asset/text.html");
+        webWv.loadUrl("file:///android_asset/test.html");
 
     }
 
