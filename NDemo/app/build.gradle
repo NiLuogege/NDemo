@@ -21,14 +21,16 @@ android {
 
 /***** greenDao****/
 apply plugin: 'org.greenrobot.greendao'
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.1'
-    }
-}
+//buildscript {  //这个迁移到了 顶层build.gradle
+//    repositories {
+//        jcenter()
+//        mavenCentral()
+//    }
+//    dependencies {
+//        classpath 'com.android.tools.build:gradle:2.3.0'
+//        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.1'
+//    }
+//}
 
 greendao {
     schemaVersion 1
@@ -60,7 +62,7 @@ dependencies {
     //butterknife
     compile 'com.jakewharton:butterknife:7.0.1'
     //提取主要颜色的支持库
-    compile 'com.android.support:palette-v7:25.0.0'
+    compile 'com.android.support:palette-v7:25.1.1'
     //recyclerView支持库
     compile 'com.android.support:recyclerview-v7:25.1.1'
     //design支持库
