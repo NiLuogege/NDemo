@@ -106,6 +106,7 @@ public class ContentFragment extends Fragment {
                     if(!isLoadMore&&(visiableChild+firstVisibleItemPosition)>totleChild){//已经到底了
                         isLoadMore=true;
                         ++page;
+                        mAdapter.loadingMoreStart();
                         getMeizi();
 
                         if (BuildConfig.DEBUG) Log.e("ContentFragment", "loadMore");
@@ -175,6 +176,7 @@ public class ContentFragment extends Fragment {
 
     private void loadMoreData(List<GankMeiziReponse> data) {
         isLoadMore=false;
+        mAdapter.loadingMoreEnd();
         mAdapter.addData(data);
     }
 

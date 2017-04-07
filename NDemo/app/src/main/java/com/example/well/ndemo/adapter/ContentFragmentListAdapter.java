@@ -3,10 +3,10 @@ package com.example.well.ndemo.adapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
 import com.example.well.ndemo.net.entity.resulte.GankMeiziReponse;
 import com.example.well.ndemo.ui.activity.MeiziDetialActivity;
@@ -34,6 +35,7 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
     private static final int LIMIT = 48;
     private Activity context;
     private List<GankMeiziReponse> data = null;
+    private boolean isLoadMore=false;//是否是加载更多
 
     public ContentFragmentListAdapter(Activity context, List<GankMeiziReponse> data) {
         this.data = data;
@@ -41,17 +43,8 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
     }
 
     public void addData(final List<GankMeiziReponse> newData){
-
-        Handler handler = new Handler();
-
-        final Runnable r = new Runnable() {
-            public void run() {
-                data.addAll(newData);
-                notifyDataSetChanged();
-            }
-        };
-        handler.post(r);
-
+        data.addAll(newData);
+//        notifyDataSetChanged();
     }
 
 
@@ -68,7 +61,7 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
         String text = reponse.desc.length() > LIMIT ? reponse.desc.substring(0, LIMIT) +
                 "..." : reponse.desc;
 
-        holder.mTv.setText(text);
+        holder.mTv.setText("position="+position);
 
 
         Glide.with(context)
@@ -111,6 +104,23 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
     @Override
     public int getItemCount() {
         return data.size();
+    }
+
+    public void loadingMoreStart() {
+        if(!isLoadMore) return;
+        isLoadMore=true;
+        notifyItemInserted(getLoadingMoreItemPosition());
+    }
+
+    public void loadingMoreEnd() {
+        if(isLoadMore) return;
+        isLoadMore=false;
+        notifyItemRemoved(getLoadingMoreItemPosition());
+    }
+
+    private  int getLoadingMoreItemPosition(){
+        if (BuildConfig.DEBUG) Log.e("ContentFragmentListAdap", "getItemCount():" + getItemCount());
+        return  getItemCount()-1;
     }
 
     class InnerViewHolder extends RecyclerView.ViewHolder {
