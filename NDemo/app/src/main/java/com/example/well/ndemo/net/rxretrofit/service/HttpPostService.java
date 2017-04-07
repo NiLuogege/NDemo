@@ -38,7 +38,7 @@ public interface HttpPostService {
     @GET("females/temps")
     Observable<BaseResultEntity<List<Temp>>> getTemp(@Query("cellphone") String cellphone, @Query("beginTime") long beginTime, @Query("endTime") long endTime, @Query("unit") String day);
 
-    @GET("data/福利/10/{page}")
+    @GET("data/福利/20/{page}")
     Observable<BaseResultEntity<List<GankMeiziReponse>>> getGankMeizi(@Path("page") int page);
 
 

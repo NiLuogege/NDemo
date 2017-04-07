@@ -136,6 +136,8 @@ public class ContentFragment extends Fragment {
 
         @Override
         public void onNext(List<GankMeiziReponse> gankFuLiReponses) {
+            if (BuildConfig.DEBUG) Log.e("ContentFragment", "onNext");
+
             isLoading=false;
             mData = gankFuLiReponses;
             onLoadDataFinish(mData);
@@ -144,6 +146,8 @@ public class ContentFragment extends Fragment {
         @Override
         public void onCacheNext(String string) {
             super.onCacheNext(string);
+            if (BuildConfig.DEBUG) Log.e("ContentFragment", "onCacheNext");
+
             isLoading=false;
             Gson gson = new Gson();
             Type type = new TypeToken<BaseResultEntity<List<GankMeiziReponse>>>() {
@@ -156,13 +160,19 @@ public class ContentFragment extends Fragment {
         @Override
         public void onCancel() {
             super.onCancel();
+
+            if (BuildConfig.DEBUG) Log.e("ContentFragment", "onCancel");
             isLoading=false;
+            mAdapter.loadingMoreEnd();
         }
 
         @Override
         public void onError(Throwable e) {
             super.onError(e);
+
+            if (BuildConfig.DEBUG) Log.e("ContentFragment", "onError");
             isLoading=false;
+            mAdapter.loadingMoreEnd();
         }
     };
 
