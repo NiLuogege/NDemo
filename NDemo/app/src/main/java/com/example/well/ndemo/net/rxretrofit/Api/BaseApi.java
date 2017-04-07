@@ -145,7 +145,8 @@ public abstract class BaseApi<T> implements Func1<BaseResultEntity<T>, T> {
 
     @Override
     public T call(BaseResultEntity<T> httpResult) {
-        if(!httpResult.isError()){
+
+        if(httpResult.isError()){
             throw new HttpTimeException(0);
         }
         return httpResult.getResult();

@@ -18,7 +18,6 @@ public class GankMeiziApi extends BaseApi {
 
     public GankMeiziApi(HttpOnNextListener listener, RxAppCompatActivity rxAppCompatActivity) {
         super(listener, rxAppCompatActivity);
-        setCache(false);
     }
 
     @Override
