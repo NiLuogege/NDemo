@@ -5,7 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorPrimaryDarkNight">#5acc95</color>
 
-    <!-- app palette -->
+    <!-- context palette -->
     <color name="primary">#69F0AE</color>
     <color name="accent">@color/primary</color> <!-- mono-color -->
     <color name="primary_dark">#5acc95</color>
