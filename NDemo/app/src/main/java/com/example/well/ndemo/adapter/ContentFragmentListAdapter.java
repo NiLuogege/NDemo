@@ -3,6 +3,7 @@ package com.example.well.ndemo.adapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -37,6 +38,20 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
     public ContentFragmentListAdapter(Activity context, List<GankMeiziReponse> data) {
         this.data = data;
         this.context = context;
+    }
+
+    public void addData(final List<GankMeiziReponse> newData){
+
+        Handler handler = new Handler();
+
+        final Runnable r = new Runnable() {
+            public void run() {
+                data.addAll(newData);
+                notifyDataSetChanged();
+            }
+        };
+        handler.post(r);
+
     }
 
 
