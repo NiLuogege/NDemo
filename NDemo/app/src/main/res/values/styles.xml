@@ -12,21 +12,51 @@
     <style name="Theme_MainActiviy" parent="AppTheme">
         <item name="android:statusBarColor">@color/dribbble</item>
         <item name="android:navigationBarColor">@color/dribbble</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>//true的话系统将绘制状态栏颜色,如果我们设置了状态栏颜色那就是这个颜色,如果没有设置就会是默认的主色调也就是"colorPrimary" | false的话状态栏将会是默认的黑色
+        <!-- 添加这一句， 即可改变toolbar图标的颜色  -> toolbar最右边的菜单按钮本来默认为黑色 修改这个值可以改变其颜色-->
+        <item name="android:textColorSecondary">@color/colorTextSecondary</item>
+        <!--设置toolbar上的字体颜色-->
+        <item name="android:textColorPrimary">@color/colorTextPrimary</item>
+
+        <!--true的话系统将绘制状态栏颜色,如果我们设置了状态栏颜色那就是这个颜色,如果没有设置就会是默认的主色调也就是"colorPrimary" | false的话状态栏将会是默认的黑色-->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
     </style>
 
     <style name="Theme_MeiziDetialActivity" parent="Theme_MainActiviy">
-        <item name="android:windowSharedElementEnterTransition">@transition/dribbble_shot_shared_enter</item>
-        <item name="android:windowSharedElementReturnTransition">@transition/dribbble_shot_shared_return</item>
+        <item name="android:windowSharedElementEnterTransition">
+            @transition/dribbble_shot_shared_enter
+        </item>
+        <item name="android:windowSharedElementReturnTransition">
+            @transition/dribbble_shot_shared_return
+        </item>
         <item name="android:windowEnterTransition">@transition/dribbble_shot_enter</item>
         <item name="android:windowReturnTransition">@transition/dribbble_shot_return</item>
 
-       <!-- 设置Activity为透明-->
+        <!-- 设置Activity为透明-->
         <item name="android:windowBackground">@color/scrim</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
 
     </style>
+
+
+    <!--显示在toolbar下面的popupMenu-->
+    <style name="popupMenu" parent="@style/ThemeOverlay.AppCompat.Light">
+        <!--<item name="android:colorBackground">#000000</item> 也可以设置背景色以及menu中的其他属性-->
+        <item name="actionOverflowMenuStyle">@style/OverflowMenuStyle</item>
+    </style>
+
+    <style name="OverflowMenuStyle" parent="Widget.AppCompat.Light.PopupMenu.Overflow">
+        <item name="overlapAnchor">false</item>  <!--设置不覆盖锚点-->
+    </style>
+
+
+
+
+
+
+
+
 
 
 
@@ -40,8 +70,12 @@
 
     <!--下面是Look的style-->
     <style name="Look.Translucent.Look.Image">
-        <item name="android:windowSharedElementEnterTransition">@transition/dribbble_shot_shared_enter</item>
-        <item name="android:windowSharedElementReturnTransition">@transition/dribbble_shot_shared_return</item>
+        <item name="android:windowSharedElementEnterTransition">
+            @transition/dribbble_shot_shared_enter
+        </item>
+        <item name="android:windowSharedElementReturnTransition">
+            @transition/dribbble_shot_shared_return
+        </item>
         <item name="android:windowEnterTransition">@transition/dribbble_shot_enter</item>
         <item name="android:windowReturnTransition">@transition/dribbble_shot_return</item>
     </style>

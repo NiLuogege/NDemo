@@ -13,6 +13,8 @@ import android.text.TextUtils;
 import android.transition.Transition;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.webkit.WebView;
@@ -63,24 +65,48 @@ public class MeiziDetialActivity extends BaseActivity {
 
     private void initView() {
         chromeFader = new ElasticDragDismissFrameLayout.SystemChromeFader(this);//这个监听会随着控件的拖动设置statusBar的颜色
-        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
-        mToolbar.setTitle(R.string.app_name);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MeiziDetialActivity.this.finish();
-            }
-        });
+
+        initToolbar();
 
         webWv.loadUrl("file:///android_asset/test.html");
 
     }
 
+    /**
+     * 初始化Toolbar
+     */
+    private void initToolbar() {
+        setSupportActionBar(mToolbar);//兼容低版本的actionBar
+        mToolbar.setTitle(R.string.app_name);
+        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        mToolbar.setNavigationOnClickListener(mOnClickListener);
+//        mToolbar.inflateMenu(R.menu.menu_activity_meizidetial);
+        mToolbar.setOnMenuItemClickListener(mOnMenuItemClickListener);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+         getMenuInflater().inflate(R.menu.menu_activity_meizidetial,menu);
+        return true;
+    }
+
+    /**
+     * 分享图片
+     */
+    private void shareImage() {
+    }
+
+    /**
+     * 保存图片到本地
+     */
+    private void saveImage() {
+    }
+
     private void initData() {
         Intent intent = getIntent();
-        if(intent!=null){
+        if (intent != null) {
             String url = intent.getStringExtra(URL);
-            if(!TextUtils.isEmpty(url)){
+            if (!TextUtils.isEmpty(url)) {
                 Glide
                         .with(context)
                         .load(url)
@@ -118,6 +144,7 @@ public class MeiziDetialActivity extends BaseActivity {
 
     /**
      * 设置状态栏的颜色和动画
+     *
      * @param bitmap
      */
     private void setStatusBarColor(final Bitmap bitmap) {
@@ -130,45 +157,45 @@ public class MeiziDetialActivity extends BaseActivity {
                     public void onGenerated(Palette palette) {
                         boolean isDark;
                         int lightness = ColorUtils.isDark(palette);//获取到主要颜色
-                        if(lightness==ColorUtils.LIGHTNESS_UNKNOWN){//说明不知道是不是暗色的
-                            isDark=ColorUtils.isDark(bitmap,bitmap.getWidth()/2,0);
-                        }else{
-                            isDark=lightness== ColorUtils.IS_DARK;
+                        if (lightness == ColorUtils.LIGHTNESS_UNKNOWN) {//说明不知道是不是暗色的
+                            isDark = ColorUtils.isDark(bitmap, bitmap.getWidth() / 2, 0);
+                        } else {
+                            isDark = lightness == ColorUtils.IS_DARK;
                         }
 
 
                         /*这里设置了状态栏的颜色和动画*/
-                          if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
-                              //获取到状态栏颜色
-                              int statusBarColor = getWindow().getStatusBarColor();
-                              Palette.Swatch topColor = ColorUtils.getMostPopulousSwatch(palette);
-                              if (topColor != null &&
-                                      (isDark || Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)) {
-                                  statusBarColor = ColorUtils.scrimify(topColor.getRgb(),
-                                          isDark, SCRIM_ADJUSTMENT);
-                                  // set a light status bar on M+
-                                  if (!isDark && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                      ViewUtils.setLightStatusBar(mShot);
-                                  }
-                              }
-                              if (statusBarColor != getWindow().getStatusBarColor()) {
-                                  mShot.setScrimColor(statusBarColor);
-                                  ValueAnimator statusBarColorAnim = ValueAnimator.ofArgb(
-                                          getWindow().getStatusBarColor(), statusBarColor);
-                                  statusBarColorAnim.addUpdateListener(new ValueAnimator
-                                          .AnimatorUpdateListener() {
-                                      @Override
-                                      public void onAnimationUpdate(ValueAnimator animation) {
-                                          getWindow().setStatusBarColor(
-                                                  (int) animation.getAnimatedValue());
-                                      }
-                                  });
-                                  statusBarColorAnim.setDuration(1000L);
-                                  statusBarColorAnim.setInterpolator(
-                                          new AccelerateInterpolator());
-                                  statusBarColorAnim.start();
-                              }
-                          }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            //获取到状态栏颜色
+                            int statusBarColor = getWindow().getStatusBarColor();
+                            Palette.Swatch topColor = ColorUtils.getMostPopulousSwatch(palette);
+                            if (topColor != null &&
+                                    (isDark || Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)) {
+                                statusBarColor = ColorUtils.scrimify(topColor.getRgb(),
+                                        isDark, SCRIM_ADJUSTMENT);
+                                // set a light status bar on M+
+                                if (!isDark && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    ViewUtils.setLightStatusBar(mShot);
+                                }
+                            }
+                            if (statusBarColor != getWindow().getStatusBarColor()) {
+                                mShot.setScrimColor(statusBarColor);
+                                ValueAnimator statusBarColorAnim = ValueAnimator.ofArgb(
+                                        getWindow().getStatusBarColor(), statusBarColor);
+                                statusBarColorAnim.addUpdateListener(new ValueAnimator
+                                        .AnimatorUpdateListener() {
+                                    @Override
+                                    public void onAnimationUpdate(ValueAnimator animation) {
+                                        getWindow().setStatusBarColor(
+                                                (int) animation.getAnimatedValue());
+                                    }
+                                });
+                                statusBarColorAnim.setDuration(1000L);
+                                statusBarColorAnim.setInterpolator(
+                                        new AccelerateInterpolator());
+                                statusBarColorAnim.start();
+                            }
+                        }
 
 
                     }
@@ -177,6 +204,7 @@ public class MeiziDetialActivity extends BaseActivity {
 
     /**
      * 设置图片的前景色和背景色
+     *
      * @param bitmap
      */
     private void setMshotColor(Bitmap bitmap) {
@@ -188,7 +216,7 @@ public class MeiziDetialActivity extends BaseActivity {
 
                         // slightly more opaque ripple on the pinned image to compensate
                         // for the scrim
-                        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
                             mShot.setForeground(ViewUtils.createRipple(palette, 0.3f, 0.6f,
                                     ContextCompat.getColor(MeiziDetialActivity.this, R.color.mid_grey),
@@ -244,4 +272,31 @@ public class MeiziDetialActivity extends BaseActivity {
         super.onPause();
         mDraggableFrame.removeListener(chromeFader);
     }
+
+
+    View.OnClickListener mOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            MeiziDetialActivity.this.finish();
+        }
+    };
+
+    Toolbar.OnMenuItemClickListener mOnMenuItemClickListener = new Toolbar.OnMenuItemClickListener() {
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            int itemId = item.getItemId();
+            switch (itemId) {
+                case R.id.save:
+                    saveImage();
+                    break;
+                case R.id.share:
+                    shareImage();
+                    break;
+            }
+
+
+            return true;
+        }
+    };
 }

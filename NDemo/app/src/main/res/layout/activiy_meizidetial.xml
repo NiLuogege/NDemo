@@ -55,6 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="?android:actionBarSize"
             android:background="#3b000000"
+            app:popupTheme="@style/popupMenu"
             android:elevation="1dp">
         </android.support.v7.widget.Toolbar>
 </com.example.well.ndemo.view.ElasticDragDismissFrameLayout>

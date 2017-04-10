@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--showAsAction 是设置菜单显示的方式-->
+    <!--　　  1、always：使菜单项一直显示在ToolBar上。-->
+    <!--　　  2、ifRoom：如果有足够的空间，这个值会使菜单项显示在ToolBar上。-->
+    <!--　　  3、never：使菜单项永远都不出现在ToolBar上,在…的子项中显示。-->
+    <!--　　  4、withText：使菜单项和它的图标，菜单文本一起显示。-->
+
+    <!--orderInCategory 是设置显示优先级顺序 值越大优先级越低-->
+
+
+    <item
+        android:id="@+id/save"
+        android:icon="@mipmap/ic_save_white_24dp"
+        android:orderInCategory="@integer/integer_99"
+        android:title="@string/save"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/share"
+        android:icon="@mipmap/ic_share_white_24dp"
+        android:orderInCategory="@integer/integer_100"
+        android:title="@string/share"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/csy"
+        android:icon="@mipmap/ic_csy"
+        android:orderInCategory="@integer/integer_100"
+        android:title="@string/share"
+        app:showAsAction="never"/>
+
+</menu>
