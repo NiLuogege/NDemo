@@ -28,7 +28,7 @@
         android:id="@+id/csy"
         android:icon="@mipmap/ic_csy"
         android:orderInCategory="@integer/integer_100"
-        android:title="@string/share"
+        android:title="@string/csy"
         app:showAsAction="never"/>
 
 </menu>
