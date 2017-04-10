@@ -12,4 +12,10 @@ public interface SettingsUtils {
      * SD卡中文件夹名称
      */
     String SD_DIR = "NDemo";
+
+
+    /**
+     * 外部内存权限的请求吗
+     */
+    int PREMIERE_REQUEST_CODE_STORAGE=1;
 }

@@ -1,10 +1,13 @@
 package com.example.well.ndemo.ui.activity;
 
+import android.Manifest;
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.graphics.Palette;
@@ -30,6 +33,7 @@ import com.example.well.ndemo.utils.ColorUtils;
 import com.example.well.ndemo.utils.GlideUtils;
 import com.example.well.ndemo.utils.ImageUtils;
 import com.example.well.ndemo.utils.MD5Utils;
+import com.example.well.ndemo.utils.SettingsUtils;
 import com.example.well.ndemo.utils.SnackbarUtils;
 import com.example.well.ndemo.utils.ViewUtils;
 import com.example.well.ndemo.view.ElasticDragDismissFrameLayout;
@@ -64,9 +68,21 @@ public class MeiziDetialActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activiy_meizidetial);
         ButterKnife.bind(this);
+
+
         initView();
         initListener();
         initData();
+    }
+
+    private void getPermission() {
+        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+        requestPermission(permissions, new PermissionHandler() {
+            @Override
+            public void onGranted() {
+                saveImage();
+            }
+        });
     }
 
     private void initView() {
@@ -75,7 +91,6 @@ public class MeiziDetialActivity extends BaseActivity {
         initToolbar();
 
         webWv.loadUrl("file:///android_asset/test.html");
-
     }
 
     /**
@@ -104,11 +119,21 @@ public class MeiziDetialActivity extends BaseActivity {
     }
 
     /**
-     * 保存图片到本地
+     * 保图片到本地
      */
     private void saveImage() {
-        String md5String = MD5Utils.encryptMD5ToString(mUrl) + ".jpg";
-        ImageUtils.saveImage(mBitmap, md5String,mSucceedOrFaild);
+        String name = Thread.currentThread().getName();
+        if (BuildConfig.DEBUG) Log.e("MeiziDetialActivity", name);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                String name = Thread.currentThread().getName();
+                if (BuildConfig.DEBUG) Log.e("MeiziDetialActivity", name);
+                String md5String = MD5Utils.encryptMD5ToString(mUrl) + ".jpg";
+                ImageUtils.saveImage(mBitmap, md5String, mSucceedOrFaild);
+            }
+        }).start();
     }
 
     private void initData() {
@@ -282,6 +307,21 @@ public class MeiziDetialActivity extends BaseActivity {
         mDraggableFrame.removeListener(chromeFader);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == SettingsUtils.PREMIERE_REQUEST_CODE_STORAGE) {//外部内存的权限
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {//用户同意使用内存权限
+                if (BuildConfig.DEBUG)
+                    Log.e("MeiziDetialActivity", "onRequestPermissionsResult_true");
+            } else {//用户不同意使用内存权限
+                if (BuildConfig.DEBUG)
+                    Log.e("MeiziDetialActivity", "onRequestPermissionsResult_false");
+            }
+        }
+    }
+
 
     View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
@@ -297,7 +337,8 @@ public class MeiziDetialActivity extends BaseActivity {
             int itemId = item.getItemId();
             switch (itemId) {
                 case R.id.save:
-                    saveImage();
+                    getPermission();
+
                     break;
                 case R.id.share:
                     shareImage();
@@ -309,16 +350,16 @@ public class MeiziDetialActivity extends BaseActivity {
         }
     };
 
-    SucceedOrFaild mSucceedOrFaild= new SucceedOrFaild() {
+    SucceedOrFaild mSucceedOrFaild = new SucceedOrFaild() {
 
         @Override
         public void succeed() {
-            SnackbarUtils.showDefaultShortSnackbar(mDraggableFrame,getString(R.string.shareSucceed));
+            SnackbarUtils.showDefaultShortSnackbar(mDraggableFrame, getString(R.string.shareSucceed));
         }
 
         @Override
         public void faild() {
-            SnackbarUtils.showDefaultShortSnackbar(mDraggableFrame,getString(R.string.shareFaild));
+            SnackbarUtils.showDefaultShortSnackbar(mDraggableFrame, getString(R.string.shareFaild));
         }
     };
 
