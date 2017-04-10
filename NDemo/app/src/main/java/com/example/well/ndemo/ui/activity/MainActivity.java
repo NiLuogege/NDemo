@@ -1,6 +1,7 @@
 package com.example.well.ndemo.ui.activity;
 
 import android.Manifest;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
@@ -35,14 +36,10 @@ public class MainActivity extends BaseActivity {
     }
 
     private void requestPermission() {
-        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE};
-        requestPermission(permissions, new PermissionHandler() {
-            @Override
-            public void onGranted() {
-
-            }
-        });
-
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE};
+            requestPermission(permissions, new PermissionHandler() {});
+        }
     }
 
     private void initView() {

@@ -1,5 +1,6 @@
 package com.example.well.ndemo.ui.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,11 +39,13 @@ public class BaseActivity extends RxAppCompatActivity {
      * @param handler     回调
      */
     protected void requestPermission(String[] permissions, PermissionHandler handler) {
-        if (PermissionUtils.hasSelfPermissions(this, permissions)) {//同意
-            handler.onGranted();
-        } else {
-            mHandler = handler;
-            ActivityCompat.requestPermissions(this, permissions, 001);
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            if (PermissionUtils.hasSelfPermissions(this, permissions)) {//同意
+                handler.onGranted();
+            } else {
+                mHandler = handler;
+                ActivityCompat.requestPermissions(this, permissions, 001);
+            }
         }
     }
 
@@ -88,7 +91,7 @@ public class BaseActivity extends RxAppCompatActivity {
         /**
          * 权限通过
          */
-        public abstract void onGranted();
+        public void onGranted(){}
 
         /**
          * 权限拒绝

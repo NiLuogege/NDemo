@@ -123,13 +123,11 @@ public class MeiziDetialActivity extends BaseActivity {
      */
     private void saveImage() {
         String name = Thread.currentThread().getName();
-        if (BuildConfig.DEBUG) Log.e("MeiziDetialActivity", name);
         new Thread(new Runnable() {
             @Override
             public void run() {
 
                 String name = Thread.currentThread().getName();
-                if (BuildConfig.DEBUG) Log.e("MeiziDetialActivity", name);
                 String md5String = MD5Utils.encryptMD5ToString(mUrl) + ".jpg";
                 ImageUtils.saveImage(mBitmap, md5String, mSucceedOrFaild);
             }
@@ -337,8 +335,11 @@ public class MeiziDetialActivity extends BaseActivity {
             int itemId = item.getItemId();
             switch (itemId) {
                 case R.id.save:
-                    getPermission();
-
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        getPermission();
+                    } else {
+                        saveImage();
+                    }
                     break;
                 case R.id.share:
                     shareImage();
