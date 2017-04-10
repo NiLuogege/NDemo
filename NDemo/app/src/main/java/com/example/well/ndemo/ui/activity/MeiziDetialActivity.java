@@ -25,8 +25,12 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
+import com.example.well.ndemo.ui.Interface.SucceedOrFaild;
 import com.example.well.ndemo.utils.ColorUtils;
 import com.example.well.ndemo.utils.GlideUtils;
+import com.example.well.ndemo.utils.ImageUtils;
+import com.example.well.ndemo.utils.MD5Utils;
+import com.example.well.ndemo.utils.SnackbarUtils;
 import com.example.well.ndemo.utils.ViewUtils;
 import com.example.well.ndemo.view.ElasticDragDismissFrameLayout;
 import com.example.well.ndemo.view.ParallaxScrimageView;
@@ -52,6 +56,8 @@ public class MeiziDetialActivity extends BaseActivity {
     private ElasticDragDismissFrameLayout.SystemChromeFader chromeFader;
     public static final String URL = "url";
     private static final float SCRIM_ADJUSTMENT = 0.075f;
+    private Bitmap mBitmap;//显示的图片
+    private String mUrl;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,7 +92,7 @@ public class MeiziDetialActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-         getMenuInflater().inflate(R.menu.menu_activity_meizidetial,menu);
+        getMenuInflater().inflate(R.menu.menu_activity_meizidetial, menu);
         return true;
     }
 
@@ -94,22 +100,25 @@ public class MeiziDetialActivity extends BaseActivity {
      * 分享图片
      */
     private void shareImage() {
+
     }
 
     /**
      * 保存图片到本地
      */
     private void saveImage() {
+        String md5String = MD5Utils.encryptMD5ToString(mUrl) + ".jpg";
+        ImageUtils.saveImage(mBitmap, md5String,mSucceedOrFaild);
     }
 
     private void initData() {
         Intent intent = getIntent();
         if (intent != null) {
-            String url = intent.getStringExtra(URL);
-            if (!TextUtils.isEmpty(url)) {
+            mUrl = intent.getStringExtra(URL);
+            if (!TextUtils.isEmpty(mUrl)) {
                 Glide
                         .with(context)
-                        .load(url)
+                        .load(mUrl)
                         .listener(mRequestListener)
                         .into(mShot);
             }
@@ -133,11 +142,11 @@ public class MeiziDetialActivity extends BaseActivity {
         @Override
         public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
 
-            final Bitmap bitmap = GlideUtils.getBitmap(resource);
+            mBitmap = GlideUtils.getBitmap(resource);
 
-            setStatusBarColor(bitmap);
+            setStatusBarColor(mBitmap);
 
-            setMshotColor(bitmap);
+            setMshotColor(mBitmap);
             return false;
         }
     };
@@ -299,4 +308,18 @@ public class MeiziDetialActivity extends BaseActivity {
             return true;
         }
     };
+
+    SucceedOrFaild mSucceedOrFaild= new SucceedOrFaild() {
+
+        @Override
+        public void succeed() {
+            SnackbarUtils.showDefaultShortSnackbar(mDraggableFrame,getString(R.string.shareSucceed));
+        }
+
+        @Override
+        public void faild() {
+            SnackbarUtils.showDefaultShortSnackbar(mDraggableFrame,getString(R.string.shareFaild));
+        }
+    };
+
 }

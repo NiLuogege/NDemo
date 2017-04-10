@@ -5,13 +5,8 @@
     <string name="save">保存</string>
     <string name="share">分享</string>
     <string name="csy">财神爷</string>
-
-
-
-
-
-
-
+    <string name="shareSucceed">保存成功</string>
+    <string name="shareFaild">保存失败,请重试</string>
 
 
     <!--下面是look的-->
