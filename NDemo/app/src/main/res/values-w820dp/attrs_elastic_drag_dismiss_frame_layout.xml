@@ -15,6 +15,8 @@
   limitations under the License.
   -->
 
+<!--<attr name="dragDismissScale" format="float" /> 销毁的时候布局的缩放比例-->
+<!--<attr name="dragDismissDistance" format="dimension" />  移动多少距离销毁-->
 <resources>
 
     <declare-styleable name="ElasticDragDismissFrameLayout">

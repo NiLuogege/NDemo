@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.widget.Toast;
 
 import com.example.well.ndemo.utils.PermissionUtils;
+import com.example.well.ndemo.utils.SnackbarUtils;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
 /**
@@ -74,7 +74,8 @@ public class BaseActivity extends RxAppCompatActivity {
             if (!PermissionUtils.shouldShowRequestPermissionRationale(this, permissions)) {
                 if (!mHandler.onNeverAsk()) {
                     //TODO
-                    Toast.makeText(this, "权限已被拒绝,请在设置-应用-权限中打开", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, "权限已被拒绝,请在设置-应用-权限中打开", Toast.LENGTH_SHORT).show();
+                    SnackbarUtils.showDefaultLongSnackbar(getWindow().getDecorView().getRootView(),"权限已被拒绝,请在设置-应用-权限中打开");
                 }
 
             } else {
