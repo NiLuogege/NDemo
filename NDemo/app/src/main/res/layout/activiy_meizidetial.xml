@@ -35,11 +35,11 @@
                 app:scrimAlpha="0"
                 app:scrimColor="@color/scrim"/>
 
-            <WebView
-                android:id="@+id/webWv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/background_light"/>
+                <org.sufficientlysecure.htmltextview.HtmlTextView
+                    android:id="@+id/hTv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/background_light"/>
 
             <!--&lt;!&ndash;解决nestView无法滑倒低端&ndash;&gt;-->
             <!--<View-->

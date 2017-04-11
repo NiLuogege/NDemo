@@ -20,7 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
-import android.webkit.WebView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -39,6 +38,9 @@ import com.example.well.ndemo.utils.ViewUtils;
 import com.example.well.ndemo.view.ElasticDragDismissFrameLayout;
 import com.example.well.ndemo.view.ParallaxScrimageView;
 
+import org.sufficientlysecure.htmltextview.HtmlResImageGetter;
+import org.sufficientlysecure.htmltextview.HtmlTextView;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -54,8 +56,8 @@ public class MeiziDetialActivity extends BaseActivity {
     Toolbar mToolbar;
     @Bind(R.id.shot)
     ParallaxScrimageView mShot;
-    @Bind(R.id.webWv)
-    WebView webWv;
+    @Bind(R.id.hTv)
+    HtmlTextView hTv;
 
     private ElasticDragDismissFrameLayout.SystemChromeFader chromeFader;
     public static final String URL = "url";
@@ -90,7 +92,7 @@ public class MeiziDetialActivity extends BaseActivity {
 
         initToolbar();
 
-        webWv.loadUrl("file:///android_asset/test.html");
+        hTv.setHtml(getString(R.string.news),new HtmlResImageGetter(hTv));
     }
 
     /**
