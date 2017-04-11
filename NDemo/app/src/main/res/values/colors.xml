@@ -6,6 +6,23 @@
     <color name="colorPrimaryDarkNight">#5acc95</color>
     <color name="colorTextSecondary">#ffffff</color>
     <color name="colorTextPrimary">#ffffff</color>
+    <color name="colorToolbar">#3b000000</color>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <!-- context palette -->
     <color name="primary">#69F0AE</color>
