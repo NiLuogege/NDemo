@@ -27,7 +27,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
-import com.example.well.ndemo.ui.Interface.SucceedOrFaild;
+import com.example.well.ndemo.ui.Interface.SucceedOrFaildListener;
 import com.example.well.ndemo.utils.ColorUtils;
 import com.example.well.ndemo.utils.GlideUtils;
 import com.example.well.ndemo.utils.ImageUtils;
@@ -71,41 +71,21 @@ public class MeiziDetialActivity extends BaseActivity {
         setContentView(R.layout.activiy_meizidetial);
         ButterKnife.bind(this);
 
-
-
         initView();
         initListener();
         initData();
     }
 
-    private void getPermission() {
-        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
-        requestPermission(permissions, new PermissionHandler() {
-            @Override
-            public void onGranted() {
-                saveImage();
-            }
-        });
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mDraggableFrame.addListener(chromeFader);
     }
 
-    private void initView() {
-        chromeFader = new ElasticDragDismissFrameLayout.SystemChromeFader(this);//这个监听会随着控件的拖动设置statusBar的颜色
-
-        initToolbar();
-
-        hTv.setHtml(getString(R.string.news),new HtmlResImageGetter(hTv));
-    }
-
-    /**
-     * 初始化Toolbar
-     */
-    private void initToolbar() {
-        setSupportActionBar(mToolbar);//兼容低版本的actionBar
-        mToolbar.setTitle(R.string.app_name);
-        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
-        mToolbar.setNavigationOnClickListener(mOnClickListener);
-//        mToolbar.inflateMenu(R.menu.menu_activity_meizidetial);
-        mToolbar.setOnMenuItemClickListener(mOnMenuItemClickListener);
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDraggableFrame.removeListener(chromeFader);
     }
 
     @Override
@@ -114,27 +94,12 @@ public class MeiziDetialActivity extends BaseActivity {
         return true;
     }
 
-    /**
-     * 分享图片
-     */
-    private void shareImage() {
+    private void initView() {
+        chromeFader = new ElasticDragDismissFrameLayout.SystemChromeFader(this);//这个监听会随着控件的拖动设置statusBar的颜色
 
-    }
+        initToolbar();
 
-    /**
-     * 保图片到本地
-     */
-    private void saveImage() {
-        String name = Thread.currentThread().getName();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                String name = Thread.currentThread().getName();
-                String md5String = MD5Utils.encryptMD5ToString(mUrl) + ".jpg";
-                ImageUtils.saveImage(mBitmap, md5String, mSucceedOrFaild);
-            }
-        }).start();
+        hTv.setHtml(getString(R.string.news),new HtmlResImageGetter(hTv));
     }
 
     private void initData() {
@@ -158,24 +123,48 @@ public class MeiziDetialActivity extends BaseActivity {
 
     }
 
-    private RequestListener mRequestListener = new RequestListener<String, GlideDrawable>() {
+    /**
+     * 初始化Toolbar
+     */
+    private void initToolbar() {
+        setSupportActionBar(mToolbar);//兼容低版本的actionBar
+        mToolbar.setTitle(R.string.app_name);
+        mToolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        mToolbar.setNavigationOnClickListener(mOnClickListener);
+//        mToolbar.inflateMenu(R.menu.menu_activity_meizidetial);
+        mToolbar.setOnMenuItemClickListener(mOnMenuItemClickListener);
+    }
 
-        @Override
-        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-            return false;
-        }
+    private void getPermission() {
+        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
+        requestPermission(permissions, new PermissionHandler() {
+            @Override
+            public void onGranted() {
+                saveImage();
+            }
+        });
+    }
 
-        @Override
-        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+    /**
+     * 分享图片
+     */
+    private void shareImage() {
 
-            mBitmap = GlideUtils.getBitmap(resource);
+    }
 
-            setStatusBarColor(mBitmap);
-
-            setMshotColor(mBitmap);
-            return false;
-        }
-    };
+    /**
+     * 保图片到本地
+     */
+    private void saveImage() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+//                String name = Thread.currentThread().getName();
+                String md5String = MD5Utils.encryptMD5ToString(mUrl) + ".jpg";
+                ImageUtils.saveImage(mBitmap, md5String, mSucceedOrFaild);
+            }
+        }).start();
+    }
 
     /**
      * 设置状态栏的颜色和动画
@@ -264,6 +253,42 @@ public class MeiziDetialActivity extends BaseActivity {
         mShot.setBackground(null);
     }
 
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == SettingsUtils.PREMIERE_REQUEST_CODE_STORAGE) {//外部内存的权限
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {//用户同意使用内存权限
+                if (BuildConfig.DEBUG)
+                    Log.e("MeiziDetialActivity", "onRequestPermissionsResult_true");
+            } else {//用户不同意使用内存权限
+                if (BuildConfig.DEBUG)
+                    Log.e("MeiziDetialActivity", "onRequestPermissionsResult_false");
+            }
+        }
+    }
+
+    private RequestListener mRequestListener = new RequestListener<String, GlideDrawable>() {
+
+        @Override
+        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+            return false;
+        }
+
+        @Override
+        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+
+            mBitmap = GlideUtils.getBitmap(resource);
+
+            setStatusBarColor(mBitmap);
+
+            setMshotColor(mBitmap);
+            return false;
+        }
+    };
+
     private Transition.TransitionListener mTransitionListener = new Transition.TransitionListener() {
 
         @Override
@@ -295,35 +320,6 @@ public class MeiziDetialActivity extends BaseActivity {
         }
     };
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mDraggableFrame.addListener(chromeFader);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mDraggableFrame.removeListener(chromeFader);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == SettingsUtils.PREMIERE_REQUEST_CODE_STORAGE) {//外部内存的权限
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {//用户同意使用内存权限
-                if (BuildConfig.DEBUG)
-                    Log.e("MeiziDetialActivity", "onRequestPermissionsResult_true");
-            } else {//用户不同意使用内存权限
-                if (BuildConfig.DEBUG)
-                    Log.e("MeiziDetialActivity", "onRequestPermissionsResult_false");
-            }
-        }
-    }
-
-
     View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -354,7 +350,7 @@ public class MeiziDetialActivity extends BaseActivity {
         }
     };
 
-    SucceedOrFaild mSucceedOrFaild = new SucceedOrFaild() {
+    SucceedOrFaildListener mSucceedOrFaild = new SucceedOrFaildListener() {
 
         @Override
         public void succeed() {

@@ -7,7 +7,7 @@ package com.example.well.ndemo.ui.Interface;
  * 成功或者失败的回调
  */
 
-public interface SucceedOrFaild {
+public interface SucceedOrFaildListener {
     void succeed();
 
     void faild();

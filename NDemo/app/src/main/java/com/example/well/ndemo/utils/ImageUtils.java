@@ -7,7 +7,7 @@ import android.os.Environment;
 import android.text.TextUtils;
 
 import com.example.well.ndemo.MyApplication;
-import com.example.well.ndemo.ui.Interface.SucceedOrFaild;
+import com.example.well.ndemo.ui.Interface.SucceedOrFaildListener;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -65,7 +65,7 @@ public class ImageUtils {
      * @param fileName
      * @param succeedOrFaild
      */
-    public static void saveImage(Bitmap bitmap, String fileName, SucceedOrFaild succeedOrFaild) {
+    public static void saveImage(Bitmap bitmap, String fileName, SucceedOrFaildListener succeedOrFaild) {
         if(bitmap==null || TextUtils.isEmpty(fileName))  return;
 
         File dir = new File(Environment.getExternalStorageDirectory(), SettingsUtils.SD_DIR);
