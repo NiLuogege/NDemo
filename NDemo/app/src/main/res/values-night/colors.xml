@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#fff06292</color>
-    <color name="colorPrimaryDark">#ff676767</color>
+    <color name="colorPrimaryDark">#ffffffff</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorPrimaryDarkNight">#5acc95</color>
-    <color name="colorTextSecondary">#ffffff</color>
-    <color name="colorTextPrimary">#ffffff</color>
+    <color name="colorTextSecondary">#999999</color>
+    <color name="colorTextPrimary">#999999</color>
     <color name="colorToolbar">#3b000000</color>
     <color name="nev_item">#ffffffff</color>
-    <color name="white">#ffffffff</color>
+    <color name="white">#999999</color>
     <color name="text_primary_dark">#de000000</color> <!-- 87% -->
     <color name="dribbble">#fff06292</color> <!-- pink 300 -->
     <color name="dribbble_translucent">#99f06292</color> <!-- pink 300 -->
-    <color name="text_color">#f6000000</color>
-    <color name="black">#000000</color> <!-- pink 300 -->
-    <color name="gray">#999999</color>
+    <color name="text_color">#ffffffff</color>
+    <color name="black">#ffffffff</color> <!-- pink 300 -->
+    <color name="gray">#ffffffff</color>
 
 
 
@@ -89,12 +89,9 @@
     <color name="gif_badge_light_image">#40000000</color>
     <color name="gif_badge_dark_image">#b3ffffff</color>
 
-
     <color name="text_source">#732b2828</color>
 
     <color name="meizibg">#faf1f1f1</color>
-    <color name="email">#ef6269</color>
-
-
+    <color name="email">#ef6269</color> <!-- pink 300 -->
 
 </resources>

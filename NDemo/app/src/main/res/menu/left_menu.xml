@@ -10,9 +10,17 @@
             />
     </group>
 
-    <item android:title="设置"
-        android:id="@+id/setting">
+
+
+    <item
+        android:id="@+id/setting"
+        android:title="">
         <menu>
+            <item
+                android:id="@+id/nav_night"
+                android:icon="@drawable/night"
+                android:title="@string/night"
+                app:actionLayout="@layout/action_view_switch"/>
             <item
                 android:id="@+id/nav_theme"
                 android:icon="@drawable/ic_color_lens_white_24dp"
@@ -20,7 +28,6 @@
                 app:actionLayout="@layout/action_view_switch"/>
         </menu>
     </item>
-
 
 
 </menu>

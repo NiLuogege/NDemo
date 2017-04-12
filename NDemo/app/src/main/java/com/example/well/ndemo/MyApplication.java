@@ -12,15 +12,15 @@ import java.io.FileReader;
 import java.io.IOException;
 
 
-public class MyApplication extends Application{
-    public  Context context;
+public class MyApplication extends Application {
+    public Context context;
     public static MyApplication mApp = null;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        context =this;
-        mApp=this;
+        context = this;
+        mApp = this;
         init();
 
     }
@@ -30,7 +30,8 @@ public class MyApplication extends Application{
         initBugly();
     }
 
-    public static MyApplication getInstence(){
+
+    public static MyApplication getInstence() {
         return mApp;
     }
 
@@ -48,10 +49,10 @@ public class MyApplication extends Application{
         String packageName = context.getPackageName();
         // 获取当前进程名
         String processName = getProcessName(android.os.Process.myPid());
-         // 设置是否为上报进程
+        // 设置是否为上报进程
         strategy.setUploadProcess(processName == null || processName.equals(packageName));
 
-        CrashReport.initCrashReport(getApplicationContext(), "6e986c7885", true,strategy);//点三个参数 建议在测试阶段建议设置成true，发布时设置为false。
+        CrashReport.initCrashReport(getApplicationContext(), "6e986c7885", true, strategy);//点三个参数 建议在测试阶段建议设置成true，发布时设置为false。
     }
 
 

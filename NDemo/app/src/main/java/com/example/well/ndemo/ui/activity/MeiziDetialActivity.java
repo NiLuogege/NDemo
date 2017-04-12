@@ -72,6 +72,7 @@ public class MeiziDetialActivity extends BaseActivity {
         ButterKnife.bind(this);
 
 
+
         initView();
         initListener();
         initData();

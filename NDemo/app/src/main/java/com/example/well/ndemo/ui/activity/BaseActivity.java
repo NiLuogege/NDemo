@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.example.well.ndemo.utils.PermissionUtils;
+import com.example.well.ndemo.utils.SPUtils;
+import com.example.well.ndemo.utils.SettingsUtils;
 import com.example.well.ndemo.utils.SnackbarUtils;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
@@ -26,10 +29,18 @@ public class BaseActivity extends RxAppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.context=this;
+        this.context = this;
+        setNightMode();
     }
 
-
+    private void setNightMode() {
+        boolean isNightOn = SPUtils.getInstance(getApplication()).getBoolean(SettingsUtils.IS_NIGHT_ON);
+        if (isNightOn) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+    }
 
 
     /**
@@ -39,7 +50,7 @@ public class BaseActivity extends RxAppCompatActivity {
      * @param handler     回调
      */
     protected void requestPermission(String[] permissions, PermissionHandler handler) {
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (PermissionUtils.hasSelfPermissions(this, permissions)) {//同意
                 handler.onGranted();
             } else {
@@ -75,7 +86,7 @@ public class BaseActivity extends RxAppCompatActivity {
                 if (!mHandler.onNeverAsk()) {
                     //TODO
 //                    Toast.makeText(this, "权限已被拒绝,请在设置-应用-权限中打开", Toast.LENGTH_SHORT).show();
-                    SnackbarUtils.showDefaultLongSnackbar(getWindow().getDecorView().getRootView(),"权限已被拒绝,请在设置-应用-权限中打开");
+                    SnackbarUtils.showDefaultLongSnackbar(getWindow().getDecorView().getRootView(), "权限已被拒绝,请在设置-应用-权限中打开");
                 }
 
             } else {
@@ -92,7 +103,8 @@ public class BaseActivity extends RxAppCompatActivity {
         /**
          * 权限通过
          */
-        public void onGranted(){}
+        public void onGranted() {
+        }
 
         /**
          * 权限拒绝

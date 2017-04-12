@@ -8,19 +8,19 @@
     app:dragDismissDistance="200dp"
     app:dragDismissScale="0.9">
 
-        <android.support.v4.widget.NestedScrollView
-            android:id="@+id/nest"
-            android:layout_width="match_parent"
-            android:background="@android:color/white"
-            android:layout_height="match_parent">
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nest"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
 
-            <LinearLayout
-                android:id="@+id/container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:transitionGroup="false"
-                android:transitionName="shot_background">
+        <LinearLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:transitionGroup="false"
+            android:transitionName="shot_background">
 
             <com.example.well.ndemo.view.ParallaxScrimageView
                 android:id="@+id/shot"
@@ -28,34 +28,37 @@
                 android:layout_height="300dp"
                 android:foreground="@drawable/mid_grey_ripple"
                 android:minHeight="168dp"
-                android:transitionName="@string/share_meizi_detial_activity"
                 android:scaleType="centerCrop"
+                android:transitionName="@string/share_meizi_detial_activity"
                 app:maxScrimAlpha="0.4"
                 app:parallaxFactor="-0.5"
                 app:scrimAlpha="0"
                 app:scrimColor="@color/scrim"/>
 
-                <org.sufficientlysecure.htmltextview.HtmlTextView
-                    android:id="@+id/hTv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/background_light"/>
+            <org.sufficientlysecure.htmltextview.HtmlTextView
+                android:id="@+id/hTv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:textColor="@color/text_color"
+                android:textSize="16sp"/>
 
             <!--&lt;!&ndash;解决nestView无法滑倒低端&ndash;&gt;-->
             <!--<View-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="250dp"-->
-                <!--android:background="@color/background_light"/>-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="250dp"-->
+            <!--android:background="@color/background_light"/>-->
 
-            </LinearLayout>
+        </LinearLayout>
 
-        </android.support.v4.widget.NestedScrollView>
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?android:actionBarSize"
-            android:background="@color/colorToolbar"
-            app:popupTheme="@style/popupMenu"
-            android:elevation="1dp">
-        </android.support.v7.widget.Toolbar>
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:actionBarSize"
+        android:background="@color/colorToolbar"
+        android:elevation="1dp"
+        app:popupTheme="@style/popupMenu">
+    </android.support.v7.widget.Toolbar>
 </com.example.well.ndemo.view.ElasticDragDismissFrameLayout>

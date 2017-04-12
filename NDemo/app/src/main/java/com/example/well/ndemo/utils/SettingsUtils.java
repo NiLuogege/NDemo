@@ -13,9 +13,21 @@ public interface SettingsUtils {
      */
     String SD_DIR = "NDemo";
 
-
     /**
      * 外部内存权限的请求吗
      */
     int PREMIERE_REQUEST_CODE_STORAGE=1;
+
+    /**
+     * sp的名称
+     */
+    String SP_NAME="nDemo";
+
+    /**
+     * 夜间模式是否开启
+     */
+    String IS_NIGHT_ON="IS_NIGHT_ON";
+
+
+
 }
