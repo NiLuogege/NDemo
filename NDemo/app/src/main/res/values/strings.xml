@@ -7,7 +7,9 @@
     <string name="csy">财神爷</string>
     <string name="shareSucceed">保存成功</string>
     <string name="shareFaild">保存失败,请重试</string>
-
+    <string name="meizi" translatable="false">妹子</string>
+    <string name="theme">Theme</string>
+    <string name="setting">设置</string>
 
     <string name="news">"&lt;p&gt;&lt;!--VIDEO#0--&gt;&lt;/p&gt;&lt;p&gt;　　中新网4月11日电 据外媒报道，在
 一架美国联合航空公司航班上，一名华裔乘客遭强行拖拽的视频，引发社交网络广泛关注。当
@@ -54,7 +56,7 @@
 
     <string name="zhihu" translatable="false">知乎日报</string>
     <string name="topnews" translatable="false">网易头条</string>
-    <string name="meizi" translatable="false">每日看看</string>
+
 
     <string name="filter" translatable="false">打开</string>
     <string name="about" translatable="false">关于</string>
@@ -73,5 +75,7 @@
 
 
     <string name="share_dialog_title">分享</string>
+
+
 
 </resources>

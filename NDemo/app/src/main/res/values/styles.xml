@@ -3,22 +3,28 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/dribbble</item>
+        <item name="colorPrimary">@color/dribbble</item>//不能使用带有透明度的颜色,如果使用会崩溃
         <item name="colorPrimaryDark">@color/dribbble_dark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <!-- 添加这一句， 即可改变toolbar图标的颜色  -> toolbar最右边的菜单按钮本来默认为黑色 修改这个值可以改变其颜色-->
+        <item name="android:textColorSecondary">@color/colorTextSecondary</item>
+
+        <!--设置toolbar上的字体颜色-->
+        <item name="android:textColorPrimary">@color/colorTextPrimary</item>
     </style>
 
 
     <style name="Theme_MainActiviy" parent="AppTheme">
-        <item name="android:statusBarColor">@color/dribbble</item>
-        <item name="android:navigationBarColor">@android:color/black</item>
-        <!-- 添加这一句， 即可改变toolbar图标的颜色  -> toolbar最右边的菜单按钮本来默认为黑色 修改这个值可以改变其颜色-->
-        <item name="android:textColorSecondary">@color/colorTextSecondary</item>
-        <!--设置toolbar上的字体颜色-->
-        <item name="android:textColorPrimary">@color/colorTextPrimary</item>
 
+
+        <item name="android:statusBarColor">@color/dribbble_translucent</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
         <!--true的话系统将绘制状态栏颜色,如果我们设置了状态栏颜色那就是这个颜色,如果没有设置就会是默认的主色调也就是"colorPrimary" | false的话状态栏将会是默认的黑色-->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+        <!-- 添加这一句， 即可改变toolbar图标的颜色(也可以修改NavigationView中menu中的字体颜色)  -> toolbar最右边的菜单按钮本来默认为黑色 修改这个值可以改变其颜色-->
+        <item name="android:textColorSecondary">@color/colorPrimaryDark</item>
 
     </style>
 
@@ -37,6 +43,9 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
 
+        <!-- 添加这一句， 即可改变toolbar图标的颜色  -> toolbar最右边的菜单按钮本来默认为黑色 修改这个值可以改变其颜色-->
+        <item name="android:textColorSecondary">@color/colorTextSecondary</item>
+
     </style>
 
 
@@ -51,24 +60,20 @@
     </style>
 
 
+    <!-- >>>>>>>>>>>下面是Look的style<<<<<<<<<<<<<-->
 
+    <style name="Look.Home">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/immersive_bars</item>
+        <item name="android:navigationBarColor">@color/immersive_bars</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:windowEnterTransition">@transition/home_enter</item>
 
+    </style>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <!--下面是Look的style-->
     <style name="Look.Translucent.Look.Image">
         <item name="android:windowSharedElementEnterTransition">
             @transition/dribbble_shot_shared_enter
