@@ -11,7 +11,15 @@ android {
         versionName "1.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        /***** bugly ****/
+        /*****  个推推送  ****/
+        manifestPlaceholders = [
+                GETUI_APP_ID : "i29ZeSIYli7rXzGh2B5uD7",
+                GETUI_APP_KEY : "07uEyNRogR7d2zLPVG5DG4",
+                GETUI_APP_SECRET : "bpUVB0y3IKAmkWAN0F7Pr1"
+        ]
+        /******************************/
+
+        /***** bugly 和 个推推送共用 ****/
         ndk {
             // 设置支持的SO库架构
             abiFilters 'armeabi' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
@@ -44,7 +52,7 @@ greendao {
     daoPackage 'com.example.well.ndemo.net.rxretrofit.gen'
     targetGenDir 'src/main/java'
 }
-/******************************/
+/** ****************************/
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -65,8 +73,23 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     //日志输出
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
-
     /******************************/
+
+    /***** bugly ****/
+    compile 'com.tencent.bugly:crashreport:latest.release'
+    //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
+    compile 'com.tencent.bugly:nativecrashreport:latest.release'
+    //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
+    /** ************/
+
+    /*****个推推送****/
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.getui:sdk:2.+'
+//    compile 'com.android.support:support-v4:+'// 因为和v7包冲突 注释掉,目前未见有什么影响
+    /** ************/
+
+    //html-textview 可以加载HTML标签的textView
+    compile 'org.sufficientlysecure:html-textview:3.3'
     //butterknife
     compile 'com.jakewharton:butterknife:7.0.1'
     //提取主要颜色的支持库
@@ -77,12 +100,4 @@ dependencies {
     compile 'com.android.support:design:25.1.1'
     compile 'com.android.support:cardview-v7:25.1.1'
     compile 'com.github.bumptech.glide:glide:3.7.0'
-
-    /***** bugly ****/
-    compile 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
-    compile 'com.tencent.bugly:nativecrashreport:latest.release' //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
-    /**************/
-
-    //html-textview 可以加载HTML标签的textView
-    compile 'org.sufficientlysecure:html-textview:3.3'
 }

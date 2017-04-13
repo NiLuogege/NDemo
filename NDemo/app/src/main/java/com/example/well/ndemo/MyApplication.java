@@ -5,6 +5,9 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.example.well.ndemo.net.rxretrofit.RxRetrofitApp;
+import com.example.well.ndemo.service.GTPushService;
+import com.example.well.ndemo.service.NDemoIntentService;
+import com.igexin.sdk.PushManager;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.io.BufferedReader;
@@ -28,6 +31,14 @@ public class MyApplication extends Application {
     private void init() {
         RxRetrofitApp.init(this);
         initBugly();
+        initGTPush();
+    }
+
+    private void initGTPush() {
+        //GTPushService为第三方自定义推送服务
+        PushManager.getInstance().initialize(this.getApplicationContext(), GTPushService.class);
+        //NDemoIntentService为第三方自定义的推送服务事件接收类
+        PushManager.getInstance().registerPushIntentService(this.getApplicationContext(), NDemoIntentService.class);
     }
 
 
