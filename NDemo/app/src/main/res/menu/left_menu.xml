@@ -11,29 +11,47 @@
     </group>
 
 
+    <group>
+        <item
+            android:id="@+id/nav_night"
+            android:icon="@drawable/night"
+            android:title="@string/night"
+            app:actionLayout="@layout/action_view_switch_night_mode"/>
+        <item
+            android:id="@+id/nav_image_push"
+            android:icon="@drawable/image_push"
+            android:title="@string/imagePush"
+            app:actionLayout="@layout/action_view_switch_image_push"/>
 
-    <item
-        android:id="@+id/setting"
-        android:title="">
-        <menu>
-            <item
-                android:id="@+id/nav_night"
-                android:icon="@drawable/night"
-                android:title="@string/night"
-                app:actionLayout="@layout/action_view_switch_night_mode"/>
-            <item
-                android:id="@+id/nav_image_push"
-                android:icon="@drawable/image_push"
-                android:title="@string/imagePush"
-                app:actionLayout="@layout/action_view_switch_image_push"/>
+        <item
+            android:id="@+id/nav_theme"
+            android:icon="@drawable/ic_color_lens_white_24dp"
+            android:title="@string/theme"
+            app:actionLayout="@layout/action_view_switch_night_mode"/>
+    </group>
 
-            <item
-                android:id="@+id/nav_theme"
-                android:icon="@drawable/ic_color_lens_white_24dp"
-                android:title="@string/theme"
-                app:actionLayout="@layout/action_view_switch_night_mode"/>
-        </menu>
-    </item>
+    <!--<item-->
+    <!--android:id="@+id/setting"-->
+    <!--android:title="">-->
+    <!--<menu>-->
+    <!--<item-->
+    <!--android:id="@+id/nav_night"-->
+    <!--android:icon="@drawable/night"-->
+    <!--android:title="@string/night"-->
+    <!--app:actionLayout="@layout/action_view_switch_night_mode"/>-->
+    <!--<item-->
+    <!--android:id="@+id/nav_image_push"-->
+    <!--android:icon="@drawable/image_push"-->
+    <!--android:title="@string/imagePush"-->
+    <!--app:actionLayout="@layout/action_view_switch_image_push"/>-->
+
+    <!--<item-->
+    <!--android:id="@+id/nav_theme"-->
+    <!--android:icon="@drawable/ic_color_lens_white_24dp"-->
+    <!--android:title="@string/theme"-->
+    <!--app:actionLayout="@layout/action_view_switch_night_mode"/>-->
+    <!--</menu>-->
+    <!--</item>-->
 
 
 </menu>
