@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.example.well.ndemo.R;
 import com.example.well.ndemo.net.entity.resulte.GankMeiziReponse;
@@ -63,6 +64,7 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
         
         Glide.with(context)
                 .load(reponse.url)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .into(holder.mIv)
                 .getSize(new SizeReadyCallback() {
             @Override

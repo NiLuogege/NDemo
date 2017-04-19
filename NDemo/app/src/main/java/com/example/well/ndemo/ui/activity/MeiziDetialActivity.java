@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
@@ -123,6 +124,7 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
                 Glide
                         .with(context)
                         .load(mUrl)
+                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
                         .listener(mRequestListener)
                         .into(mShot);
             }
