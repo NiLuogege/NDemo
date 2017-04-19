@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -16,6 +18,7 @@ import android.text.TextUtils;
 import android.transition.Transition;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,15 +44,21 @@ import com.example.well.ndemo.view.ParallaxScrimageView;
 import org.sufficientlysecure.htmltextview.HtmlResImageGetter;
 import org.sufficientlysecure.htmltextview.HtmlTextView;
 
+import java.util.HashMap;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.PlatformActionListener;
+import cn.sharesdk.onekeyshare.themeCustom.ShareModel;
+import cn.sharesdk.onekeyshare.themeCustom.SharePopupWindow;
 
 /**
  * Created by ${LuoChen} on 2017/3/7 9:40.
  * email:luochen0519@foxmail.com
  */
 
-public class MeiziDetialActivity extends BaseActivity {
+public class MeiziDetialActivity extends BaseActivity implements Handler.Callback {
     @Bind(R.id.draggable_frame)
     ElasticDragDismissFrameLayout mDraggableFrame;
     @Bind(R.id.toolbar)
@@ -64,13 +73,13 @@ public class MeiziDetialActivity extends BaseActivity {
     private static final float SCRIM_ADJUSTMENT = 0.075f;
     private Bitmap mBitmap;//显示的图片
     private String mUrl;
+    private int mStatusBarColor;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activiy_meizidetial);
         ButterKnife.bind(this);
-
         initView();
         initListener();
         initData();
@@ -99,7 +108,7 @@ public class MeiziDetialActivity extends BaseActivity {
 
         initToolbar();
 
-        hTv.setHtml(getString(R.string.news),new HtmlResImageGetter(hTv));
+        hTv.setHtml(getString(R.string.news), new HtmlResImageGetter(hTv));
     }
 
     private void initData() {
@@ -149,7 +158,7 @@ public class MeiziDetialActivity extends BaseActivity {
      * 分享图片
      */
     private void shareImage() {
-
+        showShare();
     }
 
     /**
@@ -191,21 +200,21 @@ public class MeiziDetialActivity extends BaseActivity {
                         /*这里设置了状态栏的颜色和动画*/
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             //获取到状态栏颜色
-                            int statusBarColor = getWindow().getStatusBarColor();
+                            mStatusBarColor = getWindow().getStatusBarColor();
                             Palette.Swatch topColor = ColorUtils.getMostPopulousSwatch(palette);
                             if (topColor != null &&
                                     (isDark || Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)) {
-                                statusBarColor = ColorUtils.scrimify(topColor.getRgb(),
+                                mStatusBarColor = ColorUtils.scrimify(topColor.getRgb(),
                                         isDark, SCRIM_ADJUSTMENT);
                                 // set a light status bar on M+
                                 if (!isDark && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                                     ViewUtils.setLightStatusBar(mShot);
                                 }
                             }
-                            if (statusBarColor != getWindow().getStatusBarColor()) {
-                                mShot.setScrimColor(statusBarColor);
+                            if (mStatusBarColor != getWindow().getStatusBarColor()) {
+                                mShot.setScrimColor(mStatusBarColor);
                                 ValueAnimator statusBarColorAnim = ValueAnimator.ofArgb(
-                                        getWindow().getStatusBarColor(), statusBarColor);
+                                        getWindow().getStatusBarColor(), mStatusBarColor);
                                 statusBarColorAnim.addUpdateListener(new ValueAnimator
                                         .AnimatorUpdateListener() {
                                     @Override
@@ -253,6 +262,36 @@ public class MeiziDetialActivity extends BaseActivity {
         mShot.setBackground(null);
     }
 
+    @Override
+    public boolean handleMessage(Message msg) {
+        return false;
+    }
+
+    private void showShare() {
+        initShareSDK();
+
+        SharePopupWindow sharePopupWindow = new SharePopupWindow(context);
+        sharePopupWindow.setPlatformActionListener(new PlatformActionListener() {
+            @Override
+            public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
+            }
+
+            @Override
+            public void onError(Platform platform, int i, Throwable throwable) {
+
+            }
+
+            @Override
+            public void onCancel(Platform platform, int i) {
+
+            }
+        });
+        sharePopupWindow.showShareWindow(mStatusBarColor);
+        ShareModel shareModel = new ShareModel();
+        shareModel.setImageUrl(mUrl);
+        sharePopupWindow.initShareParams(shareModel);
+        sharePopupWindow.showAtLocation(mDraggableFrame, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
+    }
 
 
     @Override
@@ -362,5 +401,6 @@ public class MeiziDetialActivity extends BaseActivity {
             SnackbarUtils.showDefaultShortSnackbar(mDraggableFrame, getString(R.string.shareFaild));
         }
     };
+
 
 }

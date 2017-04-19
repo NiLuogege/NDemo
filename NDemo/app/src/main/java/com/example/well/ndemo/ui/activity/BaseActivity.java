@@ -13,6 +13,8 @@ import com.example.well.ndemo.utils.SettingsUtils;
 import com.example.well.ndemo.utils.SnackbarUtils;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 
+import cn.sharesdk.framework.ShareSDK;
+
 /**
  * Created by ${LuoChen} on 2017/3/3 17:08.
  * email:luochen0519@foxmail.com
@@ -31,6 +33,14 @@ public class BaseActivity extends RxAppCompatActivity {
         super.onCreate(savedInstanceState);
         this.context = this;
         setNightMode();
+    }
+
+
+    /**
+     * 初始化shareSDK 官方文档建议初始化放到入口Activity中
+     */
+    protected void initShareSDK() {
+        ShareSDK.initSDK(context,SettingsUtils.SHAREAPPKEY);
     }
 
     private void setNightMode() {

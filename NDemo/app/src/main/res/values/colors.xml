@@ -15,6 +15,7 @@
     <color name="text_color">#f6000000</color>
     <color name="black">#000000</color> <!-- pink 300 -->
     <color name="gray">#999999</color>
+    <color name="gray_translucent">#99999999</color>
 
 
 

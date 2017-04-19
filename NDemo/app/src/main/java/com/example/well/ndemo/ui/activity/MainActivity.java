@@ -31,6 +31,7 @@ import com.example.well.ndemo.utils.SettingsUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import cn.sharesdk.framework.ShareSDK;
 
 public class MainActivity extends BaseActivity {
     @Bind(R.id.fl_content)
@@ -49,10 +50,12 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         requestPermission();
+        initShareSDK();
         initView();
         setFirstEnterView();
         initBroadcastReceiver();
     }
+
 
 
     private void requestPermission() {
@@ -62,6 +65,7 @@ public class MainActivity extends BaseActivity {
             });
         }
     }
+
 
     private void initView() {
         ContentFragment contentFragment = new ContentFragment();

@@ -4,16 +4,13 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
-    <!--<permission-group android:name="android.permission-group.STORAGE"/>-->
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     /***** bugly ****/
+    <!--<uses-permission android:name="android.permission.INTERNET"/>-->
+    <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.READ_LOGS"/>
     /******************************/
@@ -26,6 +23,19 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     /******************************/
+
+    /***** ShareSDK 因为有的权限已经申请过了 所以下面进行注释掉 ****/
+    <!--<uses-permission android:name="android.permission.INTERNET" />-->
+    <!--<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />-->
+    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />-->
+    <!--<uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
+    <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    /******************************/
+
 
 
     <application
@@ -61,6 +71,36 @@
         </service>
         <!--接受个推推送消息的服务-->
         <service android:name=".service.NDemoIntentService"/>
+        <!--  *********  -->
+
+        <!--ShareSDK-->
+        <!--<有必要对下面的intent说明下，QQ的回调intent，实现QQ的分享必须要添加，并且保证您assets下的sharesdk.xml里配置的QQ的appid与这里的-->
+        <!--tencent后面的appid保持一致，否则QQ分享是没有回调的，注意替换的时候tencent保留，只替换后面的appid （不需要QQ或者微博可以不配置intent过滤，-->
+        <!--但是mobuishell这个activity必须要有）-->
+        <activity
+            android:name="com.mob.tools.MobUIShell"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustResize" >
+            <!-- QQ和QQ空间分享 QQ登录的回调必须要配置的 -->
+            <intent-filter>
+                <data android:scheme="tencentwxff174df9376afc97" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!--微信分享回调 -->
+        <activity
+            android:name=".wxapi.WXEntryActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <!--  *********  -->
+
     </application>
 
 </manifest>

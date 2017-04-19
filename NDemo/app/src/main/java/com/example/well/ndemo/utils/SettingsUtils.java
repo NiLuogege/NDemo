@@ -48,5 +48,10 @@ public interface SettingsUtils {
      */
     String IS_FIRST_ENTER = "IS_FIRST_ENTER";
 
+    /**
+     *ShareSDK 的appkey
+     */
+    String SHAREAPPKEY = "1d12fcf88ad69";
+
 
 }
