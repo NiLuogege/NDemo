@@ -271,21 +271,7 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
         initShareSDK();
 
         SharePopupWindow sharePopupWindow = new SharePopupWindow(context);
-        sharePopupWindow.setPlatformActionListener(new PlatformActionListener() {
-            @Override
-            public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-            }
-
-            @Override
-            public void onError(Platform platform, int i, Throwable throwable) {
-
-            }
-
-            @Override
-            public void onCancel(Platform platform, int i) {
-
-            }
-        });
+        sharePopupWindow.setPlatformActionListener(mPlatformActionListener);
         sharePopupWindow.showShareWindow(mStatusBarColor);
         ShareModel shareModel = new ShareModel();
         shareModel.setImageUrl(mUrl);
@@ -399,6 +385,23 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
         @Override
         public void faild() {
             SnackbarUtils.showDefaultShortSnackbar(mDraggableFrame, getString(R.string.shareFaild));
+        }
+    };
+
+    PlatformActionListener mPlatformActionListener = new PlatformActionListener() {
+        @Override
+        public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
+            SnackbarUtils.showDefaultLongSnackbar(mDraggableFrame, "分享成功");
+        }
+
+        @Override
+        public void onError(Platform platform, int i, Throwable throwable) {
+            SnackbarUtils.showDefaultLongSnackbar(mDraggableFrame, "分享失败");
+        }
+
+        @Override
+        public void onCancel(Platform platform, int i) {
+            SnackbarUtils.showDefaultLongSnackbar(mDraggableFrame, "分享已取消");
         }
     };
 
