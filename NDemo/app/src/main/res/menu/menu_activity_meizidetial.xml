@@ -24,6 +24,14 @@
         android:orderInCategory="@integer/integer_100"
         android:title="@string/share"
         app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/saveLongImage"
+        android:icon="@mipmap/ic_csy"
+        android:orderInCategory="@integer/integer_100"
+        android:title="@string/save_long_image"
+        app:showAsAction="never"/>
+
     <item
         android:id="@+id/csy"
         android:icon="@mipmap/ic_csy"

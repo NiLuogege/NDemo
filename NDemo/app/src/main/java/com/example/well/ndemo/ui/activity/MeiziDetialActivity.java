@@ -12,6 +12,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -45,6 +46,7 @@ import org.sufficientlysecure.htmltextview.HtmlResImageGetter;
 import org.sufficientlysecure.htmltextview.HtmlTextView;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -67,6 +69,8 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
     ParallaxScrimageView mShot;
     @Bind(R.id.hTv)
     HtmlTextView hTv;
+    @Bind(R.id.nest)
+    NestedScrollView nest;
 
     private ElasticDragDismissFrameLayout.SystemChromeFader chromeFader;
     public static final String URL = "url";
@@ -174,6 +178,17 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
             }
         }).start();
     }
+
+    /**
+     * 保存整个页面到本地
+     */
+    private void saveLongImage() {
+        String s = UUID.randomUUID().toString();
+        String fileName = s + ".jpg";
+        if (BuildConfig.DEBUG) Log.e("MeiziDetialActivity", fileName);
+        ImageUtils.saveNestedScrollView(nest, fileName, mSucceedOrFaild);
+    }
+
 
     /**
      * 设置状态栏的颜色和动画
@@ -368,12 +383,16 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
                 case R.id.share:
                     shareImage();
                     break;
+                case R.id.saveLongImage:
+                    saveLongImage();
+                    break;
             }
 
 
             return true;
         }
     };
+
 
     SucceedOrFaildListener mSucceedOrFaild = new SucceedOrFaildListener() {
 

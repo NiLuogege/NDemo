@@ -2,9 +2,13 @@ package com.example.well.ndemo.utils;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.ScrollView;
 
 import com.example.well.ndemo.MyApplication;
 import com.example.well.ndemo.ui.Interface.SucceedOrFaildListener;
@@ -20,7 +24,6 @@ import java.io.FileOutputStream;
  */
 
 public class ImageUtils {
-
 
 
     /**
@@ -66,7 +69,7 @@ public class ImageUtils {
      * @param succeedOrFaild
      */
     public static void saveImage(Bitmap bitmap, String fileName, SucceedOrFaildListener succeedOrFaild) {
-        if(bitmap==null || TextUtils.isEmpty(fileName))  return;
+        if (bitmap == null || TextUtils.isEmpty(fileName)) return;
 
         File dir = new File(Environment.getExternalStorageDirectory(), SettingsUtils.SD_DIR);
 
@@ -102,6 +105,62 @@ public class ImageUtils {
                 succeedOrFaild.faild();
             }
         }
+    }
+
+    /**
+     * 将一个View保存成图片到本地
+     *
+     * @param view
+     * @param fileName
+     * @param succeedOrFaild
+     */
+    public static void saveView(View view, String fileName, SucceedOrFaildListener succeedOrFaild) {
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_4444);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        saveImage(bitmap, fileName, succeedOrFaild);
+    }
+
+    /**
+     * 将一个ScrollView保存成图片到本地
+     *
+     * @param scrollView
+     * @param fileName
+     * @param succeedOrFaild
+     */
+    public static void saveScrollView(ScrollView scrollView, String fileName, SucceedOrFaildListener succeedOrFaild) {
+        int scrollViewHeight = 0;
+        int childCount = scrollView.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View childAt = scrollView.getChildAt(i);
+            scrollViewHeight += childAt.getHeight();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(scrollView.getWidth(), scrollViewHeight, Bitmap.Config.ARGB_4444);
+        Canvas canvas = new Canvas(bitmap);
+        scrollView.draw(canvas);
+        saveImage(bitmap, fileName, succeedOrFaild);
+    }
+
+    /**
+     * 将一个NestedScrollView保存成图片到本地
+     *
+     * @param nestedScrollView
+     * @param fileName
+     * @param succeedOrFaild
+     */
+    public static void saveNestedScrollView(NestedScrollView nestedScrollView, String fileName, SucceedOrFaildListener succeedOrFaild) {
+
+        int scrollViewHeight = 0;
+        int childCount = nestedScrollView.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View childAt = nestedScrollView.getChildAt(i);
+            scrollViewHeight += childAt.getHeight();
+        }
+        Bitmap bitmap = Bitmap.createBitmap(nestedScrollView.getWidth(), scrollViewHeight, Bitmap.Config.ARGB_4444);
+        Canvas canvas = new Canvas(bitmap);
+        nestedScrollView.draw(canvas);
+        saveImage(bitmap, fileName, succeedOrFaild);
     }
 
     /**
