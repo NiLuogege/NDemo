@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SizeReadyCallback;
-import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
 import com.example.well.ndemo.net.entity.resulte.GankMeiziReponse;
 import com.example.well.ndemo.ui.activity.MeiziDetialActivity;
@@ -60,10 +58,9 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
 
         String text = reponse.desc.length() > LIMIT ? reponse.desc.substring(0, LIMIT) +
                 "..." : reponse.desc;
-
-        holder.mTv.setText("position="+position);
-
-
+//        holder.mTv.setText("position="+position);
+        holder.mTv.setText(text);
+        
         Glide.with(context)
                 .load(reponse.url)
                 .into(holder.mIv)
@@ -119,7 +116,6 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
     }
 
     private  int getLoadingMoreItemPosition(){
-        if (BuildConfig.DEBUG) Log.e("ContentFragmentListAdap", "getItemCount():" + getItemCount());
         return  getItemCount()-1;
     }
 
