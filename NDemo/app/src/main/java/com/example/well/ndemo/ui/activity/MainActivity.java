@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -26,18 +27,21 @@ import com.bumptech.glide.Glide;
 import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
 import com.example.well.ndemo.ui.fragment.ContentFragment;
+import com.example.well.ndemo.utils.NetworkUtils;
 import com.example.well.ndemo.utils.SPUtils;
 import com.example.well.ndemo.utils.SettingsUtils;
+import com.example.well.ndemo.utils.SnackbarUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import cn.sharesdk.framework.ShareSDK;
 
 public class MainActivity extends BaseActivity {
     @Bind(R.id.fl_content)
     FrameLayout mFlContent;
     @Bind(R.id.nav)
     NavigationView nav;
+    @Bind(R.id.dl_main)
+    DrawerLayout dl_main;
     private static final String TAG_CONTENTFRAGMENT = "TagContentFragment";
     private int contentId = R.id.fl_content;
     private TextView mImage_description;
@@ -48,14 +52,21 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        requestPermission();
-        initShareSDK();
-        initView();
-        setFirstEnterView();
-        initBroadcastReceiver();
-    }
 
+        ButterKnife.bind(this);
+        boolean networkAvailable = NetworkUtils.isNetworkAvailable(context);
+        if (networkAvailable) {
+            requestPermission();
+            initShareSDK();
+            initView();
+            setFirstEnterView();
+            initBroadcastReceiver();
+        } else {
+            SnackbarUtils.showDefaultLongSnackbar(dl_main, getString(R.string.networkUnuseable));
+        }
+
+
+    }
 
 
     private void requestPermission() {
