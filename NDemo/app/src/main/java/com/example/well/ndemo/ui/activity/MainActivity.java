@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -88,6 +89,9 @@ public class MainActivity extends BaseActivity {
         mImage_description = (TextView) nav.getHeaderView(0).findViewById(R.id.image_description);
         MenuItem item_night = nav.getMenu().findItem(R.id.nav_night);
         MenuItem item_push = nav.getMenu().findItem(R.id.nav_image_push);
+        MenuItem item_map = nav.getMenu().findItem(R.id.map);
+        item_map.setOnMenuItemClickListener(mOnMenuItemClickListener);
+
         mNight_switch = (SwitchCompat) MenuItemCompat.getActionView(item_night).findViewById(R.id.night_switch);
         mPush_switch = (SwitchCompat) MenuItemCompat.getActionView(item_push).findViewById(R.id.push_switch);
         mNight_switch.setOnCheckedChangeListener(mOnCheckedChangeListener);
@@ -205,6 +209,21 @@ public class MainActivity extends BaseActivity {
             }
 
 
+        }
+    };
+
+    MenuItem.OnMenuItemClickListener mOnMenuItemClickListener = new MenuItem.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.map:
+                    Intent intent = new Intent(context,MapActivity.class);
+                    ActivityOptionsCompat compat = ActivityOptionsCompat.makeScaleUpAnimation(mNav_image,mNav_image.getWidth()/2,mNav_image.getHeight(),0,0);
+                    Bundle bundle = compat.toBundle();
+                    startActivity(intent,bundle);
+                    break;
+            }
+            return false;
         }
     };
 

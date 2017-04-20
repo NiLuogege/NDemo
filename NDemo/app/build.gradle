@@ -61,7 +61,7 @@ dependencies {
     //    })
     //    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:25.1.1'
-    /** *** retrofit + rxJava 网络请求 ****/
+    /** *** retrofit + rxJava 网络请求  ****/
     /*greenDao*/
     compile 'org.greenrobot:greendao:3.2.0'
     /*rx-android-java*/
@@ -74,13 +74,13 @@ dependencies {
     //日志输出
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     /** ****************************/
-    /** *** bugly  ****/
+    /** *** bugly   ****/
     compile 'com.tencent.bugly:crashreport:latest.release'
     //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
     compile 'com.tencent.bugly:nativecrashreport:latest.release'
     //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
     /** ************/
-    /** ***个推推送 ****/
+    /** ***个推推送  ****/
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.getui:sdk:2.+'
     //    compile 'com.android.support:support-v4:+'// 因为和v7包冲突 注释掉,目前未见有什么影响
@@ -98,4 +98,5 @@ dependencies {
     compile 'com.android.support:cardview-v7:25.1.1'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile files('libs/MobCommons-2017.0322.0931.jar')
+    compile files('libs/Android_Map3D_SDK_V5.0.0_20170311.jar')
 }
