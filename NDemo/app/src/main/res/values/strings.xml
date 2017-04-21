@@ -34,6 +34,8 @@
     <string name="share_dialog_title">分享</string>
     <string name="save_long_image">保存整个页面</string>
     <string name="networkUnuseable">"网络不好,请检查网络"</string>
+    <string name="map">地图</string>
+    <string name="location_error">定位失败</string>
 
 
 
@@ -79,7 +81,7 @@
 
     <string name="about_text" translatable="false">感谢对项目的支持和关注,项目会不断的升级更新,如果小主感兴趣欢迎一起来贡献,有好的想法也可以随时发email给我.</string>
     <string name="email" translatable="false">maat.xing@gmail.com</string>
-    <string name="map">地图</string>
+
 
 
 </resources>
