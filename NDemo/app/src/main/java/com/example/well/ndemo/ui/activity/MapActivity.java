@@ -2,7 +2,10 @@ package com.example.well.ndemo.ui.activity;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.RelativeLayout;
 
 import com.amap.api.location.AMapLocation;
@@ -37,6 +40,8 @@ public class MapActivity extends BaseActivity {
     MapView mMapView;
     @Bind(R.id.rl_root)
     RelativeLayout rl_root;
+    @Bind(R.id.toolbar)
+    android.support.v7.widget.Toolbar toolbar;
     private AMap mAMap;
     private LocationSource.OnLocationChangedListener mOnLocationChangedListener;
     private AMapLocationClient mLocationClient;
@@ -49,8 +54,16 @@ public class MapActivity extends BaseActivity {
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
         mMapView.onCreate(savedInstanceState);// 此方法须覆写，虚拟机需要在很多情况下保存地图绘制的当前状态。
+        initView();
         initMap();
 
+    }
+
+    private void initView() {
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        toolbar.setOnMenuItemClickListener(mOnMenuItemClickListener);
     }
 
     private void initMap() {
@@ -92,6 +105,11 @@ public class MapActivity extends BaseActivity {
         return style;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_map, menu);
+        return true;
+    }
 
     @Override
     protected void onDestroy() {
@@ -143,6 +161,31 @@ public class MapActivity extends BaseActivity {
     }
 
     /**
+     * 设置Toolbar的标题
+     *
+     * @param aMapLocation
+     */
+    private void setToolbarTitle(AMapLocation aMapLocation) {
+        String district = aMapLocation.getDistrict();//城区信息
+        String street = aMapLocation.getStreet();//街道信息
+        String mCurrentLocation = district + "-" + street;
+        toolbar.setTitle(mCurrentLocation);
+    }
+
+    /**
+     * 开始记录行程
+     */
+    private void beginRecord() {
+
+    }
+
+    /**
+     * 停止记录行程
+     */
+    private void stopRecord() {
+    }
+
+    /**
      * 在activate()中设置定位初始化及启动定位，在deactivate()中写停止定位的相关调用。
      */
     private LocationSource mLocationSource = new LocationSource() {
@@ -166,19 +209,58 @@ public class MapActivity extends BaseActivity {
     };
 
 
-
     private AMapLocationListener mAMapLocationListener = new AMapLocationListener() {
         @Override
         public void onLocationChanged(AMapLocation aMapLocation) {//定位成功
             if (mOnLocationChangedListener != null && aMapLocation != null) {
                 if (aMapLocation.getErrorCode() == 0) {
+
+//                    //定位成功回调信息，设置相关消息
+//                    aMapLocation.getLocationType();//获取当前定位结果来源，如网络定位结果，详见定位类型表
+//                    aMapLocation.getLatitude();//获取纬度
+//                    aMapLocation.getLongitude();//获取经度
+//                    aMapLocation.getAccuracy();//获取精度信息
+//                    SimpleDateF ormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                    Date date = new Date(amapLocation.getTime());
+//                    df.format(date);//定位时间
+//                    aMapLocation.getAddress();//地址，如果option中设置isNeedAddress为false，则没有此结果，网络定位结果中会有地址信息，GPS定位不返回地址信息。
+//                    aMapLocation.getCountry();//国家信息
+//                    aMapLocation.getProvince();//省信息
+//                    aMapLocation.getCity();//城市信息
+//                    aMapLocation.getDistrict();//城区信息
+//                    aMapLocation.getStreet();//街道信息
+//                    aMapLocation.getStreetNum();//街道门牌号信息
+//                    aMapLocation.getCityCode();//城市编码
+//                    aMapLocation.getAdCode();//地区编码
+//                    aMapLocation.getAoiName();//获取当前定位点的AOI信息
+
+                    setToolbarTitle(aMapLocation);
+
                     mOnLocationChangedListener.onLocationChanged(aMapLocation);// 在更新的坐标显示系统小蓝点
                     LatLng latLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
-                    mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,ZOOMLEVEL));//设置当前地图显示为当前位置
+                    mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOMLEVEL));//设置当前地图显示为当前位置
                 }
             } else {//定位失败
                 SnackbarUtils.showDefaultLongSnackbar(rl_root, getString(R.string.location_error));
             }
         }
     };
+
+
+    private Toolbar.OnMenuItemClickListener mOnMenuItemClickListener = new Toolbar.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.map_begin:
+                    beginRecord();
+                    break;
+                case R.id.map_end:
+                    stopRecord();
+                    break;
+            }
+            return false;
+        }
+    };
+
+
 }
