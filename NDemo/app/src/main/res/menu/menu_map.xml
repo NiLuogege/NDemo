@@ -2,14 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/map_begin"
-        android:icon="@mipmap/begin"
+        android:id="@+id/map_switch"
         android:title="@string/begin"
+        android:icon="@mipmap/begin"
         app:showAsAction="always"/>
-    <item
-        android:id="@+id/map_end"
-        android:icon="@mipmap/end"
-        android:title="@string/end"
-        app:showAsAction="always"/>
-
 </menu>

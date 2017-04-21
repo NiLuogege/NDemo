@@ -17,8 +17,10 @@ import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.PolylineOptions;
 import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
 import com.example.well.ndemo.utils.SnackbarUtils;
@@ -46,6 +48,10 @@ public class MapActivity extends BaseActivity {
     private LocationSource.OnLocationChangedListener mOnLocationChangedListener;
     private AMapLocationClient mLocationClient;
     private static final float ZOOMLEVEL = 17;//zoom - 描述了一个缩放级别。高德地图的缩放级别是在3-19 之间。
+    private PolylineOptions mRealPolylineOptions;//真是的轨迹
+    private PolylineOptions mTracePolylineOptions;//校正后的轨迹
+    private boolean recording = false;//是否正在记录行程
+    private MenuItem mMapSwitch;
 
 
     @Override
@@ -56,6 +62,7 @@ public class MapActivity extends BaseActivity {
         mMapView.onCreate(savedInstanceState);// 此方法须覆写，虚拟机需要在很多情况下保存地图绘制的当前状态。
         initView();
         initMap();
+        initMapLine();
 
     }
 
@@ -71,8 +78,22 @@ public class MapActivity extends BaseActivity {
             mAMap = mMapView.getMap();
             setUpMap();
         }
-
     }
+
+    /**
+     * 初始化轨迹线段
+     */
+    private void initMapLine() {
+        mRealPolylineOptions = new PolylineOptions();
+        mRealPolylineOptions.width(10f);//设置线段的宽度，单位像素。
+        mRealPolylineOptions.color(R.color.colorToolbar);//设置线段颜色
+
+        mTracePolylineOptions = new PolylineOptions();
+        mTracePolylineOptions.width(40f);//设置线段的宽度，单位像素。
+        mTracePolylineOptions.color(R.color.colorToolbar);//设置线段颜色
+        mTracePolylineOptions.setCustomTexture(BitmapDescriptorFactory.fromResource(R.mipmap.grasp_trace_line));//设置线段的纹理图，图片为2的n次方。
+    }
+
 
     private void setUpMap() {
         mAMap.setLocationSource(mLocationSource);// 设置定位监听
@@ -110,6 +131,26 @@ public class MapActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.menu_map, menu);
         return true;
     }
+
+    /**
+     * @param menu
+     * @return
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        mMapSwitch = menu.findItem(R.id.map_switch);
+        return true;
+    }
+
+//    /**
+//     * menuItem 选中时调用
+//     * @param item
+//     * @return
+//     */
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        return true;//说明消费事件
+//    }
 
     @Override
     protected void onDestroy() {
@@ -251,11 +292,18 @@ public class MapActivity extends BaseActivity {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.map_begin:
-                    beginRecord();
-                    break;
-                case R.id.map_end:
-                    stopRecord();
+                case R.id.map_switch:
+                    if (BuildConfig.DEBUG) Log.e("MapActivity", "onMenuItemClick");
+                    if (recording) {//正在记录
+                        mMapSwitch.setIcon(R.mipmap.begin);
+                        SnackbarUtils.showDefaultLongSnackbar(rl_root,"行程记录已关闭");
+                        stopRecord();
+                    } else {//没有记录
+                        mMapSwitch.setIcon(R.mipmap.end);
+                        SnackbarUtils.showDefaultLongSnackbar(rl_root,"行程记录已开启");
+                        beginRecord();
+                    }
+                    recording = !recording;
                     break;
             }
             return false;
