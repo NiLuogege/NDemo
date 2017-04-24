@@ -36,12 +36,12 @@
                 app:scrimColor="@color/scrim"/>
 
             <org.sufficientlysecure.htmltextview.HtmlTextView
-                android:id="@+id/hTv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:textColor="@color/text_color"
-                android:textSize="16sp"/>
+            android:id="@+id/hTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:textColor="@color/text_color"
+            android:textSize="16sp"/>
 
             <!--&lt;!&ndash;解决nestView无法滑倒低端&ndash;&gt;-->
             <!--<View-->

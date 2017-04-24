@@ -7,8 +7,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -33,6 +33,9 @@ import com.example.well.ndemo.bean.PathRecord;
 import com.example.well.ndemo.db.MapDbAdapter;
 import com.example.well.ndemo.utils.SnackbarUtils;
 
+import org.sufficientlysecure.htmltextview.HtmlResImageGetter;
+import org.sufficientlysecure.htmltextview.HtmlTextView;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,12 +57,14 @@ import butterknife.OnClick;
 public class MapActivity extends BaseActivity {
     @Bind(R.id.map)
     MapView mMapView;
-    @Bind(R.id.rl_root)
-    RelativeLayout rl_root;
+    @Bind(R.id.fl_root)
+    FrameLayout rl_root;
     @Bind(R.id.toolbar)
     android.support.v7.widget.Toolbar toolbar;
     @Bind(R.id.ib_location)
     ImageButton ib_location;
+    @Bind(R.id.hTv)
+    HtmlTextView hTv;
     private AMap mAMap;
     private LocationSource.OnLocationChangedListener mOnLocationChangedListener;
     private AMapLocationClient mLocationClient;
@@ -99,9 +104,11 @@ public class MapActivity extends BaseActivity {
         toolbar.setOnMenuItemClickListener(mOnMenuItemClickListener);
         int statusBarHeight = getStatusBarHeight();
         if (statusBarHeight > 0) {
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) toolbar.getLayoutParams();
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) toolbar.getLayoutParams();
             layoutParams.topMargin = statusBarHeight;
         }
+
+        hTv.setHtml(getString(R.string.news), new HtmlResImageGetter(hTv));
     }
 
     private void initMap() {
