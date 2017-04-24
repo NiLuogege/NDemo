@@ -20,4 +20,14 @@
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
+    <ImageButton
+        android:id="@+id/ib_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
+        android:layout_marginLeft="8dp"
+        android:background="@android:color/transparent"
+        android:src="@mipmap/button_location"/>
 </RelativeLayout>

@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
 import com.amap.api.location.AMapLocation;
@@ -40,6 +41,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by ${LuoChen} on 2017/4/20 10:33.
@@ -59,6 +61,8 @@ public class MapActivity extends BaseActivity {
     RelativeLayout rl_root;
     @Bind(R.id.toolbar)
     android.support.v7.widget.Toolbar toolbar;
+    @Bind(R.id.ib_location)
+    ImageButton ib_location;
     private AMap mAMap;
     private LocationSource.OnLocationChangedListener mOnLocationChangedListener;
     private AMapLocationClient mLocationClient;
@@ -75,6 +79,7 @@ public class MapActivity extends BaseActivity {
     private List<TraceOverlay> mOverlayList = new ArrayList<>();
     private List<TraceLocation> mTracelocationlist = new ArrayList<>();
     private Polyline mPolyline;
+    public AMapLocation currentAmapLocation = null;
 
 
     @Override
@@ -133,7 +138,7 @@ public class MapActivity extends BaseActivity {
      */
     private void setMapUI() {
         UiSettings uiSettings = mAMap.getUiSettings();
-        uiSettings.setMyLocationButtonEnabled(true);//显示默认的定位按钮
+//        uiSettings.setMyLocationButtonEnabled(true);//显示默认的定位按钮
         uiSettings.setScaleControlsEnabled(true);  //设置比例尺控件
     }
 
@@ -148,6 +153,13 @@ public class MapActivity extends BaseActivity {
         style.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
         style.interval(2000);//设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
         return style;
+    }
+
+    @OnClick(R.id.ib_location)
+    void location() {
+        if (currentAmapLocation != null) {
+            mOnLocationChangedListener.onLocationChanged(currentAmapLocation);// 在更新的坐标显示系统小蓝点 ,该方法会将定位点拖动到屏幕重点
+        }
     }
 
     @Override
@@ -301,6 +313,8 @@ public class MapActivity extends BaseActivity {
 
 
     private AMapLocationListener mAMapLocationListener = new AMapLocationListener() {
+
+
         @Override
         public void onLocationChanged(AMapLocation aMapLocation) {//定位成功
             if (mOnLocationChangedListener != null && aMapLocation != null) {
@@ -327,6 +341,7 @@ public class MapActivity extends BaseActivity {
 //                    aMapLocation.getAoiName();//获取当前定位点的AOI信息
 
                     setToolbarTitle(aMapLocation);
+                    currentAmapLocation = aMapLocation;
 
                     LatLng latLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
 
