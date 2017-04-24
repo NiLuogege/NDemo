@@ -40,7 +40,7 @@ public class BaseActivity extends RxAppCompatActivity {
      * 初始化shareSDK 官方文档建议初始化放到入口Activity中
      */
     protected void initShareSDK() {
-        ShareSDK.initSDK(context,SettingsUtils.SHAREAPPKEY);
+        ShareSDK.initSDK(context, SettingsUtils.SHAREAPPKEY);
     }
 
     private void setNightMode() {
@@ -103,6 +103,19 @@ public class BaseActivity extends RxAppCompatActivity {
                 mHandler.onDenied();
             }
         }
+    }
+
+    /**
+     * 获取状态栏高度
+     * @return
+     */
+    protected int getStatusBarHeight() {
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            //根据资源ID获取响应的尺寸值
+            return getResources().getDimensionPixelSize(resourceId);
+        }
+        return -1;
     }
 
 

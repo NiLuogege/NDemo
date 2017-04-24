@@ -15,23 +15,22 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
+import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
-import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
-import com.amap.api.trace.LBSTraceClient;
-import com.amap.api.trace.TraceListener;
-import com.amap.api.trace.TraceLocation;
 import com.amap.api.trace.TraceOverlay;
 import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
 import com.example.well.ndemo.bean.PathRecord;
-import com.example.well.ndemo.utils.MapUtils;
+import com.example.well.ndemo.db.MapDbAdapter;
 import com.example.well.ndemo.utils.SnackbarUtils;
 
 import java.text.SimpleDateFormat;
@@ -53,8 +52,6 @@ import butterknife.OnClick;
  */
 
 public class MapActivity extends BaseActivity {
-    private static final int LINEID_2 = 2;//纠偏轨迹id
-    private static final int LINEID_1 = 1;//纠偏轨迹id
     @Bind(R.id.map)
     MapView mMapView;
     @Bind(R.id.rl_root)
@@ -68,7 +65,6 @@ public class MapActivity extends BaseActivity {
     private AMapLocationClient mLocationClient;
     private static final float ZOOMLEVEL = 17;//zoom - 描述了一个缩放级别。高德地图的缩放级别是在3-19 之间。
     private PolylineOptions mRealPolylineOptions;//真是的轨迹
-    private PolylineOptions mTracePolylineOptions;//校正后的轨迹
     private boolean recording = false;//是否正在记录行程
     private boolean isFirstEnter = true;//是否刚刚进入
     private MenuItem mMapSwitch;
@@ -77,9 +73,12 @@ public class MapActivity extends BaseActivity {
     private long mEndTime;//行程结束时间
     private TraceOverlay mTraceOverlay;
     private List<TraceOverlay> mOverlayList = new ArrayList<>();
-    private List<TraceLocation> mTracelocationlist = new ArrayList<>();
     private Polyline mPolyline;
     public AMapLocation currentAmapLocation = null;
+    private MapDbAdapter mMapDbAdapter;
+    private int mTotleDistance = 0;
+    private LatLng preLatLng;//记录上一个坐标
+    private Marker mMarker;
 
 
     @Override
@@ -91,7 +90,6 @@ public class MapActivity extends BaseActivity {
         initView();
         initMap();
         initMapLine();
-
     }
 
     private void initView() {
@@ -99,6 +97,11 @@ public class MapActivity extends BaseActivity {
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         toolbar.setOnMenuItemClickListener(mOnMenuItemClickListener);
+        int statusBarHeight = getStatusBarHeight();
+        if (statusBarHeight > 0) {
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) toolbar.getLayoutParams();
+            layoutParams.topMargin = statusBarHeight;
+        }
     }
 
     private void initMap() {
@@ -116,11 +119,6 @@ public class MapActivity extends BaseActivity {
         mRealPolylineOptions = new PolylineOptions();
         mRealPolylineOptions.width(10f);//设置线段的宽度，单位像素。
         mRealPolylineOptions.color(R.color.colorToolbar);//设置线段颜色
-
-        mTracePolylineOptions = new PolylineOptions();
-        mTracePolylineOptions.width(40f);//设置线段的宽度，单位像素。
-        mTracePolylineOptions.color(R.color.colorToolbar);//设置线段颜色
-        mTracePolylineOptions.setCustomTexture(BitmapDescriptorFactory.fromResource(R.mipmap.grasp_trace_line));//设置线段的纹理图，图片为2的n次方。
     }
 
 
@@ -253,7 +251,7 @@ public class MapActivity extends BaseActivity {
      * 开始记录行程
      */
     private void beginRecord() {
-        mAMap.clear();//将地图清空
+//        mAMap.clear();//将地图清空
         if (mRecord != null) {
             mRecord = null;
         }
@@ -268,15 +266,134 @@ public class MapActivity extends BaseActivity {
     private void stopRecord() {
         mEndTime = System.currentTimeMillis();
         mOverlayList.add(mTraceOverlay);
-        LBSTraceClient traceClient = new LBSTraceClient(getApplicationContext());//进行轨迹纠偏
+//        LBSTraceClient traceClient = new LBSTraceClient(getApplicationContext());//进行轨迹纠偏
 //        queryProcessedTrace方法参数解析
 //        lineID - 用于标示一条轨迹，支持多轨迹纠偏，如果多条轨迹调起纠偏接口，则lineID需不同
 //        locations - 一条轨迹的点集合，目前支持该点集合为一条行车GPS高精度定位轨迹
 //        type - 轨迹坐标系，目前支持高德 LBSTraceClient.TYPE_AMAP;GPS LBSTraceClient.TYPE_GPSTYPE_GPS;百度 LBSTraceClient.TYPE_BAIDU
 //        listener - 轨迹纠偏回调
-        traceClient.queryProcessedTrace(LINEID_2, MapUtils.parseTraceLocationList(mRecord.getPathline()), LBSTraceClient.TYPE_AMAP, mTraceListener);//进行轨迹纠偏
-        //TODO 还没有写保存的方法
-//        saveRecord(mRecord.getPathline(), mRecord.getDate());
+//        traceClient.queryProcessedTrace(LINEID_2, MapUtils.parseTraceLocationList(mRecord.getPathline()), LBSTraceClient.TYPE_AMAP, mTraceListener);//绘制纠偏轨迹
+        saveRecord(mRecord.getPathline(), mRecord.getDate());
+        reset();
+    }
+
+    /**
+     * 还原数据
+     */
+    private void reset() {
+        mAMap.clear();//清除地图上的东西
+        location();//定位到当前位置
+        mMarker = null;
+    }
+
+    /**
+     * 保存轨迹
+     *
+     * @param list
+     * @param time
+     */
+    private void saveRecord(List<AMapLocation> list, String time) {
+
+        if (list != null && list.size() > 0) {
+            mMapDbAdapter = new MapDbAdapter(context);
+            mMapDbAdapter.open();
+            String duration = getDuration();
+            float distance = getDistance(list);
+            String average = getAverage(distance);
+            String pathlineSring = getPathLineString(list);
+            AMapLocation firstLocaiton = list.get(0);
+            AMapLocation lastLocaiton = list.get(list.size() - 1);
+            String stratpoint = amapLocationToString(firstLocaiton);
+            String endpoint = amapLocationToString(lastLocaiton);
+            mMapDbAdapter.addRecord(String.valueOf(distance), duration, average,
+                    pathlineSring, stratpoint, endpoint, time);
+            mMapDbAdapter.close();
+        } else {
+            SnackbarUtils.showDefaultLongSnackbar(rl_root, "没有记录到路径");
+        }
+    }
+
+    /**
+     * 计算用时
+     *
+     * @return
+     */
+    private String getDuration() {
+        return String.valueOf((mEndTime - mStartTime) / 1000f);
+    }
+
+    /**
+     * 计算距离
+     *
+     * @param list
+     * @return
+     */
+    private float getDistance(List<AMapLocation> list) {
+        float distance = 0;
+        if (list == null || list.size() == 0) {
+            return distance;
+        }
+        for (int i = 0; i < list.size() - 1; i++) {
+            AMapLocation firstpoint = list.get(i);
+            AMapLocation secondpoint = list.get(i + 1);
+            LatLng firstLatLng = new LatLng(firstpoint.getLatitude(),
+                    firstpoint.getLongitude());
+            LatLng secondLatLng = new LatLng(secondpoint.getLatitude(),
+                    secondpoint.getLongitude());
+            double betweenDis = AMapUtils.calculateLineDistance(firstLatLng,
+                    secondLatLng);
+            distance = (float) (distance + betweenDis);
+        }
+        return distance;
+    }
+
+    /**
+     * 计算速度
+     *
+     * @param distance
+     * @return
+     */
+    private String getAverage(float distance) {
+        return String.valueOf(distance / (float) (mEndTime - mStartTime));
+    }
+
+    /**
+     * 将地图的信息连接起来
+     *
+     * @param list
+     * @return
+     */
+    private String getPathLineString(List<AMapLocation> list) {
+        if (list == null || list.size() == 0) {
+            return "";
+        }
+        StringBuffer pathline = new StringBuffer();
+        for (int i = 0; i < list.size(); i++) {
+            AMapLocation location = list.get(i);
+            String locString = amapLocationToString(location);
+            pathline.append(locString).append(";");
+        }
+        String pathLineString = pathline.toString();
+        pathLineString = pathLineString.substring(0,
+                pathLineString.length() - 1);
+        return pathLineString;
+    }
+
+    /**
+     * 将定位到的信息append 成字符串
+     *
+     * @param location
+     * @return
+     */
+    private String amapLocationToString(AMapLocation location) {
+        StringBuffer locString = new StringBuffer();
+        locString.append(location.getLatitude()).append(",");
+        locString.append(location.getLongitude()).append(",");
+        locString.append(location.getProvider()).append(",");
+        locString.append(location.getTime()).append(",");
+        locString.append(location.getSpeed()).append(",");
+        locString.append(location.getBearing());
+        return locString.toString();
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -319,8 +436,8 @@ public class MapActivity extends BaseActivity {
         public void onLocationChanged(AMapLocation aMapLocation) {//定位成功
             if (mOnLocationChangedListener != null && aMapLocation != null) {
                 if (aMapLocation.getErrorCode() == 0) {
-
-                    if (BuildConfig.DEBUG) Log.e("MapActivity", "定位成功");
+                    if (BuildConfig.DEBUG)
+                        Log.e("MapActivity", "定位成功" + " mTotleDistance= " + mTotleDistance);
 //                    //定位成功回调信息，设置相关消息
 //                    aMapLocation.getLocationType();//获取当前定位结果来源，如网络定位结果，详见定位类型表
 //                    aMapLocation.getLatitude();//获取纬度
@@ -343,30 +460,54 @@ public class MapActivity extends BaseActivity {
                     setToolbarTitle(aMapLocation);
                     currentAmapLocation = aMapLocation;
 
-                    LatLng latLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
+                    LatLng currentLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
+
 
                     if (isFirstEnter) {
                         if (BuildConfig.DEBUG) Log.e("MapActivity", "isFirstEnter=" + isFirstEnter);
                         mOnLocationChangedListener.onLocationChanged(aMapLocation);// 在更新的坐标显示系统小蓝点 ,该方法会将定位点拖动到屏幕重点
-                        mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOMLEVEL));//设置当前地图显示为当前位置
+                        mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, ZOOMLEVEL));//设置当前地图显示为当前位置
                         isFirstEnter = false;
+                        preLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
                     }
 
                     if (recording) {
                         mRecord.addpoint(aMapLocation);
-                        mRealPolylineOptions.add(latLng);
-                        mTracelocationlist.add(MapUtils.parseTraceLocation(aMapLocation));
+                        mRealPolylineOptions.add(currentLatLng);
                         reDrawline();
-//                        if (mTracelocationlist.size() > tracesize - 1) {//如果距离够长就绘制纠偏曲线
-//                            trace();
-//                        }
+                        float distance = AMapUtils.calculateLineDistance(currentLatLng, preLatLng);
+                        mTotleDistance += distance;
+                        setMarker(currentLatLng);
+                        mOnLocationChangedListener.onLocationChanged(aMapLocation);
+
                     }
+                    preLatLng = currentLatLng;
                 }
             } else {//定位失败
                 SnackbarUtils.showDefaultLongSnackbar(rl_root, getString(R.string.location_error));
             }
         }
     };
+
+    /**
+     * 设置maker
+     *
+     * @param currentLatLng
+     */
+
+    private void setMarker(LatLng currentLatLng) {
+        if (mMarker == null) {
+            MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title(mTotleDistance + "m");
+            // MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).icon(BitmapDescriptorFactory.fromResource(R.mipmap.marker)).title(mTotleDistance + "m");
+            mMarker = mAMap.addMarker(markerOptions);
+            mMarker.showInfoWindow();
+        } else {
+            mMarker.setTitle(mTotleDistance + "m");
+            mMarker.setPosition(currentLatLng);
+            mMarker.showInfoWindow();
+        }
+    }
+
 
     /**
      * 绘制实时轨迹
@@ -404,38 +545,4 @@ public class MapActivity extends BaseActivity {
             return false;
         }
     };
-
-    /**
-     * 轨迹就偏的回调接口
-     */
-    TraceListener mTraceListener = new TraceListener() {
-        /**
-         * 轨迹纠偏失败回调。
-         * @param i
-         * @param s
-         */
-        @Override
-        public void onRequestFailed(int i, String s) {
-
-        }
-
-        @Override
-        public void onTraceProcessing(int i, int i1, List<LatLng> list) {
-
-        }
-
-        /**
-         * 轨迹纠偏成功回调。
-         * @param lineID 纠偏的线路ID
-         * @param linepoints 纠偏结果
-         * @param distance 总距离
-         * @param waitingtime 等待时间
-         */
-        @Override
-        public void onFinished(int lineID, List<LatLng> linepoints, int distance, int waitingtime) {
-//TODO 绘制纠偏轨迹
-        }
-    };
-
-
 }

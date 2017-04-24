@@ -9,7 +9,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?android:actionBarSize"
-        android:layout_marginTop="16dp"
         android:background="@color/colorToolbar"
         android:elevation="1dp"
         app:popupTheme="@style/popupMenu">

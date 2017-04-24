@@ -50,13 +50,11 @@
 
     <!--MapActivity 布局可以透到状态栏后面的style-->
     <style name="Theme_MapActivity" parent="Theme_MainActiviy">
+        <item name="android:statusBarColor">@color/colorToolbar</item>
+
         <!--下列两行控制使得应用窗口透明，用于展示一些差异-->
         <item name="android:windowBackground">@color/transparency</item>
         <item name="android:windowIsTranslucent">true</item>
-
-        <!--设置导航栏/状态栏窗口color为透明  但是不会让布局透到状态栏里-->
-        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
-        <!--<item name="android:navigationBarColor">@android:color/transparent</item>-->
 
         <!--可以透到状态栏里-->
         <item name="android:windowTranslucentStatus">true</item>
