@@ -95,12 +95,19 @@
             </intent-filter>
         </activity>
 
+        <!--妹子详情-->
         <activity
             android:name=".ui.activity.MeiziDetialActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme_MeiziDetialActivity"/>
+        <!--地图-->
         <activity
             android:name=".ui.activity.MapActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme_MapActivity"/>
+        <!--demo-->
+        <activity
+            android:name=".ui.activity.DemoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme_MapActivity"/>
 
