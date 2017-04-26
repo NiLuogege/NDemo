@@ -1,5 +1,6 @@
 package com.example.well.ndemo.ui.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -98,8 +99,12 @@ public class MapActivity extends BaseActivity {
         ButterKnife.bind(this);
         mMapView.onCreate(savedInstanceState);// 此方法须覆写，虚拟机需要在很多情况下保存地图绘制的当前状态。
         initView();
-        initMap();
-        initMapLine();
+        requestPermission();
+    }
+
+    private void requestPermission() {
+        String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+        requestPermission(permissions,mPermissionHandler);
     }
 
 
@@ -454,6 +459,30 @@ public class MapActivity extends BaseActivity {
         String date = formatter.format(curDate);
         return date;
     }
+
+    /**
+     * 请求权限的回调
+     */
+    PermissionHandler mPermissionHandler=new PermissionHandler() {
+        @Override
+        public void onGranted() {
+            super.onGranted();
+            initMap();
+            initMapLine();
+        }
+
+        @Override
+        public void onDenied() {
+            super.onDenied();
+            SnackbarUtils.showDefaultLongSnackbar(rl_root, "该功能需要位置权限");
+        }
+
+        @Override
+        public boolean onNeverAsk() {
+            SnackbarUtils.showDefaultLongSnackbar(rl_root, "该功能需要位置权限");
+            return super.onNeverAsk();
+        }
+    };
 
     /**
      * 在activate()中设置定位初始化及启动定位，在deactivate()中写停止定位的相关调用。
