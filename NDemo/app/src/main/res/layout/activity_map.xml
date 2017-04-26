@@ -47,8 +47,11 @@
             android:id="@id/handle"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="@color/dribbble"
-            android:gravity="center"
+            android:background="@color/white"
+            android:drawableLeft="@mipmap/record"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="8dp"
             android:text="行程记录"
             android:textSize="18dp"/>
 

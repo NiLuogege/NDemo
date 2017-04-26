@@ -2,10 +2,12 @@ package com.example.well.ndemo.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
 import com.example.well.ndemo.bean.PathRecord;
 
@@ -37,8 +39,18 @@ public class RecordListAdapter extends RecyclerView.Adapter<RecordListAdapter.Re
     @Override
     public void onBindViewHolder(RecordListHolder holder, int position) {
         PathRecord record = data.get(position);
+        if (BuildConfig.DEBUG) Log.e("RecordListAdapter", record.toString());
         holder.tv_date.setText(record.getDate());
-        holder.tv_describe.setText(record.getDuration());
+        String street_start = record.getStartpoint().getStreet();//街道
+        String address_start = record.getStartpoint().getAddress();//地址
+        String street_end = record.getEndpoint().getStreet();//街道
+        String address_end = record.getEndpoint().getAddress();//地址
+        holder.tv_fromTo.setText(street_start +"--->"+street_end);
+        if (BuildConfig.DEBUG) Log.e("RecordListAdapter", "address_start="+address_start+" address_end="+address_end);
+        String distance = record.getDistance();//距离
+        String duration = record.getDuration();//耗时
+        String averagespeed = record.getAveragespeed();//速度
+        holder.tv_describe.setText("距离: "+distance+"  耗时: "+duration+"  速度: "+averagespeed);
     }
 
     @Override
@@ -52,6 +64,8 @@ public class RecordListAdapter extends RecyclerView.Adapter<RecordListAdapter.Re
         TextView tv_date;
         @Bind(R.id.tv_describe)
         TextView tv_describe;
+        @Bind(R.id.tv_fromTo)
+        TextView tv_fromTo;
 
         public RecordListHolder(View itemView) {
             super(itemView);

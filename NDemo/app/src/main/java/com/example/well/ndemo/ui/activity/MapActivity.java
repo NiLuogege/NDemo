@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
@@ -121,6 +122,7 @@ public class MapActivity extends BaseActivity {
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         toolbar.setOnMenuItemClickListener(mOnMenuItemClickListener);
+        toolbar.setNavigationOnClickListener(mOnClickListener);
         int statusBarHeight = getStatusBarHeight();
         if (statusBarHeight > 0) {
             FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) toolbar.getLayoutParams();
@@ -569,6 +571,13 @@ public class MapActivity extends BaseActivity {
                     break;
             }
             return false;
+        }
+    };
+
+    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            MapActivity.this.finish();
         }
     };
 }
