@@ -13,18 +13,18 @@ android {
 
         /*****  个推推送  ****/
         manifestPlaceholders = [
-                GETUI_APP_ID : "i29ZeSIYli7rXzGh2B5uD7",
-                GETUI_APP_KEY : "07uEyNRogR7d2zLPVG5DG4",
-                GETUI_APP_SECRET : "bpUVB0y3IKAmkWAN0F7Pr1"
+                GETUI_APP_ID    : "i29ZeSIYli7rXzGh2B5uD7",
+                GETUI_APP_KEY   : "07uEyNRogR7d2zLPVG5DG4",
+                GETUI_APP_SECRET: "bpUVB0y3IKAmkWAN0F7Pr1"
         ]
-        /******************************/
+        /** ****************************/
 
         /***** bugly 和 个推推送共用 ****/
         ndk {
             // 设置支持的SO库架构
             abiFilters 'armeabi' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
         }
-        /******************************/
+        /** ****************************/
     }
     buildTypes {
         release {
@@ -59,7 +59,7 @@ dependencies {
     //    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {//因为报Execution failed for task ':context:prepareDebugAndroidTest 所以注释掉
     //        exclude group: 'com.android.support', module: 'support-annotations'
     //    })
-    //    testCompile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:25.1.1'
     /** *** retrofit + rxJava 网络请求   ****/
     /*greenDao*/

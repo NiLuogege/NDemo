@@ -3,6 +3,8 @@ package com.example.well.ndemo.ui.activity;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -29,12 +31,10 @@ import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.trace.TraceOverlay;
 import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
+import com.example.well.ndemo.adapter.RecordListAdapter;
 import com.example.well.ndemo.bean.PathRecord;
 import com.example.well.ndemo.db.MapDbAdapter;
 import com.example.well.ndemo.utils.SnackbarUtils;
-
-import org.sufficientlysecure.htmltextview.HtmlResImageGetter;
-import org.sufficientlysecure.htmltextview.HtmlTextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,8 +63,9 @@ public class MapActivity extends BaseActivity {
     android.support.v7.widget.Toolbar toolbar;
     @Bind(R.id.ib_location)
     ImageButton ib_location;
-    @Bind(R.id.hTv)
-    HtmlTextView hTv;
+    @Bind(R.id.content)
+    RecyclerView rv_RecordList;
+
     private AMap mAMap;
     private LocationSource.OnLocationChangedListener mOnLocationChangedListener;
     private AMapLocationClient mLocationClient;
@@ -98,6 +99,24 @@ public class MapActivity extends BaseActivity {
     }
 
     private void initView() {
+        initToolbar();
+        initRecycalView();
+    }
+
+    private void initRecycalView() {
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);
+        rv_RecordList.setLayoutManager(layoutManager);
+        if (mMapDbAdapter == null) {
+            mMapDbAdapter = new MapDbAdapter(context);
+        }
+        mMapDbAdapter.open();
+        List<PathRecord> records = mMapDbAdapter.queryRecordAll();
+        mMapDbAdapter.close();
+        RecordListAdapter adapter = new RecordListAdapter(context, records);
+        rv_RecordList.setAdapter(adapter);
+    }
+
+    private void initToolbar() {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
@@ -107,8 +126,6 @@ public class MapActivity extends BaseActivity {
             FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) toolbar.getLayoutParams();
             layoutParams.topMargin = statusBarHeight;
         }
-
-        hTv.setHtml(getString(R.string.news), new HtmlResImageGetter(hTv));
     }
 
     private void initMap() {
@@ -302,7 +319,9 @@ public class MapActivity extends BaseActivity {
     private void saveRecord(List<AMapLocation> list, String time) {
 
         if (list != null && list.size() > 0) {
-            mMapDbAdapter = new MapDbAdapter(context);
+            if (mMapDbAdapter == null) {
+                mMapDbAdapter = new MapDbAdapter(context);
+            }
             mMapDbAdapter.open();
             String duration = getDuration();
             float distance = getDistance(list);

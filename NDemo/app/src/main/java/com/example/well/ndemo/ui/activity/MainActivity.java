@@ -219,8 +219,7 @@ public class MainActivity extends BaseActivity {
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.map:
-//                    Intent intent = new Intent(context,MapActivity.class);
-                    Intent intent = new Intent(context,DemoActivity.class);
+                    Intent intent = new Intent(context,MapActivity.class);
                     ActivityOptionsCompat compat = ActivityOptionsCompat.makeScaleUpAnimation(mNav_image,mNav_image.getWidth()/2,mNav_image.getHeight(),0,0);
                     Bundle bundle = compat.toBundle();
                     startActivity(intent,bundle);

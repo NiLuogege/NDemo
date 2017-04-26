@@ -16,7 +16,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="550dp">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="40dp">
 
         <com.amap.api.maps.MapView
             android:id="@+id/map"
@@ -34,31 +35,27 @@
             android:src="@mipmap/button_location"/>
     </RelativeLayout>
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/nest"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <LinearLayout
+    <SlidingDrawer
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="80dp"
+        android:content="@+id/content"
+        android:handle="@+id/handle">
+
+        <TextView
+            android:id="@id/handle"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/dribbble"
+            android:gravity="center"
+            android:text="行程记录"
+            android:textSize="18dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="550dp"
-            android:background="@color/white"
-            android:orientation="vertical">
-
-            <org.sufficientlysecure.htmltextview.HtmlTextView
-                android:id="@+id/hTv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_color"
-                android:textSize="16sp"/>
-
-            <!--为了让内容显示完整-->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="500dp"/>
-
-        </LinearLayout>
-
-    </android.support.v4.widget.NestedScrollView>
+            android:background="@color/white"/>
+    </SlidingDrawer>
 </FrameLayout>
