@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.SlidingDrawer;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -66,6 +67,8 @@ public class MapActivity extends BaseActivity {
     ImageButton ib_location;
     @Bind(R.id.content)
     RecyclerView rv_RecordList;
+    @Bind(R.id.sd)
+    SlidingDrawer sd;
 
     private AMap mAMap;
     private LocationSource.OnLocationChangedListener mOnLocationChangedListener;
@@ -99,9 +102,24 @@ public class MapActivity extends BaseActivity {
         initMapLine();
     }
 
+
     private void initView() {
         initToolbar();
         initRecycalView();
+        initSlidingDrawer();
+    }
+
+    private void initToolbar() {
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        toolbar.setOnMenuItemClickListener(mOnMenuItemClickListener);
+        toolbar.setNavigationOnClickListener(mOnClickListener);
+        int statusBarHeight = getStatusBarHeight();
+        if (statusBarHeight > 0) {
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) toolbar.getLayoutParams();
+            layoutParams.topMargin = statusBarHeight;
+        }
     }
 
     private void initRecycalView() {
@@ -117,17 +135,21 @@ public class MapActivity extends BaseActivity {
         rv_RecordList.setAdapter(adapter);
     }
 
-    private void initToolbar() {
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
-        toolbar.setOnMenuItemClickListener(mOnMenuItemClickListener);
-        toolbar.setNavigationOnClickListener(mOnClickListener);
-        int statusBarHeight = getStatusBarHeight();
-        if (statusBarHeight > 0) {
-            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) toolbar.getLayoutParams();
-            layoutParams.topMargin = statusBarHeight;
-        }
+    private void initSlidingDrawer() {
+
+        //view绘制完成后在调用--> 此方法只调用一次，其原理是将自定义的runnable放入到消息队列的尾部，当looper调用到它时，view已经初始化完成了
+        toolbar.post(new Runnable() {
+            @Override
+            public void run() {
+                int statusBarHeight = getStatusBarHeight();
+                int toolbarHeight = toolbar.getHeight();
+                FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) sd.getLayoutParams();
+                layoutParams.topMargin = statusBarHeight + toolbarHeight;
+                sd.setLayoutParams(layoutParams);
+            }
+        });
+
+
     }
 
     private void initMap() {

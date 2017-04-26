@@ -37,9 +37,9 @@
 
 
     <SlidingDrawer
+        android:id="@+id/sd"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="80dp"
         android:content="@+id/content"
         android:handle="@+id/handle">
 
