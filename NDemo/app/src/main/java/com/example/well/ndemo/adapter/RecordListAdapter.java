@@ -41,7 +41,7 @@ public class RecordListAdapter extends RecyclerView.Adapter<RecordListAdapter.Re
 
     @Override
     public void onBindViewHolder(RecordListHolder holder, int position) {
-        PathRecord record = data.get(position);
+        final PathRecord record = data.get(position);
         holder.tv_date.setText(record.getDate());
         String street_start = record.getStartpoint().getStreet();//街道
         String address_start = record.getStartpoint().getAddress();//地址
@@ -58,6 +58,7 @@ public class RecordListAdapter extends RecyclerView.Adapter<RecordListAdapter.Re
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, MapRecordActivity.class);
+                intent.putExtra(MapRecordActivity.EXTRAID,record.getId());
                 context.startActivity(intent);
 
             }
