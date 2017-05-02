@@ -74,7 +74,7 @@ public class MapUtils {
         }
         String[] loc = latLonStr.split(",");
         AMapLocation location = null;
-        if (loc.length == 6) {
+        if (loc.length == 7) {
             location = new AMapLocation(loc[2]);
             location.setProvider(loc[2]);
             location.setLatitude(Double.parseDouble(loc[0]));
@@ -82,6 +82,7 @@ public class MapUtils {
             location.setTime(Long.parseLong(loc[3]));
             location.setSpeed(Float.parseFloat(loc[4]));
             location.setBearing(Float.parseFloat(loc[5]));
+            location.setStreet(loc[6]);
         }else if(loc.length == 2){
             location = new AMapLocation("gps");
             location.setLatitude(Double.parseDouble(loc[0]));

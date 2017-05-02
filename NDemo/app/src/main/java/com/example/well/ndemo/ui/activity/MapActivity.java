@@ -447,7 +447,8 @@ public class MapActivity extends BaseActivity {
         locString.append(location.getProvider()).append(",");
         locString.append(location.getTime()).append(",");
         locString.append(location.getSpeed()).append(",");
-        locString.append(location.getBearing());
+        locString.append(location.getBearing()).append(",");
+        locString.append(location.getStreet());
         return locString.toString();
     }
 
