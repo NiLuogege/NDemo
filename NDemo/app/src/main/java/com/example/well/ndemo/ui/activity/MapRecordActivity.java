@@ -98,6 +98,9 @@ public class MapRecordActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mRePlay != null) {
+            mRePlay.stopTrace();
+        }
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
     }
