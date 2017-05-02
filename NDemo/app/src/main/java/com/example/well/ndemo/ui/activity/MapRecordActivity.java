@@ -31,6 +31,7 @@ import com.example.well.ndemo.db.MapDbAdapter;
 import com.example.well.ndemo.utils.MapUtils;
 import com.example.well.ndemo.utils.SnackbarUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -64,6 +65,7 @@ public class MapRecordActivity extends BaseActivity {
     private Polyline mPoly_trace;//纠偏轨迹的线
     private Marker mStartMarker_trace;//纠偏轨迹的起点
     private Marker mEndMarker_trace;//纠偏轨迹的结束点
+    private List<Integer> mColorList;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -138,7 +140,19 @@ public class MapRecordActivity extends BaseActivity {
             mMap = mMapView.getMap();
             mMap.setOnMapLoadedListener(mOnMapLoadedListener);//设计地图加载成功的回调
         }
+        initColorList();
+    }
 
+    /**
+     * 初始化ColorList
+     */
+    private void initColorList() {
+        int[] intArray = getResources().getIntArray(R.array.colorList);
+        mColorList = new ArrayList<>();
+        for (int i = 0; i < intArray.length; i++) {
+//            if (BuildConfig.DEBUG) Log.e("MapRecordActivity", "intArray[i]:" + intArray[i]);
+            mColorList.add(intArray[i]);
+        }
     }
 
 
@@ -215,7 +229,9 @@ public class MapRecordActivity extends BaseActivity {
     private void drawLine(LatLng startLatLng, LatLng endLatLng, List<LatLng> latLngList) {
         PolylineOptions polylineOptions = new PolylineOptions()
                 .width(15f)
-                .color(R.color.colorToolbar)
+                .useGradient(true)
+                .colorValues(mColorList)
+                .zIndex(10)
                 .addAll(latLngList);
         MarkerOptions options_start = new MarkerOptions()
                 .position(startLatLng)

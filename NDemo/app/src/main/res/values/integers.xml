@@ -21,4 +21,13 @@
     <integer name="integer_100">100</integer>
     <integer name="integer_99">99</integer>
     <integer name="integer_98">98</integer>
+
+
+   <integer-array name="colorList">
+       <item>0xFFFF0000</item>
+       <item>0xFFFF4500</item>
+       <item>0xFFFF7F50</item>
+       <item>0xFF98FB98</item>
+       <item>0xFF90EE90</item>
+   </integer-array>
 </resources>
