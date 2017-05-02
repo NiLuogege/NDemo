@@ -137,6 +137,7 @@ public class MapDbAdapter {
             record.setEndpoint(MapUtils.parseLocation(query
                     .getString(query
                             .getColumnIndex(MapDbAdapter.KEY_END))));
+            record.setAveragespeed(query.getString(query.getColumnIndex(MapDbAdapter.KEY_SPEED)));
             records.add(record);
         }
 

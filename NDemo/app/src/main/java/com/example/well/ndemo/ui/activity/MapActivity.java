@@ -409,7 +409,8 @@ public class MapActivity extends BaseActivity {
      * @return
      */
     private String getAverage(float distance) {
-        return String.valueOf(distance / (float) (mEndTime - mStartTime));
+        float s = (mEndTime - mStartTime) / 1000;
+        return String.valueOf(distance / s);
     }
 
     /**

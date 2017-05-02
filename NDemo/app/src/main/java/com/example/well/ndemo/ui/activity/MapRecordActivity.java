@@ -28,6 +28,7 @@ import com.example.well.ndemo.bean.PathRecord;
 import com.example.well.ndemo.db.MapDbAdapter;
 import com.example.well.ndemo.utils.MapUtils;
 import com.example.well.ndemo.utils.SnackbarUtils;
+import com.example.well.ndemo.utils.SystemUtils;
 import com.example.well.ndemo.utils.TraceRePlay;
 
 import java.util.ArrayList;
@@ -207,6 +208,11 @@ public class MapRecordActivity extends BaseActivity {
             if (pathline == null || endpoint == null || startpoint == null) {
                 return;
             }
+
+            String street_start = record.getStartpoint().getStreet();//街道
+            String street_end = record.getEndpoint().getStreet();//街道
+            toolbar.setTitle(street_start +"->"+street_end);
+            toolbar.setTitleMarginStart(SystemUtils.dp2px(-5,getResources()));
 
             LatLng startLatLng = new LatLng(startpoint.getLatitude(), startpoint.getLongitude());
             LatLng endLatLng = new LatLng(endpoint.getLatitude(), endpoint.getLongitude());
