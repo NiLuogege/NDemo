@@ -2,6 +2,8 @@ package com.example.well.ndemo.ui.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,9 +27,9 @@ import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
-import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
@@ -38,6 +40,7 @@ import com.example.well.ndemo.adapter.RecordListAdapter;
 import com.example.well.ndemo.bean.PathRecord;
 import com.example.well.ndemo.db.MapDbAdapter;
 import com.example.well.ndemo.utils.SnackbarUtils;
+import com.example.well.ndemo.utils.map.SensorEventHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -71,6 +74,9 @@ public class MapActivity extends BaseActivity {
     @Bind(R.id.sd)
     SlidingDrawer sd;
 
+    private static final int STROKE_COLOR = Color.argb(180, 3, 145, 255);
+    private static final int FILL_COLOR = Color.argb(10, 0, 0, 180);
+
     private AMap mAMap;
     private LocationSource.OnLocationChangedListener mOnLocationChangedListener;
     private AMapLocationClient mLocationClient;
@@ -78,6 +84,7 @@ public class MapActivity extends BaseActivity {
     private PolylineOptions mRealPolylineOptions;//真是的轨迹
     private boolean recording = false;//是否正在记录行程
     private boolean isFirstEnter = true;//是否刚刚进入
+    private boolean mFirstFix = false;//是否第一次定位
     private MenuItem mMapSwitch;
     private PathRecord mRecord;
     private long mStartTime;//行程的起始时间
@@ -90,6 +97,8 @@ public class MapActivity extends BaseActivity {
     private int mTotleDistance = 0;
     private LatLng preLatLng;//记录上一个坐标
     private Marker mMarker;
+    private SensorEventHelper mSensorEventHelper;//负责屏幕旋转的时候使箭头也跟着旋转
+    private Marker mLocMarker;//旋转的marker
 
 
     @Override
@@ -104,7 +113,7 @@ public class MapActivity extends BaseActivity {
 
     private void requestPermission() {
         String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
-        requestPermission(permissions,mPermissionHandler);
+        requestPermission(permissions, mPermissionHandler);
     }
 
 
@@ -162,6 +171,11 @@ public class MapActivity extends BaseActivity {
             mAMap = mMapView.getMap();
             setUpMap();
         }
+
+        mSensorEventHelper = new SensorEventHelper(context);
+        if (mSensorEventHelper != null) {
+            mSensorEventHelper.registerSensorListener();
+        }
         mTraceOverlay = new TraceOverlay(mAMap);//用于绘制轨迹纠偏
     }
 
@@ -181,7 +195,6 @@ public class MapActivity extends BaseActivity {
         mAMap.setMyLocationStyle(style);
         setMapUI();
         mAMap.setMyLocationEnabled(true);// 可触发定位并显示当前位置 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
-
     }
 
     /**
@@ -201,6 +214,10 @@ public class MapActivity extends BaseActivity {
     @NonNull
     private MyLocationStyle setDot() {
         MyLocationStyle style = new MyLocationStyle();//初始化定位蓝点样式类
+        style.myLocationIcon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.navi_map_gps_locked)));//设置定位圆点图标
+        style.radiusFillColor(FILL_COLOR);
+        style.strokeColor(STROKE_COLOR);
+        style.anchor(0.5f, 0.5f);//这只锚点
         style.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
         style.interval(2000);//设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
         return style;
@@ -254,6 +271,9 @@ public class MapActivity extends BaseActivity {
         super.onResume();
         //在activity执行onResume时执行mMapView.onResume ()，重新绘制加载地图
         mMapView.onResume();
+        if (mSensorEventHelper != null) {
+            mSensorEventHelper.registerSensorListener();
+        }
     }
 
     @Override
@@ -261,6 +281,14 @@ public class MapActivity extends BaseActivity {
         super.onPause();
         //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
         mMapView.onPause();
+
+        if (mSensorEventHelper != null) {
+            mSensorEventHelper.unRegisterSensorListener();
+            mSensorEventHelper.setCurrentMarker(null);
+            mSensorEventHelper = null;
+        }
+
+        mFirstFix = false;
     }
 
     @Override
@@ -465,7 +493,7 @@ public class MapActivity extends BaseActivity {
     /**
      * 请求权限的回调
      */
-    PermissionHandler mPermissionHandler=new PermissionHandler() {
+    PermissionHandler mPermissionHandler = new PermissionHandler() {
         @Override
         public void onGranted() {
             super.onGranted();
@@ -552,13 +580,14 @@ public class MapActivity extends BaseActivity {
                         preLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
                     }
 
+                    setMarker(currentLatLng);
+
                     if (recording) {
                         mRecord.addpoint(aMapLocation);
                         mRealPolylineOptions.add(currentLatLng);
                         reDrawline();
                         float distance = AMapUtils.calculateLineDistance(currentLatLng, preLatLng);
                         mTotleDistance += distance;
-                        setMarker(currentLatLng);
                         mOnLocationChangedListener.onLocationChanged(aMapLocation);
 
                     }
@@ -577,16 +606,18 @@ public class MapActivity extends BaseActivity {
      */
 
     private void setMarker(LatLng currentLatLng) {
-        if (mMarker == null) {
-            MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).title(mTotleDistance + "m");
-            // MarkerOptions markerOptions = new MarkerOptions().position(currentLatLng).icon(BitmapDescriptorFactory.fromResource(R.mipmap.marker)).title(mTotleDistance + "m");
-            mMarker = mAMap.addMarker(markerOptions);
-            mMarker.showInfoWindow();
+        List<Marker> mapScreenMarkers = mAMap.getMapScreenMarkers();
+        mLocMarker = mapScreenMarkers.get(0);
+        if (!mFirstFix) {
+            mFirstFix = true;
+            mSensorEventHelper.setCurrentMarker(mLocMarker);//定位图标旋转
         } else {
-            mMarker.setTitle(mTotleDistance + "m");
-            mMarker.setPosition(currentLatLng);
-            mMarker.showInfoWindow();
+            if (recording) {
+                mLocMarker.setTitle(mTotleDistance + "m");
+            }
         }
+        mLocMarker.setPosition(currentLatLng);
+        mLocMarker.showInfoWindow();
     }
 
 

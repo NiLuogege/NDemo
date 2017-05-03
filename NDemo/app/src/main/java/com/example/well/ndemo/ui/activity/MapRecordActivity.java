@@ -29,7 +29,7 @@ import com.example.well.ndemo.db.MapDbAdapter;
 import com.example.well.ndemo.utils.MapUtils;
 import com.example.well.ndemo.utils.SnackbarUtils;
 import com.example.well.ndemo.utils.SystemUtils;
-import com.example.well.ndemo.utils.TraceRePlay;
+import com.example.well.ndemo.utils.map.TraceRePlay;
 
 import java.util.ArrayList;
 import java.util.List;
