@@ -58,7 +58,7 @@ import butterknife.OnClick;
  * 在Activity中使用地图可以更好地管理地图的声明周期
  * <p>
  * http://blog.csdn.net/pan960821/article/details/50907330
- *
+ * <p>
  * 以后做的时候 我们可以吧地图自带的箭头和那个圆圈去掉或者变为透明,然后自己加marker 这样自定义的程度更高
  */
 
@@ -76,7 +76,7 @@ public class MapActivity extends BaseActivity {
     @Bind(R.id.sd)
     SlidingDrawer sd;
 
-//    private static final int STROKE_COLOR = Color.argb(180, 3, 145, 255);
+    //    private static final int STROKE_COLOR = Color.argb(180, 3, 145, 255);
 //    private static final int FILL_COLOR = Color.argb(10, 0, 0, 180);
     private static final int STROKE_COLOR = Color.argb(0, 0, 0, 0);
     private static final int FILL_COLOR = Color.argb(0, 0, 0, 0);
@@ -100,7 +100,6 @@ public class MapActivity extends BaseActivity {
     private MapDbAdapter mMapDbAdapter;
     private int mTotleDistance = 0;
     private LatLng preLatLng;//记录上一个坐标
-    private Marker mMarker;
     private SensorEventHelper mSensorEventHelper;//负责屏幕旋转的时候使箭头也跟着旋转
     private Marker mLocMarker;//旋转的marker
 
@@ -311,7 +310,7 @@ public class MapActivity extends BaseActivity {
         mLocationClient.setLocationListener(mAMapLocationListener);//设置定位回调监听
         AMapLocationClientOption option = new AMapLocationClientOption(); //初始化定位参数
         option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);//设置为高精度定位模式
-        option.setInterval(5000);//设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
+        option.setInterval(2000);//设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
         mLocationClient.setLocationOption(option);//设置定位参数
         // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
         // 注意设置合适的定位时间的间隔（最小间隔支持为2000ms），并且在合适时间调用stopLocation()方法来取消定位请求
@@ -368,7 +367,7 @@ public class MapActivity extends BaseActivity {
     private void reset() {
         mAMap.clear();//清除地图上的东西
         location();//定位到当前位置
-        mMarker = null;
+        mFirstFix = false;
     }
 
     /**
@@ -592,8 +591,8 @@ public class MapActivity extends BaseActivity {
                         reDrawline();
                         float distance = AMapUtils.calculateLineDistance(currentLatLng, preLatLng);
                         mTotleDistance += distance;
+                        mOnLocationChangedListener.onLocationChanged(aMapLocation);
                     }
-                    mOnLocationChangedListener.onLocationChanged(aMapLocation);
                     preLatLng = currentLatLng;
                 }
             } else {//定位失败
@@ -617,7 +616,7 @@ public class MapActivity extends BaseActivity {
         } else {
             if (recording) {
                 mLocMarker.setTitle(mTotleDistance + "m");
-            }else{
+            } else {
                 mLocMarker.setPosition(currentLatLng);
             }
 
