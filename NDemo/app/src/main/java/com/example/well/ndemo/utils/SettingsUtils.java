@@ -53,5 +53,8 @@ public interface SettingsUtils {
      */
     String SHAREAPPKEY = "1d12fcf88ad69";
 
-
+    /**
+     *mapActivity中最后一个定位点
+     */
+    String LASTLATLNG="LASTLATLNG";
 }

@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,6 +48,8 @@ import com.example.well.ndemo.bean.NodemoMapLocation;
 import com.example.well.ndemo.bean.PathRecord;
 import com.example.well.ndemo.db.MapDbAdapter;
 import com.example.well.ndemo.mapbackground.LocationService;
+import com.example.well.ndemo.utils.SPUtils;
+import com.example.well.ndemo.utils.SettingsUtils;
 import com.example.well.ndemo.utils.SnackbarUtils;
 import com.example.well.ndemo.utils.map.SensorEventHelper;
 
@@ -116,6 +119,8 @@ public class MapActivity extends BaseActivity {
     private Marker mLocMarker;//旋转的marker
     private Circle mCircle;
     private LatLng mCurrentLatLng;
+    private List<PathRecord> mRecords;
+    private RecordListAdapter mAdapter;
 
 
     @Override
@@ -151,14 +156,23 @@ public class MapActivity extends BaseActivity {
     private void initRecycalView() {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);
         rv_RecordList.setLayoutManager(layoutManager);
+        mRecords = loadRecords();
+        mAdapter = new RecordListAdapter(context, mRecords);
+        rv_RecordList.setAdapter(mAdapter);
+    }
+
+    /**
+     * 从数据库拉取数据
+     * @return
+     */
+    private List<PathRecord> loadRecords() {
         if (mMapDbAdapter == null) {
             mMapDbAdapter = new MapDbAdapter(context);
         }
         mMapDbAdapter.open();
         List<PathRecord> records = mMapDbAdapter.queryRecordAll();
         mMapDbAdapter.close();
-        RecordListAdapter adapter = new RecordListAdapter(context, records);
-        rv_RecordList.setAdapter(adapter);
+        return records;
     }
 
     private void initSlidingDrawer() {
@@ -194,12 +208,27 @@ public class MapActivity extends BaseActivity {
             mAMap = mMapView.getMap();
             setUpMap();
         }
-
+        moveMap();
         mSensorEventHelper = new SensorEventHelper(context);
         if (mSensorEventHelper != null) {
             mSensorEventHelper.registerSensorListener();
         }
         mTraceOverlay = new TraceOverlay(mAMap);//用于绘制轨迹纠偏
+    }
+
+    /**
+     * 将地图挪到上次退出的位置
+     */
+    private void moveMap() {
+        String lastLatlng = SPUtils.getInstance(getApplication()).getString(SettingsUtils.LASTLATLNG);
+        if(!TextUtils.isEmpty(lastLatlng)) {
+            if (BuildConfig.DEBUG) Log.e("MapActivity", "moveMap-->lastLatlng=" + lastLatlng);
+            String[] split = lastLatlng.split(":");
+            double latitude = Double.parseDouble(split[0]);
+            double longitude = Double.parseDouble(split[1]);
+            mCurrentLatLng = new LatLng(latitude, longitude);
+            location();
+        }
     }
 
     /**
@@ -298,6 +327,19 @@ public class MapActivity extends BaseActivity {
 
         if (locationChangeBroadcastReceiver != null)
             unregisterReceiver(locationChangeBroadcastReceiver);
+
+        catchCurrentLatLng();
+    }
+
+    /**
+     * 缓存最后一个点
+     */
+    private void catchCurrentLatLng() {
+        double latitude = mCurrentLatLng.latitude;
+        double longitude = mCurrentLatLng.longitude;
+        String lastLatlng = latitude + ":" + longitude;
+        if (BuildConfig.DEBUG) Log.e("MapActivity", "onDestroy-->lastLatlng=" + lastLatlng);
+        SPUtils.getInstance(getApplication()).put(SettingsUtils.LASTLATLNG, lastLatlng);
     }
 
     @Override
@@ -353,15 +395,10 @@ public class MapActivity extends BaseActivity {
     private void stopRecord() {
         mEndTime = System.currentTimeMillis();
         mOverlayList.add(mTraceOverlay);
-//        LBSTraceClient traceClient = new LBSTraceClient(getApplicationContext());//进行轨迹纠偏
-//        queryProcessedTrace方法参数解析
-//        lineID - 用于标示一条轨迹，支持多轨迹纠偏，如果多条轨迹调起纠偏接口，则lineID需不同
-//        locations - 一条轨迹的点集合，目前支持该点集合为一条行车GPS高精度定位轨迹
-//        type - 轨迹坐标系，目前支持高德 LBSTraceClient.TYPE_AMAP;GPS LBSTraceClient.TYPE_GPSTYPE_GPS;百度 LBSTraceClient.TYPE_BAIDU
-//        listener - 轨迹纠偏回调
-//        traceClient.queryProcessedTrace(LINEID_2, MapUtils.parseTraceLocationList(mRecord.getPathline()), LBSTraceClient.TYPE_AMAP, mTraceListener);//绘制纠偏轨迹
         saveRecord(mRecord.getPathline(), mRecord.getDate());
         reset();
+        loadRecords();
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -372,7 +409,7 @@ public class MapActivity extends BaseActivity {
         mRecord = null;
         mRealPolylineOptions = null;
         initMapLine();
-        mLocMarker=null;
+        mLocMarker = null;
         isFirstEnter = true;
         location();//定位到当前位置
     }
@@ -565,7 +602,8 @@ public class MapActivity extends BaseActivity {
      * 开始定位服务
      */
     private void startLocationService() {
-        getApplicationContext().startService(new Intent(this, LocationService.class));
+        Intent service = new Intent(this, LocationService.class);
+        getApplicationContext().startService(service);
     }
 
 
