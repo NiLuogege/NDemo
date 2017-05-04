@@ -69,6 +69,10 @@ import butterknife.OnClick;
  * http://blog.csdn.net/pan960821/article/details/50907330
  * <p>
  * 以后做的时候 我们可以吧地图自带的箭头和那个圆圈去掉或者变为透明,然后自己加marker 这样自定义的程度更高
+ * <p>
+ * <p>
+ * api:
+ * 1.mOnLocationChangedListener.onLocationChanged(currentAmapLocation);// 在更新的坐标显示系统小蓝点 ,该方法会将定位点拖动到屏幕重点
  */
 
 public class MapActivity extends BaseActivity {
@@ -112,6 +116,7 @@ public class MapActivity extends BaseActivity {
     private SensorEventHelper mSensorEventHelper;//负责屏幕旋转的时候使箭头也跟着旋转
     private Marker mLocMarker;//旋转的marker
     private Circle mCircle;
+    private LatLng mCurrentLatLng;
 
 
     @Override
@@ -124,18 +129,6 @@ public class MapActivity extends BaseActivity {
         requestPermission();
         initBroadcast();
     }
-
-    private void initBroadcast() {
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(RECEIVER_ACTION);
-        registerReceiver(locationChangeBroadcastReceiver, intentFilter);
-    }
-
-    private void requestPermission() {
-        String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
-        requestPermission(permissions, mPermissionHandler);
-    }
-
 
     private void initView() {
         initToolbar();
@@ -186,6 +179,17 @@ public class MapActivity extends BaseActivity {
 
     }
 
+    private void requestPermission() {
+        String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+        requestPermission(permissions, mPermissionHandler);
+    }
+
+    private void initBroadcast() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(RECEIVER_ACTION);
+        registerReceiver(locationChangeBroadcastReceiver, intentFilter);
+    }
+
     private void initMap() {
         if (mAMap == null) {
             mAMap = mMapView.getMap();
@@ -217,6 +221,24 @@ public class MapActivity extends BaseActivity {
         mAMap.setMyLocationEnabled(true);// 可触发定位并显示当前位置 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
     }
 
+
+    /**
+     * 设置定位点 的样式(去掉自带的定位图标)
+     *
+     * @return
+     */
+    @NonNull
+    private MyLocationStyle setDot() {
+        MyLocationStyle style = new MyLocationStyle();//初始化定位蓝点样式类
+        style.myLocationIcon(BitmapDescriptorFactory.fromResource(R.mipmap.point));//设置定位圆点图标
+        style.radiusFillColor(FILL_COLOR);
+        style.strokeColor(STROKE_COLOR);
+        style.anchor(0.5f, 0.5f);//这只锚点
+        style.myLocationType(MyLocationStyle.LOCATION_TYPE_SHOW);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
+        style.interval(2000 * 100);//设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
+        return style;
+    }
+
     /**
      * 设置地图上的控件
      */
@@ -226,27 +248,11 @@ public class MapActivity extends BaseActivity {
         uiSettings.setScaleControlsEnabled(true);  //设置比例尺控件
     }
 
-    /**
-     * 设置定位点 的样式
-     *
-     * @return
-     */
-    @NonNull
-    private MyLocationStyle setDot() {
-        MyLocationStyle style = new MyLocationStyle();//初始化定位蓝点样式类
-        style.myLocationIcon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.navi_map_gps_locked)));//设置定位圆点图标
-        style.radiusFillColor(FILL_COLOR);
-        style.strokeColor(STROKE_COLOR);
-        style.anchor(0.5f, 0.5f);//这只锚点
-        style.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
-        style.interval(2000);//设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
-        return style;
-    }
 
     @OnClick(R.id.ib_location)
     void location() {
-        if (currentAmapLocation != null) {
-            mOnLocationChangedListener.onLocationChanged(currentAmapLocation);// 在更新的坐标显示系统小蓝点 ,该方法会将定位点拖动到屏幕重点
+        if (mAMap != null) {
+            mAMap.moveCamera(CameraUpdateFactory.changeLatLng(mCurrentLatLng));//移动地图到中心
         }
     }
 
@@ -285,6 +291,12 @@ public class MapActivity extends BaseActivity {
             mLocationClient.onDestroy();
         }
 
+        if (mSensorEventHelper != null) {
+            mSensorEventHelper.unRegisterSensorListener();
+            mSensorEventHelper.setCurrentMarker(null);
+            mSensorEventHelper = null;
+        }
+
         if (locationChangeBroadcastReceiver != null)
             unregisterReceiver(locationChangeBroadcastReceiver);
     }
@@ -294,9 +306,6 @@ public class MapActivity extends BaseActivity {
         super.onResume();
         //在activity执行onResume时执行mMapView.onResume ()，重新绘制加载地图
         mMapView.onResume();
-        if (mSensorEventHelper != null) {
-            mSensorEventHelper.registerSensorListener();
-        }
     }
 
     @Override
@@ -304,13 +313,6 @@ public class MapActivity extends BaseActivity {
         super.onPause();
         //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
         mMapView.onPause();
-
-        if (mSensorEventHelper != null) {
-            mSensorEventHelper.unRegisterSensorListener();
-            mSensorEventHelper.setCurrentMarker(null);
-            mSensorEventHelper = null;
-        }
-
         mFirstFix = false;
     }
 
@@ -368,9 +370,13 @@ public class MapActivity extends BaseActivity {
      * 还原数据
      */
     private void reset() {
-        mAMap.clear();//清除地图上的东西
+//        mAMap.clear();//清除地图上的东西
         location();//定位到当前位置
+        mRecord = null;
+        mRealPolylineOptions = null;
+        initMapLine();
         mFirstFix = false;
+
     }
 
     /**
@@ -526,16 +532,14 @@ public class MapActivity extends BaseActivity {
     private LocationSource mLocationSource = new LocationSource() {
         @Override
         public void activate(OnLocationChangedListener onLocationChangedListener) {
-            if (BuildConfig.DEBUG) Log.e("MapActivity", "mLocationSource-->activate");
+            if (BuildConfig.DEBUG) Log.e("MapActivity", "定位监听mLocationSource--> activate");
             mOnLocationChangedListener = onLocationChangedListener;
-
-//            startLocation();
             startLocationService();
         }
 
         @Override
         public void deactivate() {
-            if (BuildConfig.DEBUG) Log.e("MapActivity", "deactivate");
+            if (BuildConfig.DEBUG) Log.e("MapActivity", "定位监听mLocationSource--> deactivate");
             mOnLocationChangedListener = null;
             if (mLocationClient != null) {
                 mLocationClient.stopLocation();
@@ -625,50 +629,45 @@ public class MapActivity extends BaseActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
             String action = intent.getAction();
             if (action.equals(RECEIVER_ACTION)) {
-//                if (BuildConfig.DEBUG)
-//                    Log.e("MapActivity", "定位成功" + " mTotleDistance= " + mTotleDistance);
 
-                Parcelable result = intent.getParcelableExtra("result");
-                Serializable nodemoMapLocation = intent.getSerializableExtra("NodemoMapLocation");
-                Location location = (Location) result;
+                Parcelable p_location = intent.getParcelableExtra(LocationService.ACTION_AMAPLOCATION);
+                Serializable nodemoMapLocation = intent.getSerializableExtra(LocationService.ACTION_NODEMOMAPLOCATION);
+                Location location = (Location) p_location;
                 NodemoMapLocation aMapLocation = (NodemoMapLocation) nodemoMapLocation;
+
                 if (BuildConfig.DEBUG)
-                    Log.e("MapActivity", "定位成功" + " nodemoMapLocation= " + aMapLocation.toString());
+                    Log.e("MapActivity", "接受广播成功" + " nodemoMapLocation= " + aMapLocation.toString());
+                if (BuildConfig.DEBUG)
+                    Log.e("MapActivity", "aMapLocation.getLatitude():" + aMapLocation.getLatitude() + " aMapLocation.getLongitude()=" + aMapLocation.getLongitude());
                 if (null != aMapLocation) {
                     setToolbarTitle(aMapLocation);
                     currentAmapLocation = location;
-//                    mOnLocationChangedListener.onLocationChanged(currentAmapLocation);// 在更新的坐标显示系统小蓝点 ,该方法会将定位点拖动到屏幕重点
 
-                    if (BuildConfig.DEBUG)
-                        Log.e("MapActivity", "aMapLocation.getLatitude():" + aMapLocation.getLatitude()+" aMapLocation.getLongitude()="+aMapLocation.getLongitude());
-
-                    LatLng currentLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
+                    //获取经纬度
+                    mCurrentLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());
 
 
                     if (isFirstEnter) {
                         if (BuildConfig.DEBUG) Log.e("MapActivity", "isFirstEnter=" + isFirstEnter);
-                        mOnLocationChangedListener.onLocationChanged(location);// 在更新的坐标显示系统小蓝点 ,该方法会将定位点拖动到屏幕重点
-                        mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, ZOOMLEVEL));//设置当前地图显示为当前位置
+                        addMarker(mCurrentLatLng);//添加定位图标
                         isFirstEnter = false;
                         preLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
                         mSensorEventHelper.setCurrentMarker(mLocMarker);
+                        mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, ZOOMLEVEL));//设置当前地图显示为当前位置
+                    } else {
+                        mLocMarker.setPosition(mCurrentLatLng);
                     }
-
-                    addMarker(currentLatLng);//添加定位图标
-//                    setMarker(currentLatLng);
 
                     if (recording) {
                         mRecord.addpoint(aMapLocation);
-                        mRealPolylineOptions.add(currentLatLng);
+                        mRealPolylineOptions.add(mCurrentLatLng);
                         reDrawline();
-                        float distance = AMapUtils.calculateLineDistance(currentLatLng, preLatLng);
+                        float distance = AMapUtils.calculateLineDistance(mCurrentLatLng, preLatLng);
                         mTotleDistance += distance;
-                        mOnLocationChangedListener.onLocationChanged(location);
                     }
-                    preLatLng = currentLatLng;
+                    preLatLng = mCurrentLatLng;
 
                 }
             }

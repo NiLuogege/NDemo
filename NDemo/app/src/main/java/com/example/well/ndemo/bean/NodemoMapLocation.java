@@ -84,4 +84,18 @@ public class NodemoMapLocation implements Serializable{
     public void setBearing(float bearing) {
         mBearing = bearing;
     }
+
+    @Override
+    public String toString() {
+        return "NodemoMapLocation{" +
+                "district='" + district + '\'' +
+                ", street='" + street + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", mProvider='" + mProvider + '\'' +
+                ", mTime=" + mTime +
+                ", mSpeed=" + mSpeed +
+                ", mBearing=" + mBearing +
+                '}';
+    }
 }
