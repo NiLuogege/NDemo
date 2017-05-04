@@ -73,6 +73,9 @@
     <!--<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"></uses-permission>-->
     <!--用于申请调用A-GPS模块-->
     <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS"/>
+    <!-- 不是SDK需要的权限，是示例中的后台唤醒定位需要的权限 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
     /******************************/
 
 
@@ -161,6 +164,21 @@
             android:value="7c1e9193b97c4a3eb2ed14b9eafc6c23"/>
 
         <service android:name="com.amap.api.location.APSService"></service>
+
+        <service
+            android:name=".mapbackground.LocationService"
+            android:process=":remote1">
+            <intent-filter>
+                <action android:name="com.amap.locationservicedemo.LocationService"></action>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".mapbackground.LocationHelperService"
+            android:process=":remote2">
+            <intent-filter>
+                <action android:name="com.amap.locationservicedemo.LocationHelperService"></action>
+            </intent-filter>
+        </service>
         <!--*********-->
 
     </application>

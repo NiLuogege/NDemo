@@ -47,8 +47,8 @@ public class RecordListAdapter extends RecyclerView.Adapter<RecordListAdapter.Re
     public void onBindViewHolder(RecordListHolder holder, int position) {
         final PathRecord record = data.get(position);
         holder.tv_date.setText(record.getDate());
-        String street_start = record.getStartpoint().getStreet();//街道
-        String street_end = record.getEndpoint().getStreet();//街道
+        String street_start = record.getStartPoint().getStreet();//街道
+        String street_end = record.getEndPoint().getStreet();//街道
         holder.tv_fromTo.setText(street_start +"--->"+street_end);
         String distance = mFormat_1.format(Double.parseDouble(record.getDistance()));//距离
         double h = Double.parseDouble(record.getDuration()) / 60 / 60;

@@ -131,10 +131,10 @@ public class MapDbAdapter {
             String lines = query.getString(query
                     .getColumnIndex(MapDbAdapter.KEY_LINE));
             record.setPathline(MapUtils.parseLocations(lines));
-            record.setStartpoint(MapUtils.parseLocation(query
+            record.setStartPoint(MapUtils.parseLocation(query
                     .getString(query
                             .getColumnIndex(MapDbAdapter.KEY_STRAT))));
-            record.setEndpoint(MapUtils.parseLocation(query
+            record.setEndPoint(MapUtils.parseLocation(query
                     .getString(query
                             .getColumnIndex(MapDbAdapter.KEY_END))));
             record.setAveragespeed(query.getString(query.getColumnIndex(MapDbAdapter.KEY_SPEED)));
@@ -170,9 +170,9 @@ public class MapDbAdapter {
             String lines = cursor.getString(cursor
                     .getColumnIndex(MapDbAdapter.KEY_LINE));
             record.setPathline(MapUtils.parseLocations(lines));
-            record.setStartpoint(MapUtils.parseLocation(cursor.getString(cursor
+            record.setStartPoint(MapUtils.parseLocation(cursor.getString(cursor
                     .getColumnIndex(MapDbAdapter.KEY_STRAT))));
-            record.setEndpoint(MapUtils.parseLocation(cursor.getString(cursor
+            record.setEndPoint(MapUtils.parseLocation(cursor.getString(cursor
                     .getColumnIndex(MapDbAdapter.KEY_END))));
         }
         return record;

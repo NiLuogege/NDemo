@@ -2,9 +2,15 @@ package com.example.well.ndemo.ui.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,10 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.SlidingDrawer;
 
-import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.CameraUpdateFactory;
@@ -28,8 +31,11 @@ import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.Circle;
+import com.amap.api.maps.model.CircleOptions;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
@@ -37,11 +43,14 @@ import com.amap.api.trace.TraceOverlay;
 import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
 import com.example.well.ndemo.adapter.RecordListAdapter;
+import com.example.well.ndemo.bean.NodemoMapLocation;
 import com.example.well.ndemo.bean.PathRecord;
 import com.example.well.ndemo.db.MapDbAdapter;
+import com.example.well.ndemo.mapbackground.LocationService;
 import com.example.well.ndemo.utils.SnackbarUtils;
 import com.example.well.ndemo.utils.map.SensorEventHelper;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -80,7 +89,7 @@ public class MapActivity extends BaseActivity {
 //    private static final int FILL_COLOR = Color.argb(10, 0, 0, 180);
     private static final int STROKE_COLOR = Color.argb(0, 0, 0, 0);
     private static final int FILL_COLOR = Color.argb(0, 0, 0, 0);
-
+    public static final String RECEIVER_ACTION = "location_in_background";
     private AMap mAMap;
     private LocationSource.OnLocationChangedListener mOnLocationChangedListener;
     private AMapLocationClient mLocationClient;
@@ -96,12 +105,13 @@ public class MapActivity extends BaseActivity {
     private TraceOverlay mTraceOverlay;
     private List<TraceOverlay> mOverlayList = new ArrayList<>();
     private Polyline mPolyline;
-    public AMapLocation currentAmapLocation = null;
+    public Location currentAmapLocation = null;
     private MapDbAdapter mMapDbAdapter;
     private int mTotleDistance = 0;
     private LatLng preLatLng;//记录上一个坐标
     private SensorEventHelper mSensorEventHelper;//负责屏幕旋转的时候使箭头也跟着旋转
     private Marker mLocMarker;//旋转的marker
+    private Circle mCircle;
 
 
     @Override
@@ -112,6 +122,13 @@ public class MapActivity extends BaseActivity {
         mMapView.onCreate(savedInstanceState);// 此方法须覆写，虚拟机需要在很多情况下保存地图绘制的当前状态。
         initView();
         requestPermission();
+        initBroadcast();
+    }
+
+    private void initBroadcast() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(RECEIVER_ACTION);
+        registerReceiver(locationChangeBroadcastReceiver, intentFilter);
     }
 
     private void requestPermission() {
@@ -267,6 +284,9 @@ public class MapActivity extends BaseActivity {
         if (mLocationClient != null) {
             mLocationClient.onDestroy();
         }
+
+        if (locationChangeBroadcastReceiver != null)
+            unregisterReceiver(locationChangeBroadcastReceiver);
     }
 
     @Override
@@ -301,30 +321,13 @@ public class MapActivity extends BaseActivity {
         mMapView.onSaveInstanceState(outState);
     }
 
-    /**
-     * 初始化并开启定位
-     */
-    private void startLocation() {
-        //初始化定位
-        mLocationClient = new AMapLocationClient(context);
-        mLocationClient.setLocationListener(mAMapLocationListener);//设置定位回调监听
-        AMapLocationClientOption option = new AMapLocationClientOption(); //初始化定位参数
-        option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);//设置为高精度定位模式
-        option.setInterval(2000);//设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
-        mLocationClient.setLocationOption(option);//设置定位参数
-        // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
-        // 注意设置合适的定位时间的间隔（最小间隔支持为2000ms），并且在合适时间调用stopLocation()方法来取消定位请求
-        // 在定位结束后，在合适的生命周期调用onDestroy()方法
-        // 在单次定位情况下，定位无论成功与否，都无需调用stopLocation()方法移除请求，定位sdk内部会移除
-        mLocationClient.startLocation();//启动定位
-    }
 
     /**
      * 设置Toolbar的标题
      *
      * @param aMapLocation
      */
-    private void setToolbarTitle(AMapLocation aMapLocation) {
+    private void setToolbarTitle(NodemoMapLocation aMapLocation) {
         String district = aMapLocation.getDistrict();//城区信息
         String street = aMapLocation.getStreet();//街道信息
         String mCurrentLocation = district + "-" + street;
@@ -376,7 +379,7 @@ public class MapActivity extends BaseActivity {
      * @param list
      * @param time
      */
-    private void saveRecord(List<AMapLocation> list, String time) {
+    private void saveRecord(List<NodemoMapLocation> list, String time) {
 
         if (list != null && list.size() > 0) {
             if (mMapDbAdapter == null) {
@@ -387,8 +390,8 @@ public class MapActivity extends BaseActivity {
             float distance = getDistance(list);
             String average = getAverage(distance);
             String pathlineSring = getPathLineString(list);
-            AMapLocation firstLocaiton = list.get(0);
-            AMapLocation lastLocaiton = list.get(list.size() - 1);
+            NodemoMapLocation firstLocaiton = list.get(0);
+            NodemoMapLocation lastLocaiton = list.get(list.size() - 1);
             String stratpoint = amapLocationToString(firstLocaiton);
             String endpoint = amapLocationToString(lastLocaiton);
             mMapDbAdapter.addRecord(String.valueOf(distance), duration, average,
@@ -414,14 +417,14 @@ public class MapActivity extends BaseActivity {
      * @param list
      * @return
      */
-    private float getDistance(List<AMapLocation> list) {
+    private float getDistance(List<NodemoMapLocation> list) {
         float distance = 0;
         if (list == null || list.size() == 0) {
             return distance;
         }
         for (int i = 0; i < list.size() - 1; i++) {
-            AMapLocation firstpoint = list.get(i);
-            AMapLocation secondpoint = list.get(i + 1);
+            NodemoMapLocation firstpoint = list.get(i);
+            NodemoMapLocation secondpoint = list.get(i + 1);
             LatLng firstLatLng = new LatLng(firstpoint.getLatitude(),
                     firstpoint.getLongitude());
             LatLng secondLatLng = new LatLng(secondpoint.getLatitude(),
@@ -450,13 +453,13 @@ public class MapActivity extends BaseActivity {
      * @param list
      * @return
      */
-    private String getPathLineString(List<AMapLocation> list) {
+    private String getPathLineString(List<NodemoMapLocation> list) {
         if (list == null || list.size() == 0) {
             return "";
         }
         StringBuffer pathline = new StringBuffer();
         for (int i = 0; i < list.size(); i++) {
-            AMapLocation location = list.get(i);
+            NodemoMapLocation location = list.get(i);
             String locString = amapLocationToString(location);
             pathline.append(locString).append(";");
         }
@@ -472,7 +475,7 @@ public class MapActivity extends BaseActivity {
      * @param location
      * @return
      */
-    private String amapLocationToString(AMapLocation location) {
+    private String amapLocationToString(NodemoMapLocation location) {
         StringBuffer locString = new StringBuffer();
         locString.append(location.getLatitude()).append(",");
         locString.append(location.getLongitude()).append(",");
@@ -523,9 +526,11 @@ public class MapActivity extends BaseActivity {
     private LocationSource mLocationSource = new LocationSource() {
         @Override
         public void activate(OnLocationChangedListener onLocationChangedListener) {
-            if (BuildConfig.DEBUG) Log.e("MapActivity", "activate");
+            if (BuildConfig.DEBUG) Log.e("MapActivity", "mLocationSource-->activate");
             mOnLocationChangedListener = onLocationChangedListener;
-            startLocation();
+
+//            startLocation();
+            startLocationService();
         }
 
         @Override
@@ -540,66 +545,6 @@ public class MapActivity extends BaseActivity {
         }
     };
 
-
-    private AMapLocationListener mAMapLocationListener = new AMapLocationListener() {
-
-
-        @Override
-        public void onLocationChanged(AMapLocation aMapLocation) {//定位成功
-            if (mOnLocationChangedListener != null && aMapLocation != null) {
-                if (aMapLocation.getErrorCode() == 0) {
-                    if (BuildConfig.DEBUG)
-                        Log.e("MapActivity", "定位成功" + " mTotleDistance= " + mTotleDistance);
-//                    //定位成功回调信息，设置相关消息
-//                    aMapLocation.getLocationType();//获取当前定位结果来源，如网络定位结果，详见定位类型表
-//                    aMapLocation.getLatitude();//获取纬度
-//                    aMapLocation.getLongitude();//获取经度
-//                    aMapLocation.getAccuracy();//获取精度信息
-//                    SimpleDateF ormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                    Date date = new Date(amapLocation.getTime());
-//                    df.format(date);//定位时间
-//                    aMapLocation.getAddress();//地址，如果option中设置isNeedAddress为false，则没有此结果，网络定位结果中会有地址信息，GPS定位不返回地址信息。
-//                    aMapLocation.getCountry();//国家信息
-//                    aMapLocation.getProvince();//省信息
-//                    aMapLocation.getCity();//城市信息
-//                    aMapLocation.getDistrict();//城区信息
-//                    aMapLocation.getStreet();//街道信息
-//                    aMapLocation.getStreetNum();//街道门牌号信息
-//                    aMapLocation.getCityCode();//城市编码
-//                    aMapLocation.getAdCode();//地区编码
-//                    aMapLocation.getAoiName();//获取当前定位点的AOI信息
-
-                    setToolbarTitle(aMapLocation);
-                    currentAmapLocation = aMapLocation;
-
-                    LatLng currentLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
-
-
-                    if (isFirstEnter) {
-                        if (BuildConfig.DEBUG) Log.e("MapActivity", "isFirstEnter=" + isFirstEnter);
-                        mOnLocationChangedListener.onLocationChanged(aMapLocation);// 在更新的坐标显示系统小蓝点 ,该方法会将定位点拖动到屏幕重点
-                        mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, ZOOMLEVEL));//设置当前地图显示为当前位置
-                        isFirstEnter = false;
-                        preLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
-                    }
-
-                    setMarker(currentLatLng);
-
-                    if (recording) {
-                        mRecord.addpoint(aMapLocation);
-                        mRealPolylineOptions.add(currentLatLng);
-                        reDrawline();
-                        float distance = AMapUtils.calculateLineDistance(currentLatLng, preLatLng);
-                        mTotleDistance += distance;
-                        mOnLocationChangedListener.onLocationChanged(aMapLocation);
-                    }
-                    preLatLng = currentLatLng;
-                }
-            } else {//定位失败
-                SnackbarUtils.showDefaultLongSnackbar(rl_root, getString(R.string.location_error));
-            }
-        }
-    };
 
     /**
      * 设置maker
@@ -639,6 +584,13 @@ public class MapActivity extends BaseActivity {
         }
     }
 
+    /**
+     * 开始定位服务
+     */
+    private void startLocationService() {
+        getApplicationContext().startService(new Intent(this, LocationService.class));
+    }
+
 
     private Toolbar.OnMenuItemClickListener mOnMenuItemClickListener = new Toolbar.OnMenuItemClickListener() {
         @Override
@@ -668,4 +620,81 @@ public class MapActivity extends BaseActivity {
             MapActivity.this.finish();
         }
     };
+
+    private BroadcastReceiver locationChangeBroadcastReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String action = intent.getAction();
+            if (action.equals(RECEIVER_ACTION)) {
+//                if (BuildConfig.DEBUG)
+//                    Log.e("MapActivity", "定位成功" + " mTotleDistance= " + mTotleDistance);
+
+                Parcelable result = intent.getParcelableExtra("result");
+                Serializable nodemoMapLocation = intent.getSerializableExtra("NodemoMapLocation");
+                Location location = (Location) result;
+                NodemoMapLocation aMapLocation = (NodemoMapLocation) nodemoMapLocation;
+                if (BuildConfig.DEBUG)
+                    Log.e("MapActivity", "定位成功" + " nodemoMapLocation= " + aMapLocation.toString());
+                if (null != aMapLocation) {
+                    setToolbarTitle(aMapLocation);
+                    currentAmapLocation = location;
+//                    mOnLocationChangedListener.onLocationChanged(currentAmapLocation);// 在更新的坐标显示系统小蓝点 ,该方法会将定位点拖动到屏幕重点
+
+                    if (BuildConfig.DEBUG)
+                        Log.e("MapActivity", "aMapLocation.getLatitude():" + aMapLocation.getLatitude()+" aMapLocation.getLongitude()="+aMapLocation.getLongitude());
+
+                    LatLng currentLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
+
+
+                    if (isFirstEnter) {
+                        if (BuildConfig.DEBUG) Log.e("MapActivity", "isFirstEnter=" + isFirstEnter);
+                        mOnLocationChangedListener.onLocationChanged(location);// 在更新的坐标显示系统小蓝点 ,该方法会将定位点拖动到屏幕重点
+                        mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, ZOOMLEVEL));//设置当前地图显示为当前位置
+                        isFirstEnter = false;
+                        preLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
+                        mSensorEventHelper.setCurrentMarker(mLocMarker);
+                    }
+
+                    addMarker(currentLatLng);//添加定位图标
+//                    setMarker(currentLatLng);
+
+                    if (recording) {
+                        mRecord.addpoint(aMapLocation);
+                        mRealPolylineOptions.add(currentLatLng);
+                        reDrawline();
+                        float distance = AMapUtils.calculateLineDistance(currentLatLng, preLatLng);
+                        mTotleDistance += distance;
+                        mOnLocationChangedListener.onLocationChanged(location);
+                    }
+                    preLatLng = currentLatLng;
+
+                }
+            }
+        }
+    };
+
+
+    private void addCircle(LatLng latlng, double radius) {
+        CircleOptions options = new CircleOptions();
+        options.strokeWidth(1f);
+        options.fillColor(FILL_COLOR);
+        options.strokeColor(STROKE_COLOR);
+        options.center(latlng);
+        options.radius(radius);
+        mCircle = mAMap.addCircle(options);
+    }
+
+    private void addMarker(LatLng latlng) {
+        if (mLocMarker != null) {
+            return;
+        }
+        MarkerOptions options = new MarkerOptions();
+        options.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(this.getResources(),
+                R.mipmap.navi_map_gps_locked)));
+        options.anchor(0.5f, 0.5f);
+        options.position(latlng);
+        mLocMarker = mAMap.addMarker(options);
+    }
 }

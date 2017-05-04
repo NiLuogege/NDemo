@@ -24,6 +24,7 @@ import com.amap.api.trace.LBSTraceClient;
 import com.amap.api.trace.TraceListener;
 import com.amap.api.trace.TraceLocation;
 import com.example.well.ndemo.R;
+import com.example.well.ndemo.bean.NodemoMapLocation;
 import com.example.well.ndemo.bean.PathRecord;
 import com.example.well.ndemo.db.MapDbAdapter;
 import com.example.well.ndemo.utils.MapUtils;
@@ -202,15 +203,15 @@ public class MapRecordActivity extends BaseActivity {
     private void setUpRecord() {
         PathRecord record = initData();
         if (record != null) {
-            List<AMapLocation> pathline = record.getPathline();
-            AMapLocation startpoint = record.getStartpoint();
-            AMapLocation endpoint = record.getEndpoint();
+            List<NodemoMapLocation> pathline = record.getPathline();
+            NodemoMapLocation startpoint = record.getStartPoint();
+            NodemoMapLocation endpoint = record.getEndPoint();
             if (pathline == null || endpoint == null || startpoint == null) {
                 return;
             }
 
-            String street_start = record.getStartpoint().getStreet();//街道
-            String street_end = record.getEndpoint().getStreet();//街道
+            String street_start = record.getStartPoint().getStreet();//街道
+            String street_end = record.getEndPoint().getStreet();//街道
             toolbar.setTitle(street_start +"->"+street_end);
             toolbar.setTitleMarginStart(SystemUtils.dp2px(-5,getResources()));
 
@@ -227,7 +228,7 @@ public class MapRecordActivity extends BaseActivity {
 
     }
 
-    private void initTrace(List<AMapLocation> pathline) {
+    private void initTrace(List<NodemoMapLocation> pathline) {
         LBSTraceClient traceClient = new LBSTraceClient(getApplicationContext());
         List<TraceLocation> traceLocationList = MapUtils.parseTraceLocationList(pathline);
         //        queryProcessedTrace方法参数解析

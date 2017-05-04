@@ -3,6 +3,7 @@ package com.example.well.ndemo.utils;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.trace.TraceLocation;
+import com.example.well.ndemo.bean.NodemoMapLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +21,14 @@ public class MapUtils {
      * @return
      */
     public static List<TraceLocation> parseTraceLocationList(
-            List<AMapLocation> list) {
+            List<NodemoMapLocation> list) {
         List<TraceLocation> traceList = new ArrayList<TraceLocation>();
         if (list == null) {
             return traceList;
         }
         for (int i = 0; i < list.size(); i++) {
             TraceLocation location = new TraceLocation();
-            AMapLocation amapLocation = list.get(i);
+            NodemoMapLocation amapLocation = list.get(i);
             location.setBearing(amapLocation.getBearing());
             location.setLatitude(amapLocation.getLatitude());
             location.setLongitude(amapLocation.getLongitude());
@@ -53,13 +54,13 @@ public class MapUtils {
      * @param list
      * @return
      */
-    public static List<LatLng> parseLatLngList(List<AMapLocation> list) {
+    public static List<LatLng> parseLatLngList(List<NodemoMapLocation> list) {
         List<LatLng> traceList = new ArrayList<LatLng>();
         if (list == null) {
             return traceList;
         }
         for (int i = 0; i < list.size(); i++) {
-            AMapLocation loc = list.get(i);
+            NodemoMapLocation loc = list.get(i);
             double lat = loc.getLatitude();
             double lng = loc.getLongitude();
             LatLng latlng = new LatLng(lat, lng);
@@ -68,14 +69,14 @@ public class MapUtils {
         return traceList;
     }
 
-    public static AMapLocation parseLocation(String latLonStr) {
+    public static NodemoMapLocation parseLocation(String latLonStr) {
         if (latLonStr == null || latLonStr.equals("") || latLonStr.equals("[]")) {
             return null;
         }
         String[] loc = latLonStr.split(",");
-        AMapLocation location = null;
+        NodemoMapLocation location = null;
         if (loc.length == 7) {
-            location = new AMapLocation(loc[2]);
+            location = new NodemoMapLocation();
             location.setProvider(loc[2]);
             location.setLatitude(Double.parseDouble(loc[0]));
             location.setLongitude(Double.parseDouble(loc[1]));
@@ -84,7 +85,7 @@ public class MapUtils {
             location.setBearing(Float.parseFloat(loc[5]));
             location.setStreet(loc[6]);
         }else if(loc.length == 2){
-            location = new AMapLocation("gps");
+            location = new NodemoMapLocation();
             location.setLatitude(Double.parseDouble(loc[0]));
             location.setLongitude(Double.parseDouble(loc[1]));
         }
@@ -92,11 +93,11 @@ public class MapUtils {
         return location;
     }
 
-    public static ArrayList<AMapLocation> parseLocations(String latLonStr) {
-        ArrayList<AMapLocation> locations = new ArrayList<AMapLocation>();
+    public static ArrayList<NodemoMapLocation> parseLocations(String latLonStr) {
+        ArrayList<NodemoMapLocation> locations = new ArrayList<NodemoMapLocation>();
         String[] latLonStrs = latLonStr.split(";");
         for (int i = 0; i < latLonStrs.length; i++) {
-            AMapLocation location = MapUtils.parseLocation(latLonStrs[i]);
+            NodemoMapLocation location = MapUtils.parseLocation(latLonStrs[i]);
             if (location != null) {
                 locations.add(location);
             }

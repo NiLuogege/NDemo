@@ -1,7 +1,5 @@
 package com.example.well.ndemo.bean;
 
-import com.amap.api.location.AMapLocation;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +10,9 @@ import java.util.List;
  * 
  */
 public class PathRecord {
-	private AMapLocation mStartPoint;
-	private AMapLocation mEndPoint;
-	private List<AMapLocation> mPathLinePoints = new ArrayList<AMapLocation>();
+	private NodemoMapLocation mStartPoint;
+	private NodemoMapLocation mEndPoint;
+	private List<NodemoMapLocation> mPathLinePoints = new ArrayList<NodemoMapLocation>();
 	private String mDistance;
 	private String mDuration;
 	private String mAveragespeed;
@@ -33,27 +31,27 @@ public class PathRecord {
 		this.mId = id;
 	}
 
-	public AMapLocation getStartpoint() {
+	public NodemoMapLocation getStartPoint() {
 		return mStartPoint;
 	}
 
-	public void setStartpoint(AMapLocation startpoint) {
-		this.mStartPoint = startpoint;
+	public void setStartPoint(NodemoMapLocation startPoint) {
+		mStartPoint = startPoint;
 	}
 
-	public AMapLocation getEndpoint() {
+	public NodemoMapLocation getEndPoint() {
 		return mEndPoint;
 	}
 
-	public void setEndpoint(AMapLocation endpoint) {
-		this.mEndPoint = endpoint;
+	public void setEndPoint(NodemoMapLocation endPoint) {
+		mEndPoint = endPoint;
 	}
 
-	public List<AMapLocation> getPathline() {
+	public List<NodemoMapLocation> getPathline() {
 		return mPathLinePoints;
 	}
 
-	public void setPathline(List<AMapLocation> pathline) {
+	public void setPathline(List<NodemoMapLocation> pathline) {
 		this.mPathLinePoints = pathline;
 	}
 
@@ -89,7 +87,7 @@ public class PathRecord {
 		this.mDate = date;
 	}
 
-	public void addpoint(AMapLocation point) {
+	public void addpoint(NodemoMapLocation point) {
 		mPathLinePoints.add(point);
 	}
 
