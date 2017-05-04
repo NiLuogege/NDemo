@@ -97,7 +97,7 @@ public class LocationService extends NotiService {
         mLocationClient.setLocationListener(mAMapLocationListener);//设置定位回调监听
         AMapLocationClientOption option = new AMapLocationClientOption(); //初始化定位参数
         option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);//设置为高精度定位模式
-        option.setInterval(2000);//设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
+        option.setInterval(3000);//设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
         mLocationClient.setLocationOption(option);//设置定位参数
         // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
         // 注意设置合适的定位时间的间隔（最小间隔支持为2000ms），并且在合适时间调用stopLocation()方法来取消定位请求

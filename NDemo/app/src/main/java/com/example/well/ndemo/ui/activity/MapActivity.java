@@ -101,7 +101,6 @@ public class MapActivity extends BaseActivity {
     private PolylineOptions mRealPolylineOptions;//真是的轨迹
     private boolean recording = false;//是否正在记录行程
     private boolean isFirstEnter = true;//是否刚刚进入
-    private boolean mFirstFix = false;//是否第一次定位
     private MenuItem mMapSwitch;
     private PathRecord mRecord;
     private long mStartTime;//行程的起始时间
@@ -313,7 +312,6 @@ public class MapActivity extends BaseActivity {
         super.onPause();
         //在activity执行onPause时执行mMapView.onPause ()，暂停地图的绘制
         mMapView.onPause();
-        mFirstFix = false;
     }
 
     @Override
@@ -370,13 +368,13 @@ public class MapActivity extends BaseActivity {
      * 还原数据
      */
     private void reset() {
-//        mAMap.clear();//清除地图上的东西
-        location();//定位到当前位置
+        mAMap.clear();//清除地图上的东西
         mRecord = null;
         mRealPolylineOptions = null;
         initMapLine();
-        mFirstFix = false;
-
+        mLocMarker=null;
+        isFirstEnter = true;
+        location();//定位到当前位置
     }
 
     /**
@@ -549,31 +547,6 @@ public class MapActivity extends BaseActivity {
         }
     };
 
-
-    /**
-     * 设置maker
-     *
-     * @param currentLatLng
-     */
-
-    private void setMarker(LatLng currentLatLng) {
-        List<Marker> mapScreenMarkers = mAMap.getMapScreenMarkers();
-        mLocMarker = mapScreenMarkers.get(0);
-        if (!mFirstFix) {
-            mFirstFix = true;
-            mSensorEventHelper.setCurrentMarker(mLocMarker);//定位图标旋转
-        } else {
-            if (recording) {
-                mLocMarker.setTitle(mTotleDistance + "m");
-            } else {
-                mLocMarker.setPosition(currentLatLng);
-            }
-
-        }
-        mLocMarker.showInfoWindow();
-    }
-
-
     /**
      * 绘制实时轨迹
      */
@@ -647,7 +620,6 @@ public class MapActivity extends BaseActivity {
 
                     //获取经纬度
                     mCurrentLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());
-
 
                     if (isFirstEnter) {
                         if (BuildConfig.DEBUG) Log.e("MapActivity", "isFirstEnter=" + isFirstEnter);
