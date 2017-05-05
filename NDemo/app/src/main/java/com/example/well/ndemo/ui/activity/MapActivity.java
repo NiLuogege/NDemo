@@ -123,7 +123,6 @@ public class MapActivity extends BaseActivity {
     private Marker mLocMarker;//旋转的marker
     private Circle mCircle;
     private LatLng mCurrentLatLng;
-    private List<PathRecord> mRecords;
     private RecordListAdapter mAdapter;
     private ProgressDialog mProgressDialog;
 
@@ -166,8 +165,8 @@ public class MapActivity extends BaseActivity {
     private void initRecycalView() {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);
         rv_RecordList.setLayoutManager(layoutManager);
-        mRecords = loadRecords();
-        mAdapter = new RecordListAdapter(context, mRecords);
+        List<PathRecord> records = loadRecords();
+        mAdapter = new RecordListAdapter(context, records);
         rv_RecordList.setAdapter(mAdapter);
     }
 
@@ -417,7 +416,8 @@ public class MapActivity extends BaseActivity {
         mOverlayList.add(mTraceOverlay);
         saveRecord(mRecord.getPathline(), mRecord.getDate());
         reset();
-        loadRecords();
+        List<PathRecord> records = loadRecords();
+        mAdapter.setData(records);
         mAdapter.notifyDataSetChanged();
     }
 

@@ -37,6 +37,10 @@ public class RecordListAdapter extends RecyclerView.Adapter<RecordListAdapter.Re
         mFormat_2 = new DecimalFormat("0.00");
     }
 
+    public void setData(List<PathRecord> data){
+        this.data = data;
+    }
+
     @Override
     public RecordListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = View.inflate(context, R.layout.item_record_list, null);
