@@ -84,6 +84,7 @@ import butterknife.OnClick;
  */
 
 public class MapActivity extends BaseActivity {
+
     @Bind(R.id.map)
     MapView mMapView;
     @Bind(R.id.fl_root)
@@ -102,6 +103,7 @@ public class MapActivity extends BaseActivity {
     private static final int STROKE_COLOR = Color.argb(0, 0, 0, 0);
     private static final int FILL_COLOR = Color.argb(0, 0, 0, 0);
     public static final String RECEIVER_ACTION = "location_in_background";
+    private static final int LIMITPOINT = 10;//最少有十个点 才进行记录
     private AMap mAMap;
     private LocationSource.OnLocationChangedListener mOnLocationChangedListener;
     private AMapLocationClient mLocationClient;
@@ -418,9 +420,16 @@ public class MapActivity extends BaseActivity {
         }
         mEndTime = System.currentTimeMillis();
         mOverlayList.add(mTraceOverlay);
-        saveRecord(mRecord.getPathline(), mRecord.getDate());
+
+        List<NodemoMapLocation> list = mRecord.getPathline();
+        if (list != null && list.size() > LIMITPOINT) {
+            saveRecord(list, mRecord.getDate());
+            refreshRecycleView();
+        } else {
+            SnackbarUtils.showDefaultLongSnackbar(rl_root, "记录的点过少不能画出路径");
+        }
         reset();
-        refreshRecycleView();
+
     }
 
     /**
@@ -454,26 +463,21 @@ public class MapActivity extends BaseActivity {
      * @param time
      */
     private void saveRecord(List<NodemoMapLocation> list, String time) {
-
-        if (list != null && list.size() > 0) {
-            if (mMapDbAdapter == null) {
-                mMapDbAdapter = new MapDbAdapter(context);
-            }
-            mMapDbAdapter.open();
-            String duration = getDuration();
-            float distance = getDistance(list);
-            String average = getAverage(distance);
-            String pathlineSring = getPathLineString(list);
-            NodemoMapLocation firstLocaiton = list.get(0);
-            NodemoMapLocation lastLocaiton = list.get(list.size() - 1);
-            String stratpoint = amapLocationToString(firstLocaiton);
-            String endpoint = amapLocationToString(lastLocaiton);
-            mMapDbAdapter.addRecord(String.valueOf(distance), duration, average,
-                    pathlineSring, stratpoint, endpoint, time);
-            mMapDbAdapter.close();
-        } else {
-            SnackbarUtils.showDefaultLongSnackbar(rl_root, "没有记录到路径");
+        if (mMapDbAdapter == null) {
+            mMapDbAdapter = new MapDbAdapter(context);
         }
+        mMapDbAdapter.open();
+        String duration = getDuration();
+        float distance = getDistance(list);
+        String average = getAverage(distance);
+        String pathlineSring = getPathLineString(list);
+        NodemoMapLocation firstLocaiton = list.get(0);
+        NodemoMapLocation lastLocaiton = list.get(list.size() - 1);
+        String stratpoint = amapLocationToString(firstLocaiton);
+        String endpoint = amapLocationToString(lastLocaiton);
+        mMapDbAdapter.addRecord(String.valueOf(distance), duration, average,
+                pathlineSring, stratpoint, endpoint, time);
+        mMapDbAdapter.close();
     }
 
     /**
