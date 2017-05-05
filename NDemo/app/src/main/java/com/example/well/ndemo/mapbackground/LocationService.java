@@ -72,6 +72,7 @@ public class LocationService extends NotiService {
 
     @Override
     public void onDestroy() {
+        if (BuildConfig.DEBUG) Log.e("LocationService", "LocationServiceonDestroy");
         unApplyNotiKeepMech();
         stopLocation();
 

@@ -51,6 +51,7 @@ import com.example.well.ndemo.bean.NodemoMapLocation;
 import com.example.well.ndemo.bean.PathRecord;
 import com.example.well.ndemo.db.MapDbAdapter;
 import com.example.well.ndemo.mapbackground.LocationService;
+import com.example.well.ndemo.mapbackground.Utils;
 import com.example.well.ndemo.utils.SPUtils;
 import com.example.well.ndemo.utils.SettingsUtils;
 import com.example.well.ndemo.utils.SnackbarUtils;
@@ -341,10 +342,13 @@ public class MapActivity extends BaseActivity {
             mSensorEventHelper = null;
         }
 
+        stopLocationService();
+
         if (locationChangeBroadcastReceiver != null)
             unregisterReceiver(locationChangeBroadcastReceiver);
 
         catchCurrentLatLng();
+
     }
 
     /**
@@ -623,8 +627,16 @@ public class MapActivity extends BaseActivity {
      * 开始定位服务
      */
     private void startLocationService() {
-        Intent service = new Intent(this, LocationService.class);
-        getApplicationContext().startService(service);
+        Intent locationService = new Intent(this, LocationService.class);
+        getApplicationContext().startService(locationService);
+    }
+
+    /**
+     * 关闭服务
+     * 先关闭守护进程，再关闭定位服务
+     */
+    private void stopLocationService() {
+        sendBroadcast(Utils.getCloseBrodecastIntent());
     }
 
 
