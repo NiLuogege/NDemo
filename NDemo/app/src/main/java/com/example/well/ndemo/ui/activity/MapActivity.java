@@ -2,6 +2,7 @@ package com.example.well.ndemo.ui.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,12 +18,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.SlidingDrawer;
+import android.widget.TextView;
 
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.maps.AMap;
@@ -76,6 +79,7 @@ import butterknife.OnClick;
  * <p>
  * api:
  * 1.mOnLocationChangedListener.onLocationChanged(currentAmapLocation);// 在更新的坐标显示系统小蓝点 ,该方法会将定位点拖动到屏幕重点
+ * 2.  mLocMarker.showInfoWindow();//当改变 Marker 的 title 和 snippet 属性时，再次调用 showInfoWindow()，可以更新 InfoWindow 显示内容  注意:必须要改变info的内容然后在调用该方法才有效,只调用该方法是无效的
  */
 
 public class MapActivity extends BaseActivity {
@@ -121,6 +125,7 @@ public class MapActivity extends BaseActivity {
     private LatLng mCurrentLatLng;
     private List<PathRecord> mRecords;
     private RecordListAdapter mAdapter;
+    private ProgressDialog mProgressDialog;
 
 
     @Override
@@ -138,6 +143,11 @@ public class MapActivity extends BaseActivity {
         initToolbar();
         initRecycalView();
         initSlidingDrawer();
+        initProgressDialog();
+    }
+
+    private void initProgressDialog() {
+        mProgressDialog = new ProgressDialog(context);
     }
 
     private void initToolbar() {
@@ -163,6 +173,7 @@ public class MapActivity extends BaseActivity {
 
     /**
      * 从数据库拉取数据
+     *
      * @return
      */
     private List<PathRecord> loadRecords() {
@@ -221,7 +232,7 @@ public class MapActivity extends BaseActivity {
      */
     private void moveMap() {
         String lastLatlng = SPUtils.getInstance(getApplication()).getString(SettingsUtils.LASTLATLNG);
-        if(!TextUtils.isEmpty(lastLatlng)) {
+        if (!TextUtils.isEmpty(lastLatlng)) {
             if (BuildConfig.DEBUG) Log.e("MapActivity", "moveMap-->lastLatlng=" + lastLatlng);
             String[] split = lastLatlng.split(":");
             double latitude = Double.parseDouble(split[0]);
@@ -245,6 +256,7 @@ public class MapActivity extends BaseActivity {
         mAMap.setLocationSource(mLocationSource);// 设置定位监听
         MyLocationStyle style = setDot();
         mAMap.setMyLocationStyle(style);
+        mAMap.setInfoWindowAdapter(mInfoWindowAdapter);//设置InfoWindow的样式
         setMapUI();
         mAMap.setMyLocationEnabled(true);// 可触发定位并显示当前位置 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
     }
@@ -281,6 +293,11 @@ public class MapActivity extends BaseActivity {
     void location() {
         if (mAMap != null) {
             mAMap.moveCamera(CameraUpdateFactory.changeLatLng(mCurrentLatLng));//移动地图到中心
+        }
+
+        if (recording && mLocMarker != null) {
+            mLocMarker.setPosition(mCurrentLatLng);
+            mLocMarker.showInfoWindow();
         }
     }
 
@@ -393,6 +410,9 @@ public class MapActivity extends BaseActivity {
      * 停止记录行程
      */
     private void stopRecord() {
+        if (mProgressDialog != null && !mProgressDialog.isShowing()) {
+            mProgressDialog.show();
+        }
         mEndTime = System.currentTimeMillis();
         mOverlayList.add(mTraceOverlay);
         saveRecord(mRecord.getPathline(), mRecord.getDate());
@@ -408,6 +428,7 @@ public class MapActivity extends BaseActivity {
         mAMap.clear();//清除地图上的东西
         mRecord = null;
         mRealPolylineOptions = null;
+        mTotleDistance = 0;
         initMapLine();
         mLocMarker = null;
         isFirstEnter = true;
@@ -666,8 +687,12 @@ public class MapActivity extends BaseActivity {
                         preLatLng = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());//获取经纬度
                         mSensorEventHelper.setCurrentMarker(mLocMarker);
                         mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, ZOOMLEVEL));//设置当前地图显示为当前位置
+                        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                            mProgressDialog.dismiss();
+                        }
                     } else {
-                        mLocMarker.setPosition(mCurrentLatLng);
+                        resetLocMarker();
+
                     }
 
                     if (recording) {
@@ -683,6 +708,16 @@ public class MapActivity extends BaseActivity {
             }
         }
     };
+
+    private void resetLocMarker() {
+        if (recording) {
+            mLocMarker.setTitle(mTotleDistance + "m");
+            mLocMarker.showInfoWindow();//当改变 Marker 的 title 和 snippet 属性时，再次调用 showInfoWindow()，可以更新 InfoWindow 显示内容  注意:必须要改变info的内容然后在调用该方法才有效,只调用该方法是无效的
+        } else {
+            mLocMarker.hideInfoWindow();
+        }
+        mLocMarker.setPosition(mCurrentLatLng);
+    }
 
 
     private void addCircle(LatLng latlng, double radius) {
@@ -706,4 +741,29 @@ public class MapActivity extends BaseActivity {
         options.position(latlng);
         mLocMarker = mAMap.addMarker(options);
     }
+
+    AMap.InfoWindowAdapter mInfoWindowAdapter = new AMap.InfoWindowAdapter() {
+
+        private View mInflate;
+
+        @Override
+        public View getInfoContents(Marker marker) {
+            return null;
+        }
+
+        @Override
+        public View getInfoWindow(Marker marker) {
+            if (mInflate == null) {
+                mInflate = LayoutInflater.from(context).inflate(R.layout.map_infowindow, null);
+            }
+            render(marker, mInflate);
+            return mInflate;
+        }
+
+        private void render(Marker marker, View inflate) {
+            if (BuildConfig.DEBUG) Log.e("MapActivity", "render");
+            TextView tv_map_infowindow = (TextView) inflate.findViewById(R.id.tv_map_infowindow);
+            tv_map_infowindow.setText(mTotleDistance + "m");
+        }
+    };
 }
