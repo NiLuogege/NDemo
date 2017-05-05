@@ -20,7 +20,7 @@ import com.example.well.ndemo.net.entity.resulte.GankMeiziReponse;
 import com.example.well.ndemo.net.rxretrofit.Api.BaseResultEntity;
 import com.example.well.ndemo.net.rxretrofit.http.HttpManager;
 import com.example.well.ndemo.net.rxretrofit.listener.HttpOnNextListener;
-import com.example.well.ndemo.ui.activity.BaseActivity;
+import com.example.well.ndemo.ui.activity.MainActivity;
 import com.example.well.ndemo.utils.SpacesItemDecoration;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -47,7 +47,7 @@ public class ContentFragment extends Fragment {
     RecyclerView mRv;
 
 
-    private BaseActivity mActivity;
+    private MainActivity mActivity;
     private static final int SPANCOUNT = 2;//列表列数
     public List<GankMeiziReponse> mData = new ArrayList<>();//数据集合
     private ContentFragmentListAdapter mAdapter;
@@ -65,8 +65,8 @@ public class ContentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_content, null);
         ButterKnife.bind(this, view);
-        mActivity = (BaseActivity) this.getActivity();
-        initView(view);
+        mActivity = (MainActivity) this.getActivity();
+        initView();
         initListener();
         initData();
         return view;
@@ -74,8 +74,10 @@ public class ContentFragment extends Fragment {
 
 
 
-    private void initView(View view) {
+    private void initView() {
         mActivity.setSupportActionBar(mToolbar);
+        mToolbar.setNavigationIcon(R.mipmap.open);
+        mToolbar.setNavigationOnClickListener(mOnClickListener);
         setHasOptionsMenu(true);
         initRecyclerView();
     }
@@ -201,4 +203,11 @@ public class ContentFragment extends Fragment {
         super.onDestroyView();
         ButterKnife.unbind(this);
     }
+
+    View.OnClickListener mOnClickListener= new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            mActivity.openDrawer();
+        }
+    };
 }

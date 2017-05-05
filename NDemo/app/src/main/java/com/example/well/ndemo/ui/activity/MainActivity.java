@@ -219,11 +219,11 @@ public class MainActivity extends BaseActivity {
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.map:
-                    Intent intent = new Intent(context,MapActivity.class);
-                    ActivityOptionsCompat compat = ActivityOptionsCompat.makeScaleUpAnimation(mNav_image,mNav_image.getWidth()/2,mNav_image.getHeight(),0,0);
+                    Intent intent = new Intent(context, MapActivity.class);
+                    ActivityOptionsCompat compat = ActivityOptionsCompat.makeScaleUpAnimation(mNav_image, mNav_image.getWidth() / 2, mNav_image.getHeight(), 0, 0);
                     Bundle bundle = compat.toBundle();
-                    startActivity(intent,bundle);
-                    dl_main.closeDrawer(nav,false);
+                    startActivity(intent, bundle);
+                    dl_main.closeDrawer(nav, false);
 //                    Intent intent = new Intent(context,DemoActivity.class);
 //                    startActivity(intent);
                     break;
@@ -281,5 +281,10 @@ public class MainActivity extends BaseActivity {
             nav.setItemTextColor(new ColorStateList(state, color));
             nav.setItemIconTintList(new ColorStateList(state, iconcolor));
         }
+    }
+
+
+    public void openDrawer() {
+        dl_main.openDrawer(nav);
     }
 }
