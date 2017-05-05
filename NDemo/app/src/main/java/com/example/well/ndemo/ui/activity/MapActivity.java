@@ -420,9 +420,17 @@ public class MapActivity extends BaseActivity {
         mOverlayList.add(mTraceOverlay);
         saveRecord(mRecord.getPathline(), mRecord.getDate());
         reset();
+        refreshRecycleView();
+    }
+
+    /**
+     * 定点刷新列表
+     */
+    private void refreshRecycleView() {
         List<PathRecord> records = loadRecords();
         mAdapter.setData(records);
-        mAdapter.notifyDataSetChanged();
+        mAdapter.loadDataEnd();
+        rv_RecordList.scrollToPosition(0);
     }
 
     /**

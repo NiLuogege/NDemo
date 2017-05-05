@@ -75,6 +75,10 @@ public class RecordListAdapter extends RecyclerView.Adapter<RecordListAdapter.Re
         return data.size();
     }
 
+    public void loadDataEnd() {
+        notifyItemInserted(0);
+    }
+
 
     static class RecordListHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.tv_date)
