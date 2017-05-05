@@ -219,9 +219,9 @@ public class MapActivity extends BaseActivity {
     private void initMap() {
         if (mAMap == null) {
             mAMap = mMapView.getMap();
+            moveMap();
             setUpMap();
         }
-        moveMap();
         mSensorEventHelper = new SensorEventHelper(context);
         if (mSensorEventHelper != null) {
             mSensorEventHelper.registerSensorListener();
@@ -240,7 +240,9 @@ public class MapActivity extends BaseActivity {
             double latitude = Double.parseDouble(split[0]);
             double longitude = Double.parseDouble(split[1]);
             mCurrentLatLng = new LatLng(latitude, longitude);
-            location();
+            if (mAMap != null && mCurrentLatLng != null) {
+                mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mCurrentLatLng, ZOOMLEVEL));
+            }
         }
     }
 
@@ -255,7 +257,7 @@ public class MapActivity extends BaseActivity {
 
 
     private void setUpMap() {
-        mAMap.setLocationSource(mLocationSource);// 设置定位监听
+        mAMap.setLocationSource(mLocationSource);// 设置定位监听 这个监听设置以后原来的地图定位就不起作用了
         MyLocationStyle style = setDot();
         mAMap.setMyLocationStyle(style);
         mAMap.setInfoWindowAdapter(mInfoWindowAdapter);//设置InfoWindow的样式
@@ -275,8 +277,8 @@ public class MapActivity extends BaseActivity {
         style.myLocationIcon(BitmapDescriptorFactory.fromResource(R.mipmap.point));//设置定位圆点图标
         style.radiusFillColor(FILL_COLOR);
         style.strokeColor(STROKE_COLOR);
-        style.anchor(0.5f, 0.5f);//这只锚点
-        style.myLocationType(MyLocationStyle.LOCATION_TYPE_SHOW);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
+//        style.anchor(0.5f, 0.5f);//这只锚点
+//        style.myLocationType(MyLocationStyle.LOCATION_TYPE_SHOW);//连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
         style.interval(2000 * 100);//设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
         return style;
     }
@@ -357,11 +359,13 @@ public class MapActivity extends BaseActivity {
      * 缓存最后一个点
      */
     private void catchCurrentLatLng() {
-        double latitude = mCurrentLatLng.latitude;
-        double longitude = mCurrentLatLng.longitude;
-        String lastLatlng = latitude + ":" + longitude;
-        if (BuildConfig.DEBUG) Log.e("MapActivity", "onDestroy-->lastLatlng=" + lastLatlng);
-        SPUtils.getInstance(getApplication()).put(SettingsUtils.LASTLATLNG, lastLatlng);
+        if(mCurrentLatLng!=null){
+            double latitude = mCurrentLatLng.latitude;
+            double longitude = mCurrentLatLng.longitude;
+            String lastLatlng = latitude + ":" + longitude;
+            if (BuildConfig.DEBUG) Log.e("MapActivity", "onDestroy-->lastLatlng=" + lastLatlng);
+            SPUtils.getInstance(getApplication()).put(SettingsUtils.LASTLATLNG, lastLatlng);
+        }
     }
 
     @Override
