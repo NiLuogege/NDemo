@@ -9,6 +9,7 @@ import android.os.Environment;
 
 import com.example.well.ndemo.bean.PathRecord;
 import com.example.well.ndemo.utils.MapUtils;
+import com.example.well.ndemo.utils.SettingsUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +27,7 @@ public class MapDbAdapter {
     private static final java.lang.String RECORD_DB_NAME = "record";//数据库名称
     private static final java.lang.String RECORD_TABLE_NAME = "record";//表名称
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/recordPath";//存放数据库的文件夹路径
+    private static final String DATABASE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath()+ SettingsUtils.RECORDPATH;//存放数据库的文件夹路径
     private static final String DATABASE_NAME = DATABASE_PATH + "/" + RECORD_DB_NAME + ".db";//存放数据库的路径
 
     private static final String KEY_ROWID = "id";

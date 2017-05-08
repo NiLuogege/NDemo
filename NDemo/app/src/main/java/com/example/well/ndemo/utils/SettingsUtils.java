@@ -14,6 +14,11 @@ public interface SettingsUtils {
     String SD_DIR = "NDemo";
 
     /**
+     * 地图路径保存文件夹名称
+     */
+    String RECORDPATH = "/NDemo/recordPath";
+
+    /**
      * 外部内存权限的请求吗
      */
     int PREMIERE_REQUEST_CODE_STORAGE = 1;
