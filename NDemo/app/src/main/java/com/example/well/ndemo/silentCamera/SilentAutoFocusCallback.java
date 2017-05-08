@@ -7,9 +7,12 @@ import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
+import android.os.Environment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.format.DateFormat;
+import android.util.Log;
 
+import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.utils.SettingsUtils;
 
 import java.io.File;
@@ -33,6 +36,7 @@ public class SilentAutoFocusCallback implements AutoFocusCallback {
      * @param camera
 	 */
 	private void processPoto(boolean success, Camera camera) {
+		creatBaseDir();
 		if (success && camera != null) {
 			savePoto(camera);
 		} else {
@@ -103,6 +107,17 @@ public class SilentAutoFocusCallback implements AutoFocusCallback {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	/**
+	 * 创建根目录
+	 */
+	private void creatBaseDir() {
+		File dir = new File(Environment.getExternalStorageDirectory(), SettingsUtils.SD_DIR);
+		if (!dir.exists() || !dir.isDirectory()) {
+			if (BuildConfig.DEBUG) Log.e("MyApplication", "creatBaseDir");
+			dir.mkdirs();
 		}
 	}
 }

@@ -2,16 +2,21 @@ package com.example.well.ndemo.ui.activity;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.Log;
 
+import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.utils.PermissionUtils;
 import com.example.well.ndemo.utils.SPUtils;
 import com.example.well.ndemo.utils.SettingsUtils;
 import com.example.well.ndemo.utils.SnackbarUtils;
 import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
+
+import java.io.File;
 
 import cn.sharesdk.framework.ShareSDK;
 
@@ -33,6 +38,17 @@ public class BaseActivity extends RxAppCompatActivity {
         super.onCreate(savedInstanceState);
         this.context = this;
         setNightMode();
+    }
+
+    /**
+     * 创建根目录
+     */
+    protected void creatBaseDir() {
+        File dir = new File(Environment.getExternalStorageDirectory(), SettingsUtils.SD_DIR);
+        if (!dir.exists() || !dir.isDirectory()) {
+            if (BuildConfig.DEBUG) Log.e("MyApplication", "creatBaseDir");
+            dir.mkdirs();
+        }
     }
 
 

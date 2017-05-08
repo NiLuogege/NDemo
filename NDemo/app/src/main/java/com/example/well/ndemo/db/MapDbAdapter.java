@@ -6,11 +6,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
+import android.util.Log;
 
+import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.bean.PathRecord;
 import com.example.well.ndemo.utils.MapUtils;
 import com.example.well.ndemo.utils.SettingsUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -86,6 +89,7 @@ public class MapDbAdapter {
      * @return
      */
     public MapDbAdapter open() {
+        creatBaseDir();
         mDb = mDatabaseHelper.getWritableDatabase();
         return this;
     }
@@ -182,6 +186,17 @@ public class MapDbAdapter {
     private String[] getColumns() {
         return new String[]{KEY_ROWID, KEY_DISTANCE, KEY_DURATION, KEY_SPEED,
                 KEY_LINE, KEY_STRAT, KEY_END, KEY_DATE};
+    }
+
+    /**
+     * 创建根目录
+     */
+    private void creatBaseDir() {
+        File dir = new File(Environment.getExternalStorageDirectory(), SettingsUtils.SD_DIR);
+        if (!dir.exists() || !dir.isDirectory()) {
+            if (BuildConfig.DEBUG) Log.e("MyApplication", "creatBaseDir");
+            dir.mkdirs();
+        }
     }
 }
 
