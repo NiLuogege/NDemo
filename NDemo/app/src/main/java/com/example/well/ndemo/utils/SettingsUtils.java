@@ -17,6 +17,10 @@ public interface SettingsUtils {
      * 地图路径保存文件夹名称
      */
     String RECORDPATH = "/NDemo/recordPath";
+    /**
+     * 地图路径保存文件夹名称
+     */
+    String IMAGE_SILENTPATH = "/NDemo/silent";
 
     /**
      * 外部内存权限的请求吗

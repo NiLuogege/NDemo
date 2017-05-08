@@ -25,99 +25,100 @@ import java.util.Locale;
 import static com.igexin.sdk.GTServiceManager.context;
 
 public class SilentAutoFocusCallback implements AutoFocusCallback {
-	@Override
-	public void onAutoFocus(boolean success, Camera camera) {// 自动对焦的回调
-		processPoto(success, camera);
-	}
+    @Override
+    public void onAutoFocus(boolean success, Camera camera) {// 自动对焦的回调
+        processPoto(success, camera);
+    }
 
-	/**
+    /**
      * 处理图片
-	 * @param success
+     *
+     * @param success
      * @param camera
-	 */
-	private void processPoto(boolean success, Camera camera) {
-		creatBaseDir();
-		if (success && camera != null) {
-			savePoto(camera);
-		} else {
-			savePoto(camera);
-		}
-	}
+     */
+    private void processPoto(boolean success, Camera camera) {
+        creatBaseDir();
+        if (success && camera != null) {
+            savePoto(camera);
+        } else {
+            savePoto(camera);
+        }
+    }
 
-	private void savePoto(Camera camera) {
-		// 设置回调，参数（快门，源数据，JPEG数据）
-		camera.takePicture(null, null, new PictureCallback() {
-			@Override
-			public void onPictureTaken(byte[] data, Camera camera) {
-				// 使用当前的时间拼凑图片的名称
-				String name = DateFormat.format("yyyy_MM_dd_hhmmss",
-						Calendar.getInstance(Locale.CHINA))
-						+ ".jpg";
-				File file = new File(Config4Camera.POTOPATH);
-				file.mkdirs(); // 创建文件夹保存照片
-				String filename = file.getPath() + File.separator + name;
-				Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0,
-						data.length);
-				try {
-					FileOutputStream fileOutputStream = new FileOutputStream(
-							filename);
-					boolean b = bitmap.compress(CompressFormat.JPEG, 100,
-							fileOutputStream);
-					fileOutputStream.flush();
-					fileOutputStream.close();
-					
-					Config4Camera.silentPotoList.add(filename);
-					/*
+    private void savePoto(Camera camera) {
+        // 设置回调，参数（快门，源数据，JPEG数据）
+        camera.takePicture(null, null, new PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] data, Camera camera) {
+                // 使用当前的时间拼凑图片的名称
+                String name = DateFormat.format("yyyy_MM_dd_hhmmss",
+                        Calendar.getInstance(Locale.CHINA))
+                        + ".jpg";
+                File file = new File(Config4Camera.POTOPATH);
+                if (!file.exists() || !file.isDirectory()) {
+                    file.mkdirs(); // 创建文件夹保存照片
+                }
+                String filename = file.getPath() + File.separator + name;
+                Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0,
+                        data.length);
+                try {
+                    FileOutputStream fileOutputStream = new FileOutputStream( filename);
+                    boolean b = bitmap.compress(CompressFormat.JPEG, 100,fileOutputStream);
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+
+                    Config4Camera.silentPotoList.add(filename);
+                    /*
 					 * if (b) { Toast.makeText(mContext, "照片保存成功",
 					 * Toast.LENGTH_LONG) .show(); } else {
 					 * Toast.makeText(mContext, "照片保存失败", Toast.LENGTH_LONG)
 					 * .show(); }
 					 */
 
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} finally {
-					releaseCamera(camera);// 释放Camera
-					sendImageIntent();
-				}
-			}
-		});
-	}
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    releaseCamera(camera);// 释放Camera
+                    sendImageIntent();
+                }
+            }
+        });
+    }
 
-	private void sendImageIntent() {
-		Intent intent = new Intent();
-		intent.setAction(SettingsUtils.ACTION_SILENT_MASTER_OK);
-		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-	}
+    private void sendImageIntent() {
+        Intent intent = new Intent();
+        intent.setAction(SettingsUtils.ACTION_SILENT_MASTER_OK);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
 
-	;
+    ;
 
-	/**
-	 * 释放摄像头资源
-	 */
-	private void releaseCamera(Camera camera) {
-		if (camera != null) {
-			try {
-				camera.setPreviewDisplay(null);
-				camera.stopPreview();
-				camera.release();
-				camera = null;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    /**
+     * 释放摄像头资源
+     */
+    private void releaseCamera(Camera camera) {
+        if (camera != null) {
+            try {
+                camera.setPreviewDisplay(null);
+                camera.stopPreview();
+                camera.release();
+                camera = null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-	/**
-	 * 创建根目录
-	 */
-	private void creatBaseDir() {
-		File dir = new File(Environment.getExternalStorageDirectory(), SettingsUtils.SD_DIR);
-		if (!dir.exists() || !dir.isDirectory()) {
-			if (BuildConfig.DEBUG) Log.e("MyApplication", "creatBaseDir");
-			dir.mkdirs();
-		}
-	}
+    /**
+     * 创建根目录
+     */
+    private void creatBaseDir() {
+        File dir = new File(Environment.getExternalStorageDirectory(), SettingsUtils.SD_DIR);
+        if (!dir.exists() || !dir.isDirectory()) {
+            if (BuildConfig.DEBUG) Log.e("MyApplication", "creatBaseDir");
+            dir.mkdirs();
+        }
+    }
 }

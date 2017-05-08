@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,6 +17,7 @@ import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
 import com.example.well.ndemo.silentCamera.Config4Camera;
 import com.example.well.ndemo.utils.SettingsUtils;
+import com.example.well.ndemo.utils.SystemUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -52,18 +52,12 @@ public class CGImageActivity extends BaseActivity{
         ImageView mImageView = new ImageView(CGImageActivity.this);
 
 
-
+        if (BuildConfig.DEBUG) Log.e("CGImageActivity", "uri:" + uri);
         mImageView.setImageURI(uri);
-        ViewGroup.LayoutParams mLayoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        mImageView.setPadding(10, 10, 10, 10);
+        ViewGroup.LayoutParams mLayoutParams =new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, SystemUtils.dp2px(300,getResources()));
+        int i = SystemUtils.dp2px(10, getResources());
+        mImageView.setPadding(i, i, i, i);
         mImageView.setLayoutParams(mLayoutParams);
-
-        mImageView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ll_root.removeView(v);
-            }
-        });
         ll_root.addView(mImageView, Math.min(1, ll_root.getChildCount()));
 
     }
