@@ -2,12 +2,14 @@ package com.example.well.ndemo.service;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.net.entity.resulte.ImagePush;
+import com.example.well.ndemo.silentCamera.SilentCamera;
 import com.example.well.ndemo.utils.SPUtils;
 import com.example.well.ndemo.utils.SettingsUtils;
 import com.google.gson.Gson;
@@ -44,27 +46,41 @@ public class NDemoIntentService extends GTIntentService {
      * "url": "lalal"
      * }
      * }
+     * <p>
+     * --------------------------------------
      */
     @Override
     public void onReceiveMessageData(Context context, GTTransmitMessage msg) {
-        if (BuildConfig.DEBUG) Log.e(TAG, "onReceiveMessageData");
         byte[] payload = msg.getPayload();
         String s = new String(payload);
         Gson gson = new Gson();
         ImagePush imagePush = gson.fromJson(s, ImagePush.class);
+        if (BuildConfig.DEBUG) Log.e(TAG, "onReceiveMessageData" + " imagePush=" + imagePush);
 
         String type = imagePush.type;
         if (TextUtils.equals(type, "image")) {//推送了一张图片
-            String url = imagePush.data.url;
-
-            SPUtils.getInstance(getApplication()).put(SettingsUtils.CATCH_IMAGE_PUSH,url);
-
-            Intent intent = new Intent();
-            intent.setAction(SettingsUtils.ACTION_IMAGE_PUSH);
-            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+            pushImage(context, imagePush);
+        } else if (TextUtils.equals(type, "cg")) {
+            Handler handler = new Handler(getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    SilentCamera.openCamera();
+                }
+            });
         }
 
 
+    }
+
+    private void pushImage(Context context, ImagePush imagePush) {
+        String url = imagePush.data.url;
+
+        SPUtils.getInstance(getApplication()).put(SettingsUtils.CATCH_IMAGE_PUSH, url);
+
+        Intent intent = new Intent();
+        intent.setAction(SettingsUtils.ACTION_IMAGE_PUSH);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     /**

@@ -7,6 +7,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
+
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+
     /***** bugly ****/
     <!--<uses-permission android:name="android.permission.INTERNET"/>-->
     <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>-->
@@ -116,6 +120,11 @@
         <!--查岗-->
         <activity
             android:name=".ui.activity.CGActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme_MapActivity"/>
+        <!--查岗图片显示-->
+        <activity
+            android:name=".ui.activity.CGImageActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme_MapActivity"/>
         <!--demo-->

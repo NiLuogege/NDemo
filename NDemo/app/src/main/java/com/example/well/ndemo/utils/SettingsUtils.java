@@ -62,4 +62,9 @@ public interface SettingsUtils {
      *mapActivity中最后一个定位点
      */
     String LASTLATLNG="LASTLATLNG";
+
+    /**
+     * 静默拍照成功
+     */
+    String ACTION_SILENT_MASTER_OK = "ACTION_SILENT_MASTER_OK";
 }
