@@ -35,6 +35,7 @@
     <string name="save_long_image">保存整个页面</string>
     <string name="networkUnuseable">"网络不好,请检查网络"</string>
     <string name="map">地图</string>
+    <string name="cg">查岗</string>
     <string name="location_error">定位失败</string>
 
 

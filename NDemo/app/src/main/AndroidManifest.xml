@@ -113,6 +113,11 @@
             android:name=".ui.activity.MapRecordActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme_MapActivity"/>
+        <!--查岗-->
+        <activity
+            android:name=".ui.activity.CGActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme_MapActivity"/>
         <!--demo-->
         <activity
             android:name=".ui.activity.DemoActivity"
