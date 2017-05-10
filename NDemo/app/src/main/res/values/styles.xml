@@ -91,6 +91,14 @@
         <item name="android:windowExitAnimation">@anim/share_translate_prodetail_out</item>
     </style>
 
+    <style name="Dialog1" parent="android:style/Theme.Translucent">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.5</item>
+    </style>
+
 
     <!-- >>>>>>>>>>>下面是Look的style<<<<<<<<<<<<<-->
 

@@ -48,27 +48,35 @@ public interface SettingsUtils {
     String CATCH_IMAGE_PUSH = "CATCH_IMAGE_PUSH";
 
     /**
-     *是否加载推送来的图片
+     * 是否加载推送来的图片
      */
     String IS_LOAD_PUSH_IMAGE = "IS_LOAD_PUSH_IMAGE";
 
     /**
-     *是否第一次进入app
+     * 是否第一次进入app
      */
     String IS_FIRST_ENTER = "IS_FIRST_ENTER";
 
     /**
-     *ShareSDK 的appkey
+     * ShareSDK 的appkey
      */
     String SHAREAPPKEY = "1d12fcf88ad69";
 
     /**
-     *mapActivity中最后一个定位点
+     * mapActivity中最后一个定位点
      */
-    String LASTLATLNG="LASTLATLNG";
+    String LASTLATLNG = "LASTLATLNG";
 
     /**
      * 静默拍照成功
      */
     String ACTION_SILENT_MASTER_OK = "ACTION_SILENT_MASTER_OK";
+    /**
+     * 静默拍照开启
+     */
+    String ACTION_SILENT_MASTER_START = "ACTION_SILENT_MASTER_START";
+    /**
+     * 静默拍照结束
+     */
+    String ACTION_SILENT_MASTER_STOP = "ACTION_SILENT_MASTER_STOP";
 }

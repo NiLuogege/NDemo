@@ -2,14 +2,12 @@ package com.example.well.ndemo.service;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.net.entity.resulte.ImagePush;
-import com.example.well.ndemo.silentCamera.SilentCamera;
 import com.example.well.ndemo.utils.SPUtils;
 import com.example.well.ndemo.utils.SettingsUtils;
 import com.google.gson.Gson;
@@ -61,13 +59,16 @@ public class NDemoIntentService extends GTIntentService {
         if (TextUtils.equals(type, "image")) {//推送了一张图片
             pushImage(context, imagePush);
         } else if (TextUtils.equals(type, "cg")) {
-            Handler handler = new Handler(getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    SilentCamera.openCamera();
-                }
-            });
+//            Handler handler = new Handler(getMainLooper());
+//            handler.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    SilentCamera.openCamera();
+//                }
+//            });
+            Intent intent = new Intent();
+            intent.setAction(SettingsUtils.ACTION_SILENT_MASTER_START);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         }
 
 
