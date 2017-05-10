@@ -13,7 +13,6 @@ import android.util.Log;
 import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.utils.SettingsUtils;
 
-import static com.igexin.sdk.GTServiceManager.context;
 
 /**
  * 后台进行拍照的服务
@@ -29,7 +28,14 @@ public class PhotoWindowService extends Service {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        if (BuildConfig.DEBUG) Log.e("PhotoWindowService", "onCreate");
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (BuildConfig.DEBUG) Log.e("PhotoWindowService", "onStartCommand");
         initReceiver();
         myWindowManager = new MyPhotoWindowManager();
         createWindow();
@@ -41,7 +47,7 @@ public class PhotoWindowService extends Service {
         super.onDestroy();
         if (BuildConfig.DEBUG) Log.e("PhotoWindowService", "onDestroy");
         if (mReceiver != null) {
-            LocalBroadcastManager.getInstance(context).unregisterReceiver(mReceiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
         }
     }
 
@@ -56,7 +62,7 @@ public class PhotoWindowService extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(SettingsUtils.ACTION_SILENT_MASTER_START);
         filter.addAction(SettingsUtils.ACTION_SILENT_MASTER_STOP);
-        LocalBroadcastManager.getInstance(context).registerReceiver(mReceiver, filter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
     }
 
 

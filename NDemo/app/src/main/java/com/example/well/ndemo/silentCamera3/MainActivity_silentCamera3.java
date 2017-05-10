@@ -33,6 +33,7 @@ public class MainActivity_silentCamera3 extends BaseActivity {
     LinearLayout ll_root;
 
     private static final int CODE_OVERLAY_PERMISSION = 10;
+    private Intent mService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +47,27 @@ public class MainActivity_silentCamera3 extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        stopService(mService);
+    }
+
     private void init() {
-        Intent intent = new Intent(MainActivity_silentCamera3.this, PhotoWindowService.class);
-        startService(intent);
+        mService = new Intent(MainActivity_silentCamera3.this, PhotoWindowService.class);
+        startService(mService);
         initReceiver();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void requestDrawOverlaysPermission() {
         if (!Settings.canDrawOverlays(this)) {
+            if (BuildConfig.DEBUG) Log.e("MainActivity_silentCame", "申请权限");
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, CODE_OVERLAY_PERMISSION);
+        }else{
+            if (BuildConfig.DEBUG) Log.e("MainActivity_silentCame", "已经获得到权限");
+            init();
         }
     }
 
