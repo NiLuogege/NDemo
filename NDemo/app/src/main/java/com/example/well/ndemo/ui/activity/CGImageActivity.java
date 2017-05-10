@@ -73,5 +73,11 @@ public class CGImageActivity extends BaseActivity{
         }
     };
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mReceiver != null) {
+            LocalBroadcastManager.getInstance(context).unregisterReceiver(mReceiver);
+        }
+    }
 }

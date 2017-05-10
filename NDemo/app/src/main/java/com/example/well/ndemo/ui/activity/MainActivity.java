@@ -69,6 +69,13 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mReceiver != null) {
+            LocalBroadcastManager.getInstance(context).unregisterReceiver(mReceiver);
+        }
+    }
 
     private void requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -84,8 +91,6 @@ public class MainActivity extends BaseActivity {
             });
         }
     }
-
-
 
 
     private void initView() {
@@ -115,7 +120,7 @@ public class MainActivity extends BaseActivity {
 
     private void setFirstEnterView() {
         boolean isFirstEnter = SPUtils.getInstance(getApplication()).getBoolean(SettingsUtils.IS_FIRST_ENTER, true);
-        if (BuildConfig.DEBUG) Log.e("MainActivity_silentCamera3", "isFirstEnter:" + isFirstEnter);
+        if (BuildConfig.DEBUG) Log.e("MainActivity", "isFirstEnter:" + isFirstEnter);
         if (isFirstEnter) {
             mPush_switch.setChecked(true);
             SPUtils.getInstance(getApplication()).put(SettingsUtils.IS_FIRST_ENTER, false);
@@ -193,7 +198,7 @@ public class MainActivity extends BaseActivity {
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (BuildConfig.DEBUG) Log.e("MainActivity_silentCamera3", "onReceive");
+            if (BuildConfig.DEBUG) Log.e("MainActivity", "onReceive");
             boolean isLoadImagePush = SPUtils.getInstance(getApplication()).getBoolean(SettingsUtils.IS_LOAD_PUSH_IMAGE);
             if (isLoadImagePush) {
                 String url = SPUtils.getInstance(getApplication()).getString(SettingsUtils.CATCH_IMAGE_PUSH);
@@ -237,7 +242,7 @@ public class MainActivity extends BaseActivity {
 //                    startActivity(intent);
                     break;
                 case R.id.cg:
-                    if (BuildConfig.DEBUG) Log.e("MainActivity_silentCamera3", "R.id.cg:" + R.id.cg);
+                    if (BuildConfig.DEBUG) Log.e("MainActivity", "R.id.cg:" + R.id.cg);
                     Intent intent_cg = new Intent(context, CGActivity.class);
                     startActivity(intent_cg);
                     break;
@@ -263,7 +268,7 @@ public class MainActivity extends BaseActivity {
     private void changeNightMode(boolean isChecked) {
         SPUtils.getInstance(getApplication()).put(SettingsUtils.IS_NIGHT_ON, isChecked);
 
-        if (BuildConfig.DEBUG) Log.e("MainActivity_silentCamera3", "isChecked:" + isChecked);
+        if (BuildConfig.DEBUG) Log.e("MainActivity", "isChecked:" + isChecked);
 
         if (isChecked) {//夜间模式
             mImage_description.setTextColor(getResources().getColor(android.R.color.darker_gray));

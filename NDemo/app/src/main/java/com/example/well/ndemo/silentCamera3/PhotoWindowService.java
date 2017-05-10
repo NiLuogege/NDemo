@@ -39,7 +39,10 @@ public class PhotoWindowService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        if (BuildConfig.DEBUG) Log.e("PhotoWindowService", "onDestroy");
+        if (mReceiver != null) {
+            LocalBroadcastManager.getInstance(context).unregisterReceiver(mReceiver);
+        }
     }
 
     private void createWindow() {
