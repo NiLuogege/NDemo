@@ -46,6 +46,14 @@ public class NDemoIntentService extends GTIntentService {
      * }
      * <p>
      * --------------------------------------
+     * 拍照的格式为
+     *  {
+     "type": "cg",
+     "data": {
+     "url": "lalal"
+     }
+     }
+     *
      */
     @Override
     public void onReceiveMessageData(Context context, GTTransmitMessage msg) {
