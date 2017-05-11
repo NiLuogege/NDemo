@@ -1,477 +1,477 @@
-package com.example.well.ndemo.silentCamera2;
-
-import android.app.Activity;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.hardware.Camera;
-import android.hardware.Camera.PreviewCallback;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.widget.Toast;
-
-import com.example.well.ndemo.R;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-
-public class PhotoActivity extends Activity implements PreviewCallback {
-
-	private SurfaceView mSurfaceView = null;
-	private SurfaceHolder mSurfaceHolder = null;
-	private Camera mCamera = null;
-	private List<PictureBean> listBuffer = new ArrayList<PictureBean>();
-	private String filePath;
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_photo);
-		try {
-			initData();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void initData() throws FileNotFoundException {
-		mSurfaceView = (SurfaceView) this.findViewById(R.id.surfaceview);
-		mSurfaceHolder = mSurfaceView.getHolder();
-		mSurfaceHolder.addCallback(new SurfaceHolderCallback());
-		mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
-		boolean result = Environment.getExternalStorageState().equals(
-				Environment.MEDIA_MOUNTED);
-		if (result) {
-			// sdcard´æÔÚµÄÇé¿öÏÂ
-			filePath = Environment.getExternalStorageDirectory()
-					.getAbsolutePath();
-			filePath += "/pic.jpg";
-		} else {
-			// sdcard²»´æÔÚµÄÇé¿öÏÂ
-			this.openFileOutput("pic.jpg", Context.MODE_WORLD_WRITEABLE
-					| Context.MODE_WORLD_READABLE);
-			File file = this.getFilesDir();
-			file = new File(file, "pic.jpg");
-			filePath = file.getAbsolutePath();
-		}
-
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
-	/**
-	 * ÏàÆ¬´¦ÀíÓëÉÏ´«
-	 */
-	private void doPhotographics() {
-		new Thread() {
-			public void run() {
-				for (int i = 0; i < listBuffer.size(); i++) {
-					PictureBean bean = listBuffer.get(i);
-					byte[] buffer = imageZoom(bean);
-					if (buffer != null) {
-						bean.setBuffer(buffer);
-						listBuffer.set(i, bean);
-					}
-				}
-				PictureBean selectBean = choosebitMap(listBuffer);
-				byte[] data = selectBean.getBuffer();
-				try {
-					FileOutputStream fout = new FileOutputStream(filePath);
-					fout.write(data);
-					fout.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				handler.sendEmptyMessage(0);
-			}
-		}.start();
-	}
-
-	private Handler handler = new Handler() {
-
-		@Override
-		public void handleMessage(Message msg) {
-			if (msg.what == 0) {
-				Toast.makeText(PhotoActivity.this, "ÅÄÕÕÍê³É£¡", Toast.LENGTH_LONG)
-						.show();
-			}
-			super.handleMessage(msg);
-		}
-
-	};
-
-	/**
-	 * ÔñÑ¡Í¼Æ¬
-	 *
-	 * @param beans
-	 * @return
-	 */
-
-	private PictureBean choosebitMap(List<PictureBean> beans) {
-		int max = 0;
-		PictureBean pictureBean = null;
-		for (int i = 0; i < beans.size(); i++) {
-			Bitmap bitmap = BitmapFactory.decodeByteArray(beans.get(i)
-					.getBuffer(), 0, beans.get(i).getBuffer().length);
-			int grade = grayByPixels(bitmap);
-			if (grade > max) {
-				max = grade;
-				pictureBean = beans.get(i);
-			}
-		}
-		return max >= 16 ? pictureBean : null;
-	}
-
-	/**
-	 * ÑÕÉ«rgbÖµ×ªÂë
-	 *
-	 * @param colorValue
-	 * @return
-	 */
-	private int getGrayNumColor(int colorValue) {
-		return (Color.red(colorValue) * 19595 + Color.green(colorValue) * 38469 + Color
-				.blue(colorValue) * 7472) >> 16;
-	}
-
-	/**
-	 * ·µ»ØÏñËØÆ½¾ùÖµ
-	 *
-	 * @param bitMap
-	 * @return
-	 */
-	private int grayByPixels(Bitmap bitMap) {
-		int totalNum = 0;
-		int totalGrayPix = 0;
-		for (int i = 0; i < bitMap.getWidth(); i++) {
-			for (int j = 0; j < bitMap.getHeight(); j++) {
-				int tmpValue = getGrayNumColor(bitMap.getPixel(i, j));
-				totalNum += 1;
-				totalGrayPix += tmpValue;
-			}
-		}
-		// È¡¸÷¸öÏñËØµÄÆ½¾ùÖµ
-		int avgGray = totalGrayPix / totalNum;
-		return avgGray;
-	}
-
-	/**
-	 * ÎÞ·µ»ØÖµ·½·¨
-	 *
-	 * @param packageName
-	 * @param methodName
-	 * @param parasObj
-	 * @param isStatic
-	 * @return
-	 */
-	private void setupMethod(String packageName, String methodName,
-							 @SuppressWarnings("rawtypes") Class[] parasClass,
-							 Object[] parasObj, boolean isStatic) {
-		try {
-			@SuppressWarnings("rawtypes")
-			Class myClass = Class.forName(packageName);
-			Method method = myClass.getMethod(methodName, parasClass);
-			if (method != null)
-				method.invoke(myClass, parasObj);
-		} catch (Exception e) {
-		}
-	}
-
-	/**
-	 * ·´Éä·½·¨
-	 *
-	 * @param packageName
-	 * @param methodName
-	 * @param parasClass
-	 * @param parasObj
-	 * @return
-	 */
-	private Object getValueOfMethod(String packageName, String methodName,
-									@SuppressWarnings("rawtypes") Class[] parasClass,
-									Object[] parasObj, boolean isStatic) {
-		try {
-			Class<?> myClass = Class.forName(packageName);
-			Object resultObj = null;
-			if (parasClass != null || parasObj != null) {
-				Method method = myClass.getMethod(methodName, parasClass);
-				resultObj = method.invoke(
-						isStatic ? myClass : myClass.newInstance(), parasObj);
-			} else {
-				Method method = myClass.getMethod(methodName);
-				resultObj = method.invoke(isStatic ? myClass : myClass
-						.newInstance());
-			}
-			return resultObj;
-		} catch (Exception e) {
-		}
-		return null;
-	}
-
-	/**
-	 * ·´Éä×Ö¶Î
-	 *
-	 * @param packageName
-	 * @param fieldName
-	 * @return
-	 */
-	private Object reflectLayoutID(String packageName, String fieldName,
-								   boolean isStatic) {
-		Object layoutID = null;
-		try {
-			@SuppressWarnings("rawtypes")
-			Class myClass = null;
-			myClass = Class.forName(packageName);
-			/*******/
-			Field field = myClass.getField(fieldName);
-			layoutID = field.get(isStatic ? myClass : myClass.newInstance());
-		} catch (Exception e) {
-		}
-		return layoutID;
-	}
-
-	/**
-	 * ·´Éä×Ö¶Î1
-	 * @param fieldName
-	 * @return
-	 */
-	private Object reflectLayoutID(Object object, String fieldName) {
-		Object layoutID = null;
-		try {
-			@SuppressWarnings("rawtypes")
-			Class myClass = null;
-			myClass = object.getClass();
-			Field field = myClass.getField(fieldName);
-			layoutID = field.getInt(object);
-		} catch (Exception e) {
-		}
-		return layoutID;
-	}
-
-	/**
-	 * Í¼Æ¬Ëõ·Å
-	 * @return
-	 */
-	private byte[] imageZoom(PictureBean bean) {
-		Matrix matrix = new Matrix();
-		int j = 0;
-		try {
-			Object objId = reflectLayoutID("android.os.Build$VERSION_CODES",
-					"GINGERBREAD", true);
-			boolean result = objId != null;
-			if (result) {
-				int currenCodes = (Integer) objId;
-				if (Build.VERSION.SDK_INT >= currenCodes) {
-					int numbers = (Integer) getValueOfMethod(
-							"android.hardware.Camera", "getNumberOfCameras",
-							null, null, true);
-					int CAMERA_FACING_FRONT = (Integer) reflectLayoutID(
-							"android.hardware.Camera$CameraInfo",
-							"CAMERA_FACING_FRONT", true);
-					for (int i = 0; i < numbers; i++) {
-						Object cameraInfo = Class.forName(
-								"android.hardware.Camera$CameraInfo")
-								.newInstance();
-						setupMethod(
-								"android.hardware.Camera",
-								"getCameraInfo",
-								new Class[] { int.class, cameraInfo.getClass() },
-								new Object[] { i, cameraInfo }, true);
-						int facing = (Integer) reflectLayoutID(cameraInfo,
-								"facing");
-						if (facing == CAMERA_FACING_FRONT) {
-							j = 1;
-							break;
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-		}
-		if (j == 0) {
-			matrix.setRotate(90);
-		} else {
-			matrix.setRotate(-90);
-		}
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inDither = false; /* ²»½øÐÐÍ¼Æ¬¶¶¶¯´¦Àí */
-		options.inPreferredConfig = null; /* ÉèÖÃÈÃ½âÂëÆ÷ÒÔ×î¼Ñ·½Ê½½âÂë */
-		// Bitmap mBitmap = BitmapFactory.decodeByteArray(buffer, 0,
-		// buffer.length, options);
-		Bitmap mBitmap = PictureBean.beanToBitmap(bean, true);
-		if (mBitmap == null)
-			return null;
-		Bitmap bitMap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(),
-				mBitmap.getHeight(), matrix, true);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		bitMap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-		if (bean.getBuffer().length / 1024 > 1024) {// ÅÐ¶ÏÈç¹ûÍ¼Æ¬´óÓÚ1M,½øÐÐÑ¹Ëõ±ÜÃâÔÚÉú³ÉÍ¼Æ¬£¨BitmapFactory.decodeStream£©Ê±Òç³ö
-			baos.reset();// ÖØÖÃbaos¼´Çå¿Õbaos
-			bitMap.compress(Bitmap.CompressFormat.JPEG, 50, baos);// ÕâÀïÑ¹Ëõ50%£¬°ÑÑ¹ËõºóµÄÊý¾Ý´æ·Åµ½baosÖÐ
-		}
-		int w = options.outWidth;
-		int h = options.outHeight;
-		// ÏÖÔÚÖ÷Á÷ÊÖ»ú±È½Ï¶àÊÇ800*480·Ö±æÂÊ£¬ËùÒÔ¸ßºÍ¿íÎÒÃÇÉèÖÃÎª
-		float hh = 800f;// ÕâÀïÉèÖÃ¸ß¶ÈÎª800f
-		float ww = 480f;// ÕâÀïÉèÖÃ¿í¶ÈÎª480f
-		// Ëõ·Å±È¡£ÓÉÓÚÊÇ¹Ì¶¨±ÈÀýËõ·Å£¬Ö»ÓÃ¸ß»òÕß¿íÆäÖÐÒ»¸öÊý¾Ý½øÐÐ¼ÆËã¼´¿É
-		int be = 1;// be=1±íÊ¾²»Ëõ·Å
-		if (w > h && w > ww) {// Èç¹û¿í¶È´óµÄ»°¸ù¾Ý¿í¶È¹Ì¶¨´óÐ¡Ëõ·Å
-			be = (int) (options.outWidth / ww);
-		} else if (w < h && h > hh) {// Èç¹û¸ß¶È¸ßµÄ»°¸ù¾Ý¿í¶È¹Ì¶¨´óÐ¡Ëõ·Å
-			be = (int) (options.outHeight / hh);
-		}
-		if (be <= 0)
-			be = 1;
-		options.inJustDecodeBounds = false;
-		options.inSampleSize = be;// ÉèÖÃËõ·Å±ÈÀý
-		ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());
-		bitMap = BitmapFactory.decodeStream(isBm, null, options);
-		return compressImage(bitMap);// Ñ¹ËõºÃ±ÈÀý´óÐ¡ºóÔÙ½øÐÐÖÊÁ¿Ñ¹Ëõ
-
-	}
-
-	/***
-	 * Ëõ·ÅÍ¼Æ¬µÄÖÊÁ¿µ½50kbÒÔÄÚ
-	 *
-	 * @return
-	 */
-	private byte[] compressImage(Bitmap image) {
-		// ½«bitmap·ÅÖÁÊý×éÖÐ£¬ÒâÔÚbitmapµÄ´óÐ¡£¨ÓëÊµ¼Ê¶ÁÈ¡µÄÔ­ÎÄ¼þÒª´ó£©
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-
-		int options = 100;
-		while (baos.toByteArray().length / 1024 > 50) { // Ñ­»·ÅÐ¶ÏÈç¹ûÑ¹ËõºóÍ¼Æ¬ÊÇ·ñ´óÓÚ50kb,´óÓÚ¼ÌÐøÑ¹Ëõ
-			baos.reset();// ÖØÖÃbaos¼´Çå¿Õbaos
-			options -= 10;// Ã¿´Î¶¼¼õÉÙ10
-			image.compress(Bitmap.CompressFormat.JPEG, options, baos);// ÕâÀïÑ¹Ëõoptions%£¬°ÑÑ¹ËõºóµÄÊý¾Ý´æ·Åµ½baosÖÐ
-
-			if (options == 10)
-				break;// ±ÜÃâoptionsÎª0£¬Ôì³É±ÀÀ£¡£
-		}
-		image.recycle();
-		return baos.toByteArray();
-	}
-
-	@Override
-	public void onPreviewFrame(byte[] data, Camera camera) {
-		int w = camera.getParameters().getPreviewSize().width;
-		int h = camera.getParameters().getPreviewSize().height;
-		listBuffer.add(new PictureBean(data, w, h));
-		if (listBuffer.size() >= 5) {
-			mCamera.stopPreview();
-			PhotoActivity.this.finish();
-			doPhotographics();
-		}
-	}
-
-	public class SurfaceHolderCallback implements SurfaceHolder.Callback {
-
-		public void surfaceChanged(SurfaceHolder holder, int format, int width,
-								   int height) {
-			Bitmap getpage;
-			getpage = Bitmap.createBitmap(800, 380, Bitmap.Config.ARGB_8888);
-			Canvas canvas = new Canvas(getpage);
-			canvas.drawColor(Color.LTGRAY);// ÕâÀï¿ÉÒÔ½øÐÐÈÎºÎ»æÍ¼²½Öè
-			canvas.save(Canvas.ALL_SAVE_FLAG);
-			canvas.restore();
-		}
-
-		public void surfaceCreated(SurfaceHolder holder) {
-			/*************/
-			int SDK_INT = Build.VERSION.SDK_INT;
-			Object objId = reflectLayoutID("android.os.Build$VERSION_CODES",
-					"GINGERBREAD", true);
-			boolean result = objId != null;
-			if (result) {
-				int currenCodes = (Integer) objId;
-				if (SDK_INT >= currenCodes) {
-					int numbers = (Integer) getValueOfMethod(
-							"android.hardware.Camera", "getNumberOfCameras",
-							null, null, true);
-					int CAMERA_FACING_FRONT = (Integer) reflectLayoutID(
-							"android.hardware.Camera$CameraInfo",
-							"CAMERA_FACING_FRONT", true);
-					for (int i = 0; i < numbers; i++) {
-						try {
-							Object cameraInfo = Class.forName(
-									"android.hardware.Camera$CameraInfo")
-									.newInstance();
-							setupMethod("android.hardware.Camera",
-									"getCameraInfo", new Class[] { int.class,
-											cameraInfo.getClass() },
-									new Object[] { i, cameraInfo }, true);
-							int facing = (Integer) reflectLayoutID(cameraInfo,
-									"facing");
-							if (CAMERA_FACING_FRONT == facing) {
-								mCamera = (Camera) getValueOfMethod(
-										"android.hardware.Camera", "open",
-										new Class[] { int.class },
-										new Object[] { i }, true);
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-			/*********************/
-			try {
-				if (mCamera == null)
-					mCamera = Camera.open();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				mCamera.setPreviewDisplay(mSurfaceHolder);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			mCamera.setDisplayOrientation(90);
-			try {
-				mCamera.reconnect();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			mCamera.setPreviewCallback(PhotoActivity.this);
-			mCamera.startPreview();
-			try {
-				Thread.sleep(800);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-			// /*****/
-			// mCamera.takePicture(null, null, pictureCallback);
-		}
-
-		public void surfaceDestroyed(SurfaceHolder holder) {
-			if (mCamera != null) {
-				mCamera.stopPreview();
-				mCamera.unlock();
-				mCamera.release();
-				mCamera = null;
-			}
-		}
-	}
-}
+//package com.example.well.ndemo.silentCamera2;
+//
+//import android.app.Activity;
+//import android.content.Context;
+//import android.graphics.Bitmap;
+//import android.graphics.BitmapFactory;
+//import android.graphics.Canvas;
+//import android.graphics.Color;
+//import android.graphics.Matrix;
+//import android.hardware.Camera;
+//import android.hardware.Camera.PreviewCallback;
+//import android.os.Build;
+//import android.os.Bundle;
+//import android.os.Environment;
+//import android.os.Handler;
+//import android.os.Message;
+//import android.view.SurfaceHolder;
+//import android.view.SurfaceView;
+//import android.widget.Toast;
+//
+//import com.example.well.ndemo.R;
+//
+//import java.io.ByteArrayInputStream;
+//import java.io.ByteArrayOutputStream;
+//import java.io.File;
+//import java.io.FileNotFoundException;
+//import java.io.FileOutputStream;
+//import java.io.IOException;
+//import java.lang.reflect.Field;
+//import java.lang.reflect.Method;
+//import java.util.ArrayList;
+//import java.util.List;
+//
+//
+//public class PhotoActivity extends Activity implements PreviewCallback {
+//
+//	private SurfaceView mSurfaceView = null;
+//	private SurfaceHolder mSurfaceHolder = null;
+//	private Camera mCamera = null;
+//	private List<PictureBean> listBuffer = new ArrayList<PictureBean>();
+//	private String filePath;
+//
+//	@Override
+//	protected void onCreate(Bundle savedInstanceState) {
+//		super.onCreate(savedInstanceState);
+//		setContentView(R.layout.activity_photo);
+//		try {
+//			initData();
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//	}
+//
+//	public void initData() throws FileNotFoundException {
+//		mSurfaceView = (SurfaceView) this.findViewById(R.id.surfaceview);
+//		mSurfaceHolder = mSurfaceView.getHolder();
+//		mSurfaceHolder.addCallback(new SurfaceHolderCallback());
+//		mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+//
+//		boolean result = Environment.getExternalStorageState().equals(
+//				Environment.MEDIA_MOUNTED);
+//		if (result) {
+//			// sdcardï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+//			filePath = Environment.getExternalStorageDirectory()
+//					.getAbsolutePath();
+//			filePath += "/pic.jpg";
+//		} else {
+//			// sdcardï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+//			this.openFileOutput("pic.jpg", Context.MODE_WORLD_WRITEABLE
+//					| Context.MODE_WORLD_READABLE);
+//			File file = this.getFilesDir();
+//			file = new File(file, "pic.jpg");
+//			filePath = file.getAbsolutePath();
+//		}
+//
+//	}
+//
+//	@Override
+//	public void onDestroy() {
+//		super.onDestroy();
+//	}
+//
+//	/**
+//	 * ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½
+//	 */
+//	private void doPhotographics() {
+//		new Thread() {
+//			public void run() {
+//				for (int i = 0; i < listBuffer.size(); i++) {
+//					PictureBean bean = listBuffer.get(i);
+//					byte[] buffer = imageZoom(bean);
+//					if (buffer != null) {
+//						bean.setBuffer(buffer);
+//						listBuffer.set(i, bean);
+//					}
+//				}
+//				PictureBean selectBean = choosebitMap(listBuffer);
+//				byte[] data = selectBean.getBuffer();
+//				try {
+//					FileOutputStream fout = new FileOutputStream(filePath);
+//					fout.write(data);
+//					fout.close();
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//				handler.sendEmptyMessage(0);
+//			}
+//		}.start();
+//	}
+//
+//	private Handler handler = new Handler() {
+//
+//		@Override
+//		public void handleMessage(Message msg) {
+//			if (msg.what == 0) {
+//				Toast.makeText(PhotoActivity.this, "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½", Toast.LENGTH_LONG)
+//						.show();
+//			}
+//			super.handleMessage(msg);
+//		}
+//
+//	};
+//
+//	/**
+//	 * ï¿½ï¿½Ñ¡Í¼Æ¬
+//	 *
+//	 * @param beans
+//	 * @return
+//	 */
+//
+//	private PictureBean choosebitMap(List<PictureBean> beans) {
+//		int max = 0;
+//		PictureBean pictureBean = null;
+//		for (int i = 0; i < beans.size(); i++) {
+//			Bitmap bitmap = BitmapFactory.decodeByteArray(beans.get(i)
+//					.getBuffer(), 0, beans.get(i).getBuffer().length);
+//			int grade = grayByPixels(bitmap);
+//			if (grade > max) {
+//				max = grade;
+//				pictureBean = beans.get(i);
+//			}
+//		}
+//		return max >= 16 ? pictureBean : null;
+//	}
+//
+//	/**
+//	 * ï¿½ï¿½É«rgbÖµ×ªï¿½ï¿½
+//	 *
+//	 * @param colorValue
+//	 * @return
+//	 */
+//	private int getGrayNumColor(int colorValue) {
+//		return (Color.red(colorValue) * 19595 + Color.green(colorValue) * 38469 + Color
+//				.blue(colorValue) * 7472) >> 16;
+//	}
+//
+//	/**
+//	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ½ï¿½ï¿½Öµ
+//	 *
+//	 * @param bitMap
+//	 * @return
+//	 */
+//	private int grayByPixels(Bitmap bitMap) {
+//		int totalNum = 0;
+//		int totalGrayPix = 0;
+//		for (int i = 0; i < bitMap.getWidth(); i++) {
+//			for (int j = 0; j < bitMap.getHeight(); j++) {
+//				int tmpValue = getGrayNumColor(bitMap.getPixel(i, j));
+//				totalNum += 1;
+//				totalGrayPix += tmpValue;
+//			}
+//		}
+//		// È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½Æ½ï¿½ï¿½Öµ
+//		int avgGray = totalGrayPix / totalNum;
+//		return avgGray;
+//	}
+//
+//	/**
+//	 * ï¿½Þ·ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
+//	 *
+//	 * @param packageName
+//	 * @param methodName
+//	 * @param parasObj
+//	 * @param isStatic
+//	 * @return
+//	 */
+//	private void setupMethod(String packageName, String methodName,
+//							 @SuppressWarnings("rawtypes") Class[] parasClass,
+//							 Object[] parasObj, boolean isStatic) {
+//		try {
+//			@SuppressWarnings("rawtypes")
+//			Class myClass = Class.forName(packageName);
+//			Method method = myClass.getMethod(methodName, parasClass);
+//			if (method != null)
+//				method.invoke(myClass, parasObj);
+//		} catch (Exception e) {
+//		}
+//	}
+//
+//	/**
+//	 * ï¿½ï¿½ï¿½ä·½ï¿½ï¿½
+//	 *
+//	 * @param packageName
+//	 * @param methodName
+//	 * @param parasClass
+//	 * @param parasObj
+//	 * @return
+//	 */
+//	private Object getValueOfMethod(String packageName, String methodName,
+//									@SuppressWarnings("rawtypes") Class[] parasClass,
+//									Object[] parasObj, boolean isStatic) {
+//		try {
+//			Class<?> myClass = Class.forName(packageName);
+//			Object resultObj = null;
+//			if (parasClass != null || parasObj != null) {
+//				Method method = myClass.getMethod(methodName, parasClass);
+//				resultObj = method.invoke(
+//						isStatic ? myClass : myClass.newInstance(), parasObj);
+//			} else {
+//				Method method = myClass.getMethod(methodName);
+//				resultObj = method.invoke(isStatic ? myClass : myClass
+//						.newInstance());
+//			}
+//			return resultObj;
+//		} catch (Exception e) {
+//		}
+//		return null;
+//	}
+//
+//	/**
+//	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½
+//	 *
+//	 * @param packageName
+//	 * @param fieldName
+//	 * @return
+//	 */
+//	private Object reflectLayoutID(String packageName, String fieldName,
+//								   boolean isStatic) {
+//		Object layoutID = null;
+//		try {
+//			@SuppressWarnings("rawtypes")
+//			Class myClass = null;
+//			myClass = Class.forName(packageName);
+//			/*******/
+//			Field field = myClass.getField(fieldName);
+//			layoutID = field.get(isStatic ? myClass : myClass.newInstance());
+//		} catch (Exception e) {
+//		}
+//		return layoutID;
+//	}
+//
+//	/**
+//	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½1
+//	 * @param fieldName
+//	 * @return
+//	 */
+//	private Object reflectLayoutID(Object object, String fieldName) {
+//		Object layoutID = null;
+//		try {
+//			@SuppressWarnings("rawtypes")
+//			Class myClass = null;
+//			myClass = object.getClass();
+//			Field field = myClass.getField(fieldName);
+//			layoutID = field.getInt(object);
+//		} catch (Exception e) {
+//		}
+//		return layoutID;
+//	}
+//
+//	/**
+//	 * Í¼Æ¬ï¿½ï¿½ï¿½ï¿½
+//	 * @return
+//	 */
+//	private byte[] imageZoom(PictureBean bean) {
+//		Matrix matrix = new Matrix();
+//		int j = 0;
+//		try {
+//			Object objId = reflectLayoutID("android.os.Build$VERSION_CODES",
+//					"GINGERBREAD", true);
+//			boolean result = objId != null;
+//			if (result) {
+//				int currenCodes = (Integer) objId;
+//				if (Build.VERSION.SDK_INT >= currenCodes) {
+//					int numbers = (Integer) getValueOfMethod(
+//							"android.hardware.Camera", "getNumberOfCameras",
+//							null, null, true);
+//					int CAMERA_FACING_FRONT = (Integer) reflectLayoutID(
+//							"android.hardware.Camera$CameraInfo",
+//							"CAMERA_FACING_FRONT", true);
+//					for (int i = 0; i < numbers; i++) {
+//						Object cameraInfo = Class.forName(
+//								"android.hardware.Camera$CameraInfo")
+//								.newInstance();
+//						setupMethod(
+//								"android.hardware.Camera",
+//								"getCameraInfo",
+//								new Class[] { int.class, cameraInfo.getClass() },
+//								new Object[] { i, cameraInfo }, true);
+//						int facing = (Integer) reflectLayoutID(cameraInfo,
+//								"facing");
+//						if (facing == CAMERA_FACING_FRONT) {
+//							j = 1;
+//							break;
+//						}
+//					}
+//				}
+//			}
+//		} catch (Exception e) {
+//		}
+//		if (j == 0) {
+//			matrix.setRotate(90);
+//		} else {
+//			matrix.setRotate(-90);
+//		}
+//		BitmapFactory.Options options = new BitmapFactory.Options();
+//		options.inDither = false; /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+//		options.inPreferredConfig = null; /* ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ·ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ */
+//		// Bitmap mBitmap = BitmapFactory.decodeByteArray(buffer, 0,
+//		// buffer.length, options);
+//		Bitmap mBitmap = PictureBean.beanToBitmap(bean, true);
+//		if (mBitmap == null)
+//			return null;
+//		Bitmap bitMap = Bitmap.createBitmap(mBitmap, 0, 0, mBitmap.getWidth(),
+//				mBitmap.getHeight(), matrix, true);
+//		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//		bitMap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//		if (bean.getBuffer().length / 1024 > 1024) {// ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½1M,ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½BitmapFactory.decodeStreamï¿½ï¿½Ê±ï¿½ï¿½ï¿½
+//			baos.reset();// ï¿½ï¿½ï¿½ï¿½baosï¿½ï¿½ï¿½ï¿½ï¿½baos
+//			bitMap.compress(Bitmap.CompressFormat.JPEG, 50, baos);// ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½50%ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý´ï¿½Åµï¿½baosï¿½ï¿½
+//		}
+//		int w = options.outWidth;
+//		int h = options.outHeight;
+//		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½È½Ï¶ï¿½ï¿½ï¿½800*480ï¿½Ö±ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ï¿½Ô¸ßºÍ¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª
+//		float hh = 800f;// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¸ß¶ï¿½Îª800f
+//		float ww = 480f;// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½Îª480f
+//		// ï¿½ï¿½ï¿½Å±È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¹Ì¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å£ï¿½Ö»ï¿½Ã¸ß»ï¿½ï¿½ß¿ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½Ð¼ï¿½ï¿½ã¼´ï¿½ï¿½
+//		int be = 1;// be=1ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+//		if (w > h && w > ww) {// ï¿½ï¿½ï¿½ï¿½ï¿½È´ï¿½Ä»ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½È¹Ì¶ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½
+//			be = (int) (options.outWidth / ww);
+//		} else if (w < h && h > hh) {// ï¿½ï¿½ï¿½ï¿½ß¶È¸ßµÄ»ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½È¹Ì¶ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½
+//			be = (int) (options.outHeight / hh);
+//		}
+//		if (be <= 0)
+//			be = 1;
+//		options.inJustDecodeBounds = false;
+//		options.inSampleSize = be;// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å±ï¿½ï¿½ï¿½
+//		ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());
+//		bitMap = BitmapFactory.decodeStream(isBm, null, options);
+//		return compressImage(bitMap);// Ñ¹ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½Ù½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½
+//
+//	}
+//
+//	/***
+//	 * ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½50kbï¿½ï¿½ï¿½ï¿½
+//	 *
+//	 * @return
+//	 */
+//	private byte[] compressImage(Bitmap image) {
+//		// ï¿½ï¿½bitmapï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½bitmapï¿½Ä´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Êµï¿½Ê¶ï¿½È¡ï¿½ï¿½Ô­ï¿½Ä¼ï¿½Òªï¿½ï¿½
+//		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//		image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//
+//		int options = 100;
+//		while (baos.toByteArray().length / 1024 > 50) { // Ñ­ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½Ç·ï¿½ï¿½ï¿½ï¿½50kb,ï¿½ï¿½ï¿½Ú¼ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½
+//			baos.reset();// ï¿½ï¿½ï¿½ï¿½baosï¿½ï¿½ï¿½ï¿½ï¿½baos
+//			options -= 10;// Ã¿ï¿½Î¶ï¿½ï¿½ï¿½ï¿½ï¿½10
+//			image.compress(Bitmap.CompressFormat.JPEG, options, baos);// ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½options%ï¿½ï¿½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý´ï¿½Åµï¿½baosï¿½ï¿½
+//
+//			if (options == 10)
+//				break;// ï¿½ï¿½ï¿½ï¿½optionsÎª0ï¿½ï¿½ï¿½ï¿½É±ï¿½ï¿½ï¿½ï¿½ï¿½
+//		}
+//		image.recycle();
+//		return baos.toByteArray();
+//	}
+//
+//	@Override
+//	public void onPreviewFrame(byte[] data, Camera camera) {
+//		int w = camera.getParameters().getPreviewSize().width;
+//		int h = camera.getParameters().getPreviewSize().height;
+//		listBuffer.add(new PictureBean(data, w, h));
+//		if (listBuffer.size() >= 5) {
+//			mCamera.stopPreview();
+//			PhotoActivity.this.finish();
+//			doPhotographics();
+//		}
+//	}
+//
+//	public class SurfaceHolderCallback implements SurfaceHolder.Callback {
+//
+//		public void surfaceChanged(SurfaceHolder holder, int format, int width,
+//								   int height) {
+//			Bitmap getpage;
+//			getpage = Bitmap.createBitmap(800, 380, Bitmap.Config.ARGB_8888);
+//			Canvas canvas = new Canvas(getpage);
+//			canvas.drawColor(Color.LTGRAY);// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô½ï¿½ï¿½ï¿½ï¿½ÎºÎ»ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
+//			canvas.save(Canvas.ALL_SAVE_FLAG);
+//			canvas.restore();
+//		}
+//
+//		public void surfaceCreated(SurfaceHolder holder) {
+//			/*************/
+//			int SDK_INT = Build.VERSION.SDK_INT;
+//			Object objId = reflectLayoutID("android.os.Build$VERSION_CODES",
+//					"GINGERBREAD", true);
+//			boolean result = objId != null;
+//			if (result) {
+//				int currenCodes = (Integer) objId;
+//				if (SDK_INT >= currenCodes) {
+//					int numbers = (Integer) getValueOfMethod(
+//							"android.hardware.Camera", "getNumberOfCameras",
+//							null, null, true);
+//					int CAMERA_FACING_FRONT = (Integer) reflectLayoutID(
+//							"android.hardware.Camera$CameraInfo",
+//							"CAMERA_FACING_FRONT", true);
+//					for (int i = 0; i < numbers; i++) {
+//						try {
+//							Object cameraInfo = Class.forName(
+//									"android.hardware.Camera$CameraInfo")
+//									.newInstance();
+//							setupMethod("android.hardware.Camera",
+//									"getCameraInfo", new Class[] { int.class,
+//											cameraInfo.getClass() },
+//									new Object[] { i, cameraInfo }, true);
+//							int facing = (Integer) reflectLayoutID(cameraInfo,
+//									"facing");
+//							if (CAMERA_FACING_FRONT == facing) {
+//								mCamera = (Camera) getValueOfMethod(
+//										"android.hardware.Camera", "open",
+//										new Class[] { int.class },
+//										new Object[] { i }, true);
+//							}
+//						} catch (Exception e) {
+//							e.printStackTrace();
+//						}
+//					}
+//				}
+//			}
+//			/*********************/
+//			try {
+//				if (mCamera == null)
+//					mCamera = Camera.open();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//			try {
+//				mCamera.setPreviewDisplay(mSurfaceHolder);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			mCamera.setDisplayOrientation(90);
+//			try {
+//				mCamera.reconnect();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			mCamera.setPreviewCallback(PhotoActivity.this);
+//			mCamera.startPreview();
+//			try {
+//				Thread.sleep(800);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//			// /*****/
+//			// mCamera.takePicture(null, null, pictureCallback);
+//		}
+//
+//		public void surfaceDestroyed(SurfaceHolder holder) {
+//			if (mCamera != null) {
+//				mCamera.stopPreview();
+//				mCamera.unlock();
+//				mCamera.release();
+//				mCamera = null;
+//			}
+//		}
+//	}
+//}
