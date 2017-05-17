@@ -11,10 +11,6 @@
             android:id="@+id/map"
             android:icon="@drawable/map"
             android:title="@string/map"/>
-        <item
-            android:id="@+id/cg"
-            android:icon="@drawable/map"
-            android:title="@string/cg"/>
     </group>
 
 

@@ -44,15 +44,6 @@ public class NDemoIntentService extends GTIntentService {
      * "url": "lalal"
      * }
      * }
-     * <p>
-     * --------------------------------------
-     * 拍照的格式为
-     *  {
-     "type": "cg",
-     "data": {
-     "url": "lalal"
-     }
-     }
      *
      */
     @Override

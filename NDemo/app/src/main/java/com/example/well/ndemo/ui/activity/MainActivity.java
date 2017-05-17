@@ -104,9 +104,7 @@ public class MainActivity extends BaseActivity {
         MenuItem item_night = nav.getMenu().findItem(R.id.nav_night);
         MenuItem item_push = nav.getMenu().findItem(R.id.nav_image_push);
         MenuItem item_map = nav.getMenu().findItem(R.id.map);
-        MenuItem cg = nav.getMenu().findItem(R.id.cg);
         item_map.setOnMenuItemClickListener(mOnMenuItemClickListener);
-        cg.setOnMenuItemClickListener(mOnMenuItemClickListener);
 
         mNight_switch = (SwitchCompat) MenuItemCompat.getActionView(item_night).findViewById(R.id.night_switch);
         mPush_switch = (SwitchCompat) MenuItemCompat.getActionView(item_push).findViewById(R.id.push_switch);
@@ -240,11 +238,6 @@ public class MainActivity extends BaseActivity {
                     dl_main.closeDrawer(nav, false);
 //                    Intent intent = new Intent(context,DemoActivity.class);
 //                    startActivity(intent);
-                    break;
-                case R.id.cg:
-                    if (BuildConfig.DEBUG) Log.e("MainActivity", "R.id.cg:" + R.id.cg);
-                    Intent intent_cg = new Intent(context, CGActivity.class);
-                    startActivity(intent_cg);
                     break;
             }
             return false;

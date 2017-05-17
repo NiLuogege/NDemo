@@ -94,7 +94,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".silentCamera3.MainActivity_silentCamera3"
+            android:name=".ui.activity.MainActivity"
             android:theme="@style/Theme_MainActiviy"
             >
             <intent-filter>
@@ -119,31 +119,13 @@
             android:name=".ui.activity.MapRecordActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme_MapActivity"/>
-        <!--查岗-->
-        <activity
-            android:name=".ui.activity.CGActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme_MapActivity"/>
-        <!--查岗图片显示-->
-        <activity
-            android:name=".ui.activity.CGImageActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme_MapActivity"/>
+
         <!--demo-->
         <activity
             android:name=".ui.activity.DemoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme_MapActivity"/>
-        <activity
-            android:name=".silentCamera2.PhotoActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:theme="@style/Dialog1">
-        </activity>
 
-
-        <service
-            android:name=".silentCamera3.PhotoWindowService"/>
 
         <!--个推推送-->
         <service
