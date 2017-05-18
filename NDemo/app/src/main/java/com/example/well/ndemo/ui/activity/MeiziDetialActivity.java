@@ -11,6 +11,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.graphics.Palette;
@@ -20,6 +22,7 @@ import android.transition.Transition;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,6 +54,7 @@ import java.util.UUID;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.onekeyshare.themeCustom.ShareModel;
@@ -296,6 +300,23 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
         sharePopupWindow.showAtLocation(mDraggableFrame, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0);
     }
 
+    @OnClick(R.id.shot)
+    void shot() {
+        Intent intent = new Intent(context, BigImageActivity.class);
+        intent.putExtra(BigImageActivity.EXTRA_URL, mUrl);
+        ActivityOptionsCompat compat = ActivityOptionsCompat.makeSceneTransitionAnimation(MeiziDetialActivity.this, mShot, getString(R.string.share_big_image_activity));
+        Bundle bundle = compat.toBundle();
+        ActivityCompat.startActivity(context, intent, bundle);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            ActivityCompat.finishAfterTransition(MeiziDetialActivity.this);
+            overridePendingTransition(R.anim.share_translate_prodetail_in, R.anim.share_translate_prodetail_out);
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -365,7 +386,8 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
     View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            MeiziDetialActivity.this.finish();
+            ActivityCompat.finishAfterTransition(MeiziDetialActivity.this);
+            overridePendingTransition(R.anim.share_translate_prodetail_in, R.anim.share_translate_prodetail_out);
         }
     };
 

@@ -65,6 +65,23 @@
         <!--设置toolbar上的字体大小-->
         <item name="android:actionMenuTextAppearance">@style/MenuTextStyle</item>
     </style>
+    <!--MapActivity 布局可以透到状态栏后面的style-->
+    <style name="Theme_BigImageActivity" parent="Theme_MainActiviy">
+        <item name="android:statusBarColor">@color/colorToolbar</item>
+
+        <!--下列两行控制使得应用窗口透明，用于展示一些差异-->
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowIsTranslucent">false</item>
+
+        <!--可以透到状态栏里-->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+
+        <!--设置toolbar上的字体颜色-->
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <!--设置toolbar上的字体大小-->
+        <item name="android:actionMenuTextAppearance">@style/MenuTextStyle</item>
+    </style>
 
     <style name="MenuTextStyle">
         <item name="android:textSize">18sp</item>

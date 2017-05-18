@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.well.ndemo.R;
+import com.example.well.ndemo.bean.NodemoMapLocation;
 import com.example.well.ndemo.bean.PathRecord;
 import com.example.well.ndemo.ui.activity.MapRecordActivity;
 
@@ -28,6 +29,8 @@ public class RecordListAdapter extends RecyclerView.Adapter<RecordListAdapter.Re
     private List<PathRecord> data;
     private final DecimalFormat mFormat_1;
     private final DecimalFormat mFormat_2;
+    private String mStreet_start;
+    private String mStreet_end;
 
     public RecordListAdapter(Context context, List<PathRecord> data) {
         this.data = data;
@@ -37,7 +40,7 @@ public class RecordListAdapter extends RecyclerView.Adapter<RecordListAdapter.Re
         mFormat_2 = new DecimalFormat("0.00");
     }
 
-    public void setData(List<PathRecord> data){
+    public void setData(List<PathRecord> data) {
         this.data = data;
     }
 
@@ -50,20 +53,26 @@ public class RecordListAdapter extends RecyclerView.Adapter<RecordListAdapter.Re
     @Override
     public void onBindViewHolder(RecordListHolder holder, int position) {
         final PathRecord record = data.get(position);
+        NodemoMapLocation startPoint = record.getStartPoint();
+        NodemoMapLocation endPoint = record.getEndPoint();
         holder.tv_date.setText(record.getDate());
-        String street_start = record.getStartPoint().getStreet();//街道
-        String street_end = record.getEndPoint().getStreet();//街道
-        holder.tv_fromTo.setText(street_start +"--->"+street_end);
+        if (startPoint != null) {
+            mStreet_start = startPoint.getStreet(); //街道
+        }
+        if (endPoint != null) {
+            mStreet_end = endPoint.getStreet();//街道
+        }
+        holder.tv_fromTo.setText(mStreet_start + "--->" + mStreet_end);
         String distance = mFormat_1.format(Double.parseDouble(record.getDistance()));//距离
         double h = Double.parseDouble(record.getDuration()) / 60 / 60;
         String duration = mFormat_2.format(h);//耗时
         String averagespeed = mFormat_2.format(Double.parseDouble(record.getAveragespeed()));//速度
-        holder.tv_describe.setText("距离: "+distance+"m   耗时: "+duration+"h   速度: "+averagespeed+"m/s");
+        holder.tv_describe.setText("距离: " + distance + "m   耗时: " + duration + "h   速度: " + averagespeed + "m/s");
         holder.ll_record_item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, MapRecordActivity.class);
-                intent.putExtra(MapRecordActivity.EXTRAID,record.getId());
+                intent.putExtra(MapRecordActivity.EXTRAID, record.getId());
                 context.startActivity(intent);
 
             }

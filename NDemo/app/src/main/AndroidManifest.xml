@@ -120,6 +120,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme_MapActivity"/>
 
+        <!--大图-->
+        <activity
+            android:name=".ui.activity.BigImageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme_BigImageActivity"/>
+
         <!--demo-->
         <activity
             android:name=".ui.activity.DemoActivity"

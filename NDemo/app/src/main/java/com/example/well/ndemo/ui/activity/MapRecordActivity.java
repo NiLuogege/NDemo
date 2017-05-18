@@ -4,12 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.amap.api.location.AMapLocation;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
@@ -23,6 +23,7 @@ import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.trace.LBSTraceClient;
 import com.amap.api.trace.TraceListener;
 import com.amap.api.trace.TraceLocation;
+import com.example.well.ndemo.BuildConfig;
 import com.example.well.ndemo.R;
 import com.example.well.ndemo.bean.NodemoMapLocation;
 import com.example.well.ndemo.bean.PathRecord;
@@ -212,8 +213,8 @@ public class MapRecordActivity extends BaseActivity {
 
             String street_start = record.getStartPoint().getStreet();//街道
             String street_end = record.getEndPoint().getStreet();//街道
-            toolbar.setTitle(street_start +"->"+street_end);
-            toolbar.setTitleMarginStart(SystemUtils.dp2px(-5,getResources()));
+            toolbar.setTitle(street_start + "->" + street_end);
+            toolbar.setTitleMarginStart(SystemUtils.dp2px(-5, getResources()));
 
             LatLng startLatLng = new LatLng(startpoint.getLatitude(), startpoint.getLongitude());
             LatLng endLatLng = new LatLng(endpoint.getLatitude(), endpoint.getLongitude());
@@ -345,7 +346,9 @@ public class MapRecordActivity extends BaseActivity {
         mEndMarker_line.setVisible(!isTrace);
         mMarker_line_walker.setVisible(!isTrace);
         //纠偏轨迹
-        mPoly_trace.setVisible(isTrace);
+        if (mPoly_trace != null) {
+            mPoly_trace.setVisible(isTrace);
+        }
         mStartMarker_trace.setVisible(isTrace);
         mEndMarker_trace.setVisible(isTrace);
         mMarker_trace_walker.setVisible(isTrace);
@@ -385,6 +388,7 @@ public class MapRecordActivity extends BaseActivity {
             tracePathList = list;
             mRecord_switch.setChecked(true);
             drawTrace(list);
+            if (BuildConfig.DEBUG) Log.e("MapRecordActivity", "纠偏完成");
 
         }
     };

@@ -400,6 +400,7 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
             }else {
                 activity.finish();
             }
+            activity.overridePendingTransition(R.anim.share_translate_prodetail_in, R.anim.share_translate_prodetail_out);
         }
     }
 
