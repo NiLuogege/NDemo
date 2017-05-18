@@ -32,7 +32,7 @@ public class MapUtils {
             location.setBearing(amapLocation.getBearing());
             location.setLatitude(amapLocation.getLatitude());
             location.setLongitude(amapLocation.getLongitude());
-            location.setSpeed(amapLocation.getSpeed());
+            location.setSpeed(amapLocation.getTotalSpeed());
             location.setTime(amapLocation.getTime());
             traceList.add(location);
         }
@@ -81,7 +81,7 @@ public class MapUtils {
             location.setLatitude(Double.parseDouble(loc[0]));
             location.setLongitude(Double.parseDouble(loc[1]));
             location.setTime(Long.parseLong(loc[3]));
-            location.setSpeed(Float.parseFloat(loc[4]));
+            location.setTotalSpeed(Float.parseFloat(loc[4]));
             location.setBearing(Float.parseFloat(loc[5]));
             location.setStreet(loc[6]);
         }else if(loc.length == 2){
@@ -103,5 +103,14 @@ public class MapUtils {
             }
         }
         return locations;
+    }
+
+    public static List<Float> parseSpeedList(String speedList) {
+        ArrayList<Float> speed = new ArrayList<Float>();
+        String[] speedArray = speedList.split(";");
+        for (int i = 0; i < speedArray.length; i++) {
+            speed.add(Float.parseFloat(speedArray[i]));
+        }
+        return speed;
     }
 }

@@ -99,6 +99,7 @@ public class LocationService extends NotiService {
         AMapLocationClientOption option = new AMapLocationClientOption(); //初始化定位参数
         option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);//设置为高精度定位模式
         option.setInterval(3000);//设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为毫秒。
+        option.setSensorEnable(true);//设置传感器可用  自Android 定位 SDK V3.1.0版本开始，AMapLocationClientOption会有这样一个接口：setSensorEnable(boolean sensorEnable)；这个接口控制是否使用设备传感器，默认关闭，可以打开。当上述接口被设置为true后，定位的Client将会采用设备传感器计算海拔，角度和速度。意味着高精度定位模式下也可以返回速度、角度、海拔数据。
         mLocationClient.setLocationOption(option);//设置定位参数
         // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
         // 注意设置合适的定位时间的间隔（最小间隔支持为2000ms），并且在合适时间调用stopLocation()方法来取消定位请求
@@ -154,6 +155,9 @@ public class LocationService extends NotiService {
         nodemoMapLocation.setStreet(aMapLocation.getStreet());
         nodemoMapLocation.setLatitude(aMapLocation.getLatitude());
         nodemoMapLocation.setLongitude(aMapLocation.getLongitude());
+        nodemoMapLocation.setSpeed(aMapLocation.getSpeed());
+        if (BuildConfig.DEBUG)
+            Log.d("LocationService", "aMapLocation.getSpeed():" + aMapLocation.getSpeed());
 
         Intent mIntent = new Intent(MapActivity.RECEIVER_ACTION);
         mIntent.putExtra(ACTION_AMAPLOCATION, aMapLocation);

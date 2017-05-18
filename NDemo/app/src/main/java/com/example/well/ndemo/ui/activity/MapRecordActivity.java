@@ -34,6 +34,7 @@ import com.example.well.ndemo.utils.SystemUtils;
 import com.example.well.ndemo.utils.map.TraceRePlay;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -70,11 +71,13 @@ public class MapRecordActivity extends BaseActivity {
     private Polyline mPoly_trace;//纠偏轨迹的线
     private Marker mStartMarker_trace;//纠偏轨迹的起点
     private Marker mEndMarker_trace;//纠偏轨迹的结束点
-    private List<Integer> mColorList;
+    //    private List<Integer> mColorList = new ArrayList<>();
     private ExecutorService mThreadPool;
     private Marker mMarker_line_walker;
     private Marker mMarker_trace_walker;
     private TraceRePlay mRePlay;
+    private HashMap<Integer, Integer> agrSpeerColorHashMap;
+    private int[] colorList = {0xFF33FF00, 0xFF99FF00, 0xFFFFFF00, 0xFFFF9900, 0xFFFF3300, 0xFFFFFFFF};// 颜色值
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -165,10 +168,20 @@ public class MapRecordActivity extends BaseActivity {
      * 初始化ColorList
      */
     private void initColorList() {
-        int[] intArray = getResources().getIntArray(R.array.colorList);
-        mColorList = new ArrayList<>();
-        for (int i = 0; i < intArray.length; i++) {
-            mColorList.add(intArray[i]);
+
+        getAgrSpeerColorHashMap();
+
+    }
+
+    public void getAgrSpeerColorHashMap() {
+        agrSpeerColorHashMap = new HashMap<>();
+        for (int i = 0; i < 10; i++) {
+            if (i < colorList.length ) {
+                agrSpeerColorHashMap.put(i, colorList[i]);
+            } else {
+                agrSpeerColorHashMap.put(i, colorList[colorList.length - 1]);
+            }
+
         }
     }
 
@@ -188,6 +201,7 @@ public class MapRecordActivity extends BaseActivity {
             mRecord = mapDbAdapter.queryRecordById(recordId);
             mapDbAdapter.close();
         }
+        if (BuildConfig.DEBUG) Log.e("MapRecordActivity", "PathRecord=" + mRecord.toString());
         return mRecord;
     }
 
@@ -219,8 +233,10 @@ public class MapRecordActivity extends BaseActivity {
             LatLng startLatLng = new LatLng(startpoint.getLatitude(), startpoint.getLongitude());
             LatLng endLatLng = new LatLng(endpoint.getLatitude(), endpoint.getLongitude());
             mLatLngList = MapUtils.parseLatLngList(pathline);
+            List<Float> speedList = record.getSpeedList();
+
             //绘制原始轨迹
-            drawLine(startLatLng, endLatLng, mLatLngList);
+            drawLine(startLatLng, endLatLng, mLatLngList, speedList);
             //进行轨迹纠偏
             initTrace(pathline);
         } else {
@@ -242,12 +258,20 @@ public class MapRecordActivity extends BaseActivity {
 
     /**
      * 绘制原始轨迹(地图上添加原始轨迹线路及起终点、轨迹动画小人)
-     *
-     * @param startLatLng
+     *  @param startLatLng
      * @param endLatLng
      * @param latLngList
+     * @param speedList
      */
-    private void drawLine(LatLng startLatLng, LatLng endLatLng, List<LatLng> latLngList) {
+    private void drawLine(LatLng startLatLng, LatLng endLatLng, List<LatLng> latLngList, List<Float> speedList) {
+        List<Integer> mColorList = new ArrayList<>();
+        for (int i = 0; i < speedList.size(); i++) {
+            float aFloat = speedList.get(i);
+            int it = (int) aFloat;
+            mColorList.add(mColorList.size(), agrSpeerColorHashMap.get(it));
+        }
+        if (BuildConfig.DEBUG) Log.e("MapRecordActivity", mColorList.toString());
+
         PolylineOptions polylineOptions = new PolylineOptions()
                 .width(15f)
                 .useGradient(true)

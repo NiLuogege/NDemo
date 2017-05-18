@@ -13,6 +13,16 @@ public class PathRecord {
 	private NodemoMapLocation mStartPoint;
 	private NodemoMapLocation mEndPoint;
 	private List<NodemoMapLocation> mPathLinePoints = new ArrayList<NodemoMapLocation>();
+
+	public List<Float> getSpeedList() {
+		return mSpeedList;
+	}
+
+	public void setSpeedList(List<Float> speedList) {
+		mSpeedList = speedList;
+	}
+
+	private List<Float> mSpeedList = new ArrayList<Float>();
 	private String mDistance;
 	private String mDuration;
 	private String mAveragespeed;

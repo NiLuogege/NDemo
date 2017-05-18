@@ -471,6 +471,7 @@ public class MapActivity extends BaseActivity {
             mMapDbAdapter = new MapDbAdapter(context);
         }
         mMapDbAdapter.open();
+        String speedList = getSpeedList(list);
         String duration = getDuration();
         float distance = getDistance(list);
         String average = getAverage(distance);
@@ -480,8 +481,17 @@ public class MapActivity extends BaseActivity {
         String stratpoint = amapLocationToString(firstLocaiton);
         String endpoint = amapLocationToString(lastLocaiton);
         mMapDbAdapter.addRecord(String.valueOf(distance), duration, average,
-                pathlineSring, stratpoint, endpoint, time);
+                pathlineSring, stratpoint, endpoint, time,speedList);
         mMapDbAdapter.close();
+    }
+
+    private String getSpeedList(List<NodemoMapLocation> list) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            NodemoMapLocation nodemoMapLocation = list.get(i);
+            builder.append(nodemoMapLocation.getSpeed()).append(";");
+        }
+        return builder.toString();
     }
 
     /**
@@ -563,7 +573,7 @@ public class MapActivity extends BaseActivity {
         locString.append(location.getLongitude()).append(",");
         locString.append(location.getProvider()).append(",");
         locString.append(location.getTime()).append(",");
-        locString.append(location.getSpeed()).append(",");
+        locString.append(location.getTotalSpeed()).append(",");
         locString.append(location.getBearing()).append(",");
         locString.append(location.getStreet());
         return locString.toString();

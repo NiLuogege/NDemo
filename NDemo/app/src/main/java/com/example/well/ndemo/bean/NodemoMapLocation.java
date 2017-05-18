@@ -17,7 +17,17 @@ public class NodemoMapLocation implements Serializable{
     private double longitude;//纬度
     private String mProvider;
     private long mTime = 0;
+    private float mTotalSpeed = 0.0f;
     private float mSpeed = 0.0f;
+
+    public float getSpeed() {
+        return mSpeed;
+    }
+
+    public void setSpeed(float speed) {
+        mSpeed = speed;
+    }
+
     private float mBearing = 0.0f;
 
 
@@ -69,12 +79,12 @@ public class NodemoMapLocation implements Serializable{
         mTime = time;
     }
 
-    public float getSpeed() {
-        return mSpeed;
+    public float getTotalSpeed() {
+        return mTotalSpeed;
     }
 
-    public void setSpeed(float speed) {
-        mSpeed = speed;
+    public void setTotalSpeed(float totalSpeed) {
+        mTotalSpeed = totalSpeed;
     }
 
     public float getBearing() {
@@ -94,6 +104,7 @@ public class NodemoMapLocation implements Serializable{
                 ", longitude=" + longitude +
                 ", mProvider='" + mProvider + '\'' +
                 ", mTime=" + mTime +
+                ", mTotalSpeed=" + mTotalSpeed +
                 ", mSpeed=" + mSpeed +
                 ", mBearing=" + mBearing +
                 '}';

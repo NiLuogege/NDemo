@@ -41,6 +41,7 @@ public class MapDbAdapter {
     private static final String KEY_STRAT = "stratpoint";
     private static final String KEY_END = "endpoint";
     private static final String KEY_DATE = "date";
+    private static final String KEY_SPEED_LIST = "speed_list";
 
     /**
      * //创建数据库的sql语句
@@ -53,6 +54,7 @@ public class MapDbAdapter {
             + KEY_DISTANCE + " STRING,"
             + KEY_DURATION + " STRING,"
             + KEY_SPEED + " STRING,"
+            + KEY_SPEED_LIST + " STRING,"
             + KEY_DATE + " STRING"
             + ");";
     private Context context;
@@ -108,7 +110,7 @@ public class MapDbAdapter {
      */
     public long addRecord(String distance, String duration,
                           String averagespeed, String pathline, String stratpoint,
-                          String endpoint, String date) {
+                          String endpoint, String date, String speedList) {
         ContentValues values = new ContentValues();
         values.put(KEY_DISTANCE, distance);
         values.put(KEY_DURATION, duration);
@@ -117,6 +119,7 @@ public class MapDbAdapter {
         values.put(KEY_STRAT, stratpoint);
         values.put(KEY_END, endpoint);
         values.put(KEY_DATE, date);
+        values.put(KEY_SPEED_LIST, speedList);
         long insert = mDb.insert(RECORD_TABLE_NAME, null, values);
         return insert;
     }
@@ -143,6 +146,9 @@ public class MapDbAdapter {
                     .getString(query
                             .getColumnIndex(MapDbAdapter.KEY_END))));
             record.setAveragespeed(query.getString(query.getColumnIndex(MapDbAdapter.KEY_SPEED)));
+//            record.setSpeedList(MapUtils.parseSpeedList(query
+//                    .getString(query
+//                            .getColumnIndex(MapDbAdapter.KEY_SPEED_LIST))));
             records.add(record);
         }
 
@@ -179,13 +185,17 @@ public class MapDbAdapter {
                     .getColumnIndex(MapDbAdapter.KEY_STRAT))));
             record.setEndPoint(MapUtils.parseLocation(cursor.getString(cursor
                     .getColumnIndex(MapDbAdapter.KEY_END))));
+
+            record.setSpeedList(MapUtils.parseSpeedList(cursor
+                    .getString(cursor
+                            .getColumnIndex(MapDbAdapter.KEY_SPEED_LIST))));
         }
         return record;
     }
 
     private String[] getColumns() {
         return new String[]{KEY_ROWID, KEY_DISTANCE, KEY_DURATION, KEY_SPEED,
-                KEY_LINE, KEY_STRAT, KEY_END, KEY_DATE};
+                KEY_LINE, KEY_STRAT, KEY_END, KEY_DATE,KEY_SPEED_LIST};
     }
 
     /**
