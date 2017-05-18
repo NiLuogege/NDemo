@@ -104,6 +104,7 @@ public class MapActivity extends BaseActivity {
     private static final int FILL_COLOR = Color.argb(0, 0, 0, 0);
     public static final String RECEIVER_ACTION = "location_in_background";
     private static final int LIMITPOINT = 10;//最少有十个点 才进行记录
+    private static final int LIMITDISTANCE = 30;//最少有十个点 才进行记录
     private AMap mAMap;
     private LocationSource.OnLocationChangedListener mOnLocationChangedListener;
     private AMapLocationClient mLocationClient;
@@ -120,7 +121,7 @@ public class MapActivity extends BaseActivity {
     private Polyline mPolyline;
     public Location currentAmapLocation = null;
     private MapDbAdapter mMapDbAdapter;
-    private int mTotleDistance = 0;
+    private int mTotleDistance = 0;//运行的总距离
     private LatLng preLatLng;//记录上一个坐标
     private SensorEventHelper mSensorEventHelper;//负责屏幕旋转的时候使箭头也跟着旋转
     private Marker mLocMarker;//旋转的marker
@@ -359,7 +360,7 @@ public class MapActivity extends BaseActivity {
      * 缓存最后一个点
      */
     private void catchCurrentLatLng() {
-        if(mCurrentLatLng!=null){
+        if (mCurrentLatLng != null) {
             double latitude = mCurrentLatLng.latitude;
             double longitude = mCurrentLatLng.longitude;
             String lastLatlng = latitude + ":" + longitude;
@@ -426,7 +427,7 @@ public class MapActivity extends BaseActivity {
         mOverlayList.add(mTraceOverlay);
 
         List<NodemoMapLocation> list = mRecord.getPathline();
-        if (list != null && list.size() > LIMITPOINT) {
+        if (list != null && list.size() > LIMITPOINT && mTotleDistance < LIMITDISTANCE) {
             saveRecord(list, mRecord.getDate());
             refreshRecycleView();
         } else {
@@ -481,7 +482,7 @@ public class MapActivity extends BaseActivity {
         String stratpoint = amapLocationToString(firstLocaiton);
         String endpoint = amapLocationToString(lastLocaiton);
         mMapDbAdapter.addRecord(String.valueOf(distance), duration, average,
-                pathlineSring, stratpoint, endpoint, time,speedList);
+                pathlineSring, stratpoint, endpoint, time, speedList);
         mMapDbAdapter.close();
     }
 
