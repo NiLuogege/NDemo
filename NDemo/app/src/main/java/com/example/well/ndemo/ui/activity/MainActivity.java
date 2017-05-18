@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
@@ -19,6 +20,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -105,6 +107,7 @@ public class MainActivity extends BaseActivity {
         MenuItem item_push = nav.getMenu().findItem(R.id.nav_image_push);
         MenuItem item_map = nav.getMenu().findItem(R.id.map);
         item_map.setOnMenuItemClickListener(mOnMenuItemClickListener);
+        mNav_image.setOnClickListener(mOnClickListener);
 
         mNight_switch = (SwitchCompat) MenuItemCompat.getActionView(item_night).findViewById(R.id.night_switch);
         mPush_switch = (SwitchCompat) MenuItemCompat.getActionView(item_push).findViewById(R.id.push_switch);
@@ -177,7 +180,63 @@ public class MainActivity extends BaseActivity {
     }
 
 
-//    View.OnClickListener mOnClickListener=new View.OnClickListener() {
+    /**
+     * 是否开启加载推送来的图片的按钮
+     *
+     * @param isChecked
+     */
+    private void isLoadPushImage(boolean isChecked) {
+        SPUtils.getInstance(getApplication()).put(SettingsUtils.IS_LOAD_PUSH_IMAGE, isChecked);
+    }
+
+    /**
+     * 切换模式
+     *
+     * @param isChecked
+     */
+    private void changeNightMode(boolean isChecked) {
+        SPUtils.getInstance(getApplication()).put(SettingsUtils.IS_NIGHT_ON, isChecked);
+
+        if (BuildConfig.DEBUG) Log.e("MainActivity", "isChecked:" + isChecked);
+
+        if (isChecked) {//夜间模式
+            mImage_description.setTextColor(getResources().getColor(android.R.color.darker_gray));
+            nav.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+            int[][] state = new int[][]{
+                    new int[]{-android.R.attr.state_checked}, // unchecked
+                    new int[]{android.R.attr.state_checked}  // pressed
+            };
+
+            int[] color = new int[]{
+                    Color.WHITE, Color.WHITE};
+            int[] iconcolor = new int[]{
+                    Color.WHITE, Color.WHITE};
+            nav.setItemTextColor(new ColorStateList(state, color));
+            nav.setItemIconTintList(new ColorStateList(state, iconcolor));
+
+        } else {//白天
+            mImage_description.setTextColor(getResources().getColor(android.R.color.white));
+            nav.setBackgroundColor(getResources().getColor(android.R.color.white));
+            int[][] state = new int[][]{
+                    new int[]{-android.R.attr.state_checked}, // unchecked
+                    new int[]{android.R.attr.state_checked}  // pressed
+            };
+
+            int[] color = new int[]{
+                    Color.BLACK, Color.BLACK};
+            int[] iconcolor = new int[]{
+                    Color.GRAY, Color.BLACK};
+            nav.setItemTextColor(new ColorStateList(state, color));
+            nav.setItemIconTintList(new ColorStateList(state, iconcolor));
+        }
+    }
+
+
+    public void openDrawer() {
+        dl_main.openDrawer(nav);
+    }
+
+    //    View.OnClickListener mOnClickListener=new View.OnClickListener() {
 //        @Override
 //        public void onClick(View v) {
 //            boolean isNight = SPUtils.getInstance(getApplication()).getBoolean(SettingsUtils.IS_NIGHT_ON);
@@ -244,59 +303,20 @@ public class MainActivity extends BaseActivity {
         }
     };
 
-    /**
-     * 是否开启加载推送来的图片的按钮
-     *
-     * @param isChecked
-     */
-    private void isLoadPushImage(boolean isChecked) {
-        SPUtils.getInstance(getApplication()).put(SettingsUtils.IS_LOAD_PUSH_IMAGE, isChecked);
-    }
+    View.OnClickListener mOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            boolean isLoadImagePush = SPUtils.getInstance(getApplication()).getBoolean(SettingsUtils.IS_LOAD_PUSH_IMAGE);
+            if (isLoadImagePush) {
+                String url = SPUtils.getInstance(getApplication()).getString(SettingsUtils.CATCH_IMAGE_PUSH);
+                Intent intent = new Intent(context, BigImageActivity.class);
+                intent.putExtra(BigImageActivity.EXTRA_URL, url);
+                ActivityOptionsCompat compat = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this, mNav_image, getString(R.string.share_big_image_activity));
+                Bundle bundle = compat.toBundle();
+                ActivityCompat.startActivity(context, intent, bundle);
+            }
 
-    /**
-     * 切换模式
-     *
-     * @param isChecked
-     */
-    private void changeNightMode(boolean isChecked) {
-        SPUtils.getInstance(getApplication()).put(SettingsUtils.IS_NIGHT_ON, isChecked);
-
-        if (BuildConfig.DEBUG) Log.e("MainActivity", "isChecked:" + isChecked);
-
-        if (isChecked) {//夜间模式
-            mImage_description.setTextColor(getResources().getColor(android.R.color.darker_gray));
-            nav.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-            int[][] state = new int[][]{
-                    new int[]{-android.R.attr.state_checked}, // unchecked
-                    new int[]{android.R.attr.state_checked}  // pressed
-            };
-
-            int[] color = new int[]{
-                    Color.WHITE, Color.WHITE};
-            int[] iconcolor = new int[]{
-                    Color.WHITE, Color.WHITE};
-            nav.setItemTextColor(new ColorStateList(state, color));
-            nav.setItemIconTintList(new ColorStateList(state, iconcolor));
-
-        } else {//白天
-            mImage_description.setTextColor(getResources().getColor(android.R.color.white));
-            nav.setBackgroundColor(getResources().getColor(android.R.color.white));
-            int[][] state = new int[][]{
-                    new int[]{-android.R.attr.state_checked}, // unchecked
-                    new int[]{android.R.attr.state_checked}  // pressed
-            };
-
-            int[] color = new int[]{
-                    Color.BLACK, Color.BLACK};
-            int[] iconcolor = new int[]{
-                    Color.GRAY, Color.BLACK};
-            nav.setItemTextColor(new ColorStateList(state, color));
-            nav.setItemIconTintList(new ColorStateList(state, iconcolor));
         }
-    }
+    };
 
-
-    public void openDrawer() {
-        dl_main.openDrawer(nav);
-    }
 }
