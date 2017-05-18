@@ -26,7 +26,7 @@ public class NotiService extends Service {
     private Utils.CloseServiceReceiver mCloseReceiver;
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, int flags, int startId) {//创建并注册结束服务的广播
         mCloseReceiver = new Utils.CloseServiceReceiver(this);
         registerReceiver(mCloseReceiver, Utils.getCloseServiceFilter());
         return START_STICKY;
@@ -34,7 +34,7 @@ public class NotiService extends Service {
 
 
     @Override
-    public void onDestroy() {
+    public void onDestroy() {//取消注册的广播
         if (mCloseReceiver != null) {
             unregisterReceiver(mCloseReceiver);
             mCloseReceiver = null;
