@@ -427,7 +427,7 @@ public class MapActivity extends BaseActivity {
         mOverlayList.add(mTraceOverlay);
 
         List<NodemoMapLocation> list = mRecord.getPathline();
-        if (list != null && list.size() > LIMITPOINT && mTotleDistance < LIMITDISTANCE) {
+        if (list != null && list.size() > LIMITPOINT && mTotleDistance > LIMITDISTANCE) {
             saveRecord(list, mRecord.getDate());
             refreshRecycleView();
         } else {
