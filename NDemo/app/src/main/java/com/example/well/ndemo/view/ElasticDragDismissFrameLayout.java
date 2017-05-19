@@ -59,6 +59,8 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
 
     private List<ElasticDragDismissCallback> callbacks;
 
+    private static boolean isDownDrag = true;
+
     public ElasticDragDismissFrameLayout(Context context) {
         this(context, null, 0);
     }
@@ -70,7 +72,7 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
     public ElasticDragDismissFrameLayout(Context context, AttributeSet attrs,
                                          int defStyleAttr) {
 
-        super(context,attrs,defStyleAttr);
+        super(context, attrs, defStyleAttr);
 
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.ElasticDragDismissFrameLayout, 0, 0);
@@ -110,12 +112,14 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
          * @param rawOffsetPixels     The raw distance the user has dragged
          */
         void onDrag(float elasticOffset, float elasticOffsetPixels,
-                    float rawOffset, float rawOffsetPixels) { }
+                    float rawOffset, float rawOffsetPixels) {
+        }
 
         /**
          * Called when dragging is released and has exceeded the threshold dismiss distance.
          */
-        void onDragDismissed() { }
+        void onDragDismissed() {
+        }
 
     }
 
@@ -130,16 +134,16 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
     public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
         // if we're in a drag gesture and the user reverses up the we should take those events
 
-     if ( Math.abs(dx)- Math.abs(dy)>1){
-        isHorizontal=true;
-         isRecervory=true;
-         horizontal(dx);
+        if (Math.abs(dx) - Math.abs(dy) > 1) {
+            isHorizontal = true;
+            isRecervory = true;
+            horizontal(dx);
 
-     }
+        }
 
 
-        if (Math.abs(dx)- Math.abs(dy)<3){
-            isHorizontal=false;
+        if (Math.abs(dx) - Math.abs(dy) < 3) {
+            isHorizontal = false;
         }
 
 //
@@ -151,7 +155,6 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
             consumed[1] = dy;
         }
     }
-
 
 
     private void horizontal(int scroll) {
@@ -172,26 +175,25 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
         // how far have we dragged relative to the distance to perform a dismiss
         // (0–1 where 1 = dismiss distance). Decreasing logarithmically as we approach the limit
 
-        if (isHorizontal&&!draggingDown&&!draggingUp) {
+        if (isHorizontal && !draggingDown && !draggingUp) {
             totalDrag += scroll;
             float dragFraction = (float) Math.log10(1 + (Math.abs(totalDrag) / dragDismissDistance));
 
             final float scale = 1 - ((1 - dragDismissScale) * dragFraction);
-            scaleHotizontal=1-dragFraction;
-            if (scaleHotizontal<0.8f){
-                scaleHotizontal=0.8f;
+            scaleHotizontal = 1 - dragFraction;
+            if (scaleHotizontal < 0.8f) {
+                scaleHotizontal = 0.8f;
             }
 
-            scaleAlpha =1-dragFraction;
+            scaleAlpha = 1 - dragFraction;
 
-            if (scaleHotizontal>0.8f&&scaleHotizontal<1){
+            if (scaleHotizontal > 0.8f && scaleHotizontal < 1) {
                 setScaleX(scaleHotizontal);
-                setScaleY(scaleHotizontal*1.1f);
-                if (scaleAlpha>0.8f&&scaleAlpha<1.0f){
+                setScaleY(scaleHotizontal * 1.1f);
+                if (scaleAlpha > 0.8f && scaleAlpha < 1.0f) {
                     setAlpha(scaleAlpha);
                 }
             }
-
 
 
 //            float dragTo = dragFraction * dragDismissDistance * dragElacticity;
@@ -222,8 +224,8 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
 
     @Override
     public void onStopNestedScroll(View child) {
-        if (!isHorizontal&& Math.abs(totalDrag)<=dragDismissDistance){
-            if (isRecervory){
+        if (!isHorizontal && Math.abs(totalDrag) <= dragDismissDistance) {
+            if (isRecervory) {
                 // TODO: 16/8/15 recovery
 
                 totalDrag = 0;
@@ -234,13 +236,17 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
                 setAlpha(1f);
 
 
-
-                isHorizontal=false;
+                isHorizontal = false;
             }
         }
 
 
         if (Math.abs(totalDrag) >= dragDismissDistance) {
+            if (totalDrag > 0) {
+                isDownDrag = false;
+            } else {
+                isDownDrag = true;
+            }
             dispatchDismissCallback();
         } else { // settle back to natural position
             animate()
@@ -353,13 +359,13 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
     public static class SystemChromeFader extends ElasticDragDismissCallback {
 
         private final Activity activity;
-        private  int statusBarAlpha;
-        private  int navBarAlpha;
+        private int statusBarAlpha;
+        private int navBarAlpha;
         private final boolean fadeNavBar;
 
         public SystemChromeFader(Activity activity) {
             this.activity = activity;
-            if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.LOLLIPOP){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 statusBarAlpha = Color.alpha(activity.getWindow().getStatusBarColor());
                 navBarAlpha = Color.alpha(activity.getWindow().getNavigationBarColor());
             }
@@ -370,7 +376,7 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
         @Override
         public void onDrag(float elasticOffset, float elasticOffsetPixels,
                            float rawOffset, float rawOffsetPixels) {
-            if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.LOLLIPOP) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
                 if (elasticOffsetPixels > 0) {
                     // dragging downward, fade the status bar in proportion
@@ -394,13 +400,19 @@ public class ElasticDragDismissFrameLayout extends FrameLayout {
         }
 
         public void onDragDismissed() {
-            if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.LOLLIPOP){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 activity.finishAfterTransition();
 
-            }else {
+            } else {
                 activity.finish();
             }
-            activity.overridePendingTransition(R.anim.share_translate_prodetail_in, R.anim.share_translate_prodetail_out);
+
+            if (isDownDrag) {//向下
+                activity.overridePendingTransition(R.anim.share_translate_prodetail_in, R.anim.share_translate_prodetail_out_down);
+            } else {
+                activity.overridePendingTransition(R.anim.share_translate_prodetail_in, R.anim.share_translate_prodetail_out_up);
+            }
+
         }
     }
 

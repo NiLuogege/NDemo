@@ -37,7 +37,8 @@
         <item name="android:windowReturnTransition">@transition/dribbble_shot_return</item>
 
         <!-- 设置Activity为透明-->
-        <item name="android:windowBackground">@color/scrim</item>
+        <!--<item name="android:windowBackground">@color/scrim</item>-->
+        <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
 
@@ -105,7 +106,7 @@
     <!--自定义分享页面-->
     <style name="AnimBottom" parent="@android:style/Animation">
         <item name="android:windowEnterAnimation">@anim/share_translate_prodetail_in</item>
-        <item name="android:windowExitAnimation">@anim/share_translate_prodetail_out</item>
+        <item name="android:windowExitAnimation">@anim/share_translate_prodetail_out_down</item>
     </style>
 
     <style name="Dialog1" parent="android:style/Theme.Translucent">

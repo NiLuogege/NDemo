@@ -313,7 +313,7 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             ActivityCompat.finishAfterTransition(MeiziDetialActivity.this);
-            overridePendingTransition(R.anim.share_translate_prodetail_in, R.anim.share_translate_prodetail_out);
+            overridePendingTransition(R.anim.share_translate_prodetail_in, R.anim.share_translate_prodetail_out_down);
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -387,7 +387,7 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
         @Override
         public void onClick(View v) {
             ActivityCompat.finishAfterTransition(MeiziDetialActivity.this);
-            overridePendingTransition(R.anim.share_translate_prodetail_in, R.anim.share_translate_prodetail_out);
+            overridePendingTransition(R.anim.share_translate_prodetail_in, R.anim.share_translate_prodetail_out_down);
         }
     };
 
