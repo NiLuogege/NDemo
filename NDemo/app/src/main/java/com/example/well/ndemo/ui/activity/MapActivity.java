@@ -708,10 +708,10 @@ public class MapActivity extends BaseActivity {
                 Location location = (Location) p_location;
                 NodemoMapLocation aMapLocation = (NodemoMapLocation) nodemoMapLocation;
 
-                if (BuildConfig.DEBUG)
-                    Log.e("MapActivity", "接受广播成功" + " nodemoMapLocation= " + aMapLocation.toString());
-                if (BuildConfig.DEBUG)
-                    Log.e("MapActivity", "aMapLocation.getLatitude():" + aMapLocation.getLatitude() + " aMapLocation.getLongitude()=" + aMapLocation.getLongitude());
+//                if (BuildConfig.DEBUG)
+//                    Log.e("MapActivity", "接受广播成功" + " nodemoMapLocation= " + aMapLocation.toString());
+//                if (BuildConfig.DEBUG)
+//                    Log.e("MapActivity", "aMapLocation.getLatitude():" + aMapLocation.getLatitude() + " aMapLocation.getLongitude()=" + aMapLocation.getLongitude());
                 if (null != aMapLocation) {
                     setToolbarTitle(aMapLocation);
                     currentAmapLocation = location;

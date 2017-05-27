@@ -78,6 +78,10 @@ public class MapRecordActivity extends BaseActivity {
     private TraceRePlay mRePlay;
     private HashMap<Integer, Integer> agrSpeerColorHashMap;
     private int[] colorList = {0xFF33FF00, 0xFF99FF00, 0xFFFFFF00, 0xFFFF9900, 0xFFFF3300, 0xFFFFFFFF};// 颜色值
+    private String mStreet_start;
+    private String mStreet_end;
+    private LatLng mStartLatLng;
+    private LatLng mEndLatLng;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -176,7 +180,7 @@ public class MapRecordActivity extends BaseActivity {
     public void getAgrSpeerColorHashMap() {
         agrSpeerColorHashMap = new HashMap<>();
         for (int i = 0; i < 10; i++) {
-            if (i < colorList.length ) {
+            if (i < colorList.length) {
                 agrSpeerColorHashMap.put(i, colorList[i]);
             } else {
                 agrSpeerColorHashMap.put(i, colorList[colorList.length - 1]);
@@ -208,6 +212,8 @@ public class MapRecordActivity extends BaseActivity {
     AMap.OnMapLoadedListener mOnMapLoadedListener = new AMap.OnMapLoadedListener() {
         @Override
         public void onMapLoaded() {
+            if (BuildConfig.DEBUG)
+                Log.e("MapRecordActivity", "mOnMapLoadedListener:" + mOnMapLoadedListener);
             setUpRecord();
         }
     };
@@ -221,22 +227,28 @@ public class MapRecordActivity extends BaseActivity {
             List<NodemoMapLocation> pathline = record.getPathline();
             NodemoMapLocation startpoint = record.getStartPoint();
             NodemoMapLocation endpoint = record.getEndPoint();
-            if (pathline == null || endpoint == null || startpoint == null) {
-                return;
-            }
 
-            String street_start = record.getStartPoint().getStreet();//街道
-            String street_end = record.getEndPoint().getStreet();//街道
-            toolbar.setTitle(street_start + "->" + street_end);
+
+            if (startpoint != null) {
+                mStreet_start = startpoint.getStreet();  //街道
+                mStartLatLng = new LatLng(startpoint.getLatitude(), startpoint.getLongitude());
+            }
+            if (endpoint != null) {
+                mStreet_end = endpoint.getStreet(); //街道
+                mEndLatLng = new LatLng(endpoint.getLatitude(), endpoint.getLongitude());
+            }
+            toolbar.setTitle(mStreet_start + "->" + mStreet_end);
             toolbar.setTitleMarginStart(SystemUtils.dp2px(-5, getResources()));
 
-            LatLng startLatLng = new LatLng(startpoint.getLatitude(), startpoint.getLongitude());
-            LatLng endLatLng = new LatLng(endpoint.getLatitude(), endpoint.getLongitude());
             mLatLngList = MapUtils.parseLatLngList(pathline);
+            if (endpoint == null) {
+                mEndLatLng=mLatLngList.get(mLatLngList.size()-1);
+            }
+
             List<Float> speedList = record.getSpeedList();
 
             //绘制原始轨迹
-            drawLine(startLatLng, endLatLng, mLatLngList, speedList);
+            drawLine(mStartLatLng, mEndLatLng, mLatLngList, speedList);
             //进行轨迹纠偏
             initTrace(pathline);
         } else {
@@ -258,7 +270,8 @@ public class MapRecordActivity extends BaseActivity {
 
     /**
      * 绘制原始轨迹(地图上添加原始轨迹线路及起终点、轨迹动画小人)
-     *  @param startLatLng
+     *
+     * @param startLatLng
      * @param endLatLng
      * @param latLngList
      * @param speedList
