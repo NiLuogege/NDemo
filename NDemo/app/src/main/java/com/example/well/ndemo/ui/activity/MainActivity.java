@@ -106,7 +106,9 @@ public class MainActivity extends BaseActivity {
         MenuItem item_night = nav.getMenu().findItem(R.id.nav_night);
         MenuItem item_push = nav.getMenu().findItem(R.id.nav_image_push);
         MenuItem item_map = nav.getMenu().findItem(R.id.map);
+        MenuItem item_kotlin = nav.getMenu().findItem(R.id.kotlin);
         item_map.setOnMenuItemClickListener(mOnMenuItemClickListener);
+        item_kotlin.setOnMenuItemClickListener(mOnMenuItemClickListener);
         mNav_image.setOnClickListener(mOnClickListener);
 
         mNight_switch = (SwitchCompat) MenuItemCompat.getActionView(item_night).findViewById(R.id.night_switch);
@@ -295,8 +297,11 @@ public class MainActivity extends BaseActivity {
                     Bundle bundle = compat.toBundle();
                     startActivity(intent, bundle);
                     dl_main.closeDrawer(nav, false);
-//                    Intent intent = new Intent(context,DemoActivity.class);
-//                    startActivity(intent);
+                    break;
+
+                case R.id.kotlin:
+                    Intent intent_kotlin = new Intent(context,KotlinActivity.class);
+                    startActivity(intent_kotlin);
                     break;
             }
             return false;

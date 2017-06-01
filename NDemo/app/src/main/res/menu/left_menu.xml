@@ -11,6 +11,10 @@
             android:id="@+id/map"
             android:icon="@drawable/map"
             android:title="@string/map"/>
+        <item
+            android:id="@+id/kotlin"
+            android:icon="@drawable/map"
+            android:title="@string/map"/>
     </group>
 
 

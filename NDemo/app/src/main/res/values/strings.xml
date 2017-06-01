@@ -40,7 +40,6 @@
     <string name="location_error">定位失败</string>
 
 
-
     <!--下面是look的-->
 
 
@@ -85,7 +84,6 @@
     <string name="email" translatable="false">maat.xing@gmail.com</string>
     <string name="begin">开始</string>
     <string name="end">结束</string>
-
 
 
 </resources>
