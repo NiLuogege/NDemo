@@ -14,7 +14,7 @@ import java.util.*
 
 class KotlinActivity : BaseActivity() {
     private var data = ArrayList<AndroidResult>()
-//    private  var adapter : AndroidAdapter? = null
+    private  var adapter : AndroidAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +32,7 @@ class KotlinActivity : BaseActivity() {
     val listener = object : HttpOnNextListener<List<AndroidResult>>() {
         override fun onNext(t: List<AndroidResult>?) {
             data= t as ArrayList<AndroidResult>
-            val adapter = AndroidAdapter(context, data)
+             adapter = AndroidAdapter(context, data)
             rv.adapter=adapter
             Log.e("tag", t.toString())
         }
