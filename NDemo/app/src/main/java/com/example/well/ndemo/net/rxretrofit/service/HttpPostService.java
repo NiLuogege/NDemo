@@ -1,6 +1,7 @@
 package com.example.well.ndemo.net.rxretrofit.service;
 
 
+import com.example.well.ndemo.net.entity.resulte.AndroidResult;
 import com.example.well.ndemo.net.entity.resulte.GankMeiziReponse;
 import com.example.well.ndemo.net.entity.resulte.RetrofitEntity;
 import com.example.well.ndemo.net.entity.resulte.ServiceInfoResulte;
@@ -40,6 +41,9 @@ public interface HttpPostService {
 
     @GET("data/福利/20/{page}")
     Observable<BaseResultEntity<List<GankMeiziReponse>>> getGankMeizi(@Path("page") int page);
+
+    @GET("search/query/listview/category/Android/count/20/page/{page}")
+    Observable<BaseResultEntity<List<AndroidResult>>> getAndroid(@Path("page") int page);
 
 
 

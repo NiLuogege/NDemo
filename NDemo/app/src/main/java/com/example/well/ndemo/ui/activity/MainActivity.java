@@ -296,7 +296,6 @@ public class MainActivity extends BaseActivity {
                     ActivityOptionsCompat compat = ActivityOptionsCompat.makeScaleUpAnimation(mNav_image, mNav_image.getWidth() / 2, mNav_image.getHeight(), 0, 0);
                     Bundle bundle = compat.toBundle();
                     startActivity(intent, bundle);
-                    dl_main.closeDrawer(nav, false);
                     break;
 
                 case R.id.kotlin:
@@ -304,6 +303,7 @@ public class MainActivity extends BaseActivity {
                     startActivity(intent_kotlin);
                     break;
             }
+            dl_main.closeDrawer(nav, false);
             return false;
         }
     };

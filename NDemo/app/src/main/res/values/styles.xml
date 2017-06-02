@@ -88,6 +88,10 @@
         <item name="android:textSize">18sp</item>
     </style>
 
+    <style name="Theme_KotlinActivity" parent="Theme_MainActiviy">
+
+    </style>
+
 
     <!--显示在toolbar下面的popupMenu-->
     <style name="popupMenu" parent="@style/ThemeOverlay.AppCompat.Light">
