@@ -128,7 +128,9 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
                 Glide
                         .with(context)
                         .load(mUrl)
-                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .skipMemoryCache(false)
+                        .crossFade()
+                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                         .listener(mRequestListener)
                         .into(mShot);
             }
@@ -244,7 +246,7 @@ public class MeiziDetialActivity extends BaseActivity implements Handler.Callbac
                                                 (int) animation.getAnimatedValue());
                                     }
                                 });
-                                statusBarColorAnim.setDuration(1000L);
+                                statusBarColorAnim.setDuration(600L);
                                 statusBarColorAnim.setInterpolator(
                                         new AccelerateInterpolator());
                                 statusBarColorAnim.start();

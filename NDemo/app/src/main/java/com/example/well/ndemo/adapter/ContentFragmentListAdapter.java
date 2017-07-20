@@ -64,7 +64,11 @@ public class ContentFragmentListAdapter extends RecyclerView.Adapter<ContentFrag
         
         Glide.with(context)
                 .load(reponse.url)
-                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+//                .thumbnail(0.1f)//设置缩略图
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)//设置缓存所有图片
+                .skipMemoryCache(false)//使用内存缓存
+                .centerCrop()//设置图片为centerCrop
+                .crossFade()//淡入淡出动画
                 .into(holder.mIv)
                 .getSize(new SizeReadyCallback() {
             @Override

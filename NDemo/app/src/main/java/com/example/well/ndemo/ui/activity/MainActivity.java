@@ -299,8 +299,8 @@ public class MainActivity extends BaseActivity {
                     break;
 
                 case R.id.kotlin:
-                    Intent intent_kotlin = new Intent(context,KotlinActivity.class);
-                    startActivity(intent_kotlin);
+//                    Intent intent_kotlin = new Intent(context,KotlinActivity.class);
+//                    startActivity(intent_kotlin);
                     break;
             }
             dl_main.closeDrawer(nav, false);

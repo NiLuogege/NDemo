@@ -59,7 +59,9 @@ public class BigImageActivity extends BaseActivity {
                 Glide
                         .with(context)
                         .load(url)
-                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                        .skipMemoryCache(false)
+                        .crossFade()
+                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                         .listener(mRequestListener)
                         .into(pIv);
             }
