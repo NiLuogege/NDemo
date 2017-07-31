@@ -2,6 +2,7 @@ package com.example.well.ndemo;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 
 import com.example.well.ndemo.net.rxretrofit.RxRetrofitApp;
@@ -18,6 +19,16 @@ import java.io.IOException;
 public class MyApplication extends Application {
     public Context context;
     public static MyApplication mApp = null;
+
+    /**
+     * 支持MultiDex
+     * @param base
+     */
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
 
     @Override
     public void onCreate() {
