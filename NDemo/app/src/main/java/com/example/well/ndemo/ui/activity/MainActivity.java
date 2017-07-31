@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -34,6 +38,7 @@ import com.example.well.ndemo.utils.NetworkUtils;
 import com.example.well.ndemo.utils.SPUtils;
 import com.example.well.ndemo.utils.SettingsUtils;
 import com.example.well.ndemo.utils.SnackbarUtils;
+import com.example.well.ndemo.widget.globule_jbox2d.JboxLayout;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -50,6 +55,9 @@ public class MainActivity extends BaseActivity {
     private TextView mImage_description;
     private SwitchCompat mNight_switch, mPush_switch;
     private ImageView mNav_image;
+    private JboxLayout mJboxLayout;
+    private Sensor mSensor;
+    private SensorManager mSensorManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +72,7 @@ public class MainActivity extends BaseActivity {
             initView();
             setFirstEnterView();
             initBroadcastReceiver();
+            initSensor();
         } else {
             SnackbarUtils.showDefaultLongSnackbar(dl_main, getString(R.string.networkUnuseable));
         }
@@ -71,11 +80,21 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    private void initSensor() {
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    }
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (mReceiver != null) {
             LocalBroadcastManager.getInstance(context).unregisterReceiver(mReceiver);
+        }
+
+        if (dl_main != null) {
+            dl_main.removeDrawerListener(mDrawerListener);
         }
     }
 
@@ -102,6 +121,7 @@ public class MainActivity extends BaseActivity {
         }
 
         mNav_image = (ImageView) nav.getHeaderView(0).findViewById(R.id.nav_image);
+        mJboxLayout = (JboxLayout) nav.getHeaderView(0).findViewById(R.id.jboxl);
         mImage_description = (TextView) nav.getHeaderView(0).findViewById(R.id.image_description);
         MenuItem item_night = nav.getMenu().findItem(R.id.nav_night);
         MenuItem item_push = nav.getMenu().findItem(R.id.nav_image_push);
@@ -119,6 +139,8 @@ public class MainActivity extends BaseActivity {
         setNavImage();
 //        mNight_switch = (ImageView) MenuItemCompat.getActionView(item).findViewById(R.id.night_switch);
 //        mNight_switch.setOnClickListener(mOnClickListener);
+
+        dl_main.addDrawerListener(mDrawerListener);
     }
 
     private void setFirstEnterView() {
@@ -320,6 +342,44 @@ public class MainActivity extends BaseActivity {
                 Bundle bundle = compat.toBundle();
                 ActivityCompat.startActivity(context, intent, bundle);
             }
+
+        }
+    };
+
+    DrawerLayout.DrawerListener mDrawerListener = new DrawerLayout.DrawerListener() {
+        @Override
+        public void onDrawerSlide(View drawerView, float slideOffset) {
+        }
+
+        @Override
+        public void onDrawerOpened(View drawerView) {
+            mSensorManager.registerListener(mSensorEventListener, mSensor, SensorManager.SENSOR_DELAY_UI);
+        }
+
+        @Override
+        public void onDrawerClosed(View drawerView) {
+            mSensorManager.unregisterListener(mSensorEventListener);
+        }
+
+        @Override
+        public void onDrawerStateChanged(int newState) {
+        }
+    };
+
+    SensorEventListener mSensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            int type = event.sensor.getType();
+            if(type==Sensor.TYPE_ACCELEROMETER){
+                float[] values = event.values;
+                float x = values[0];
+                float y = values[1];
+                mJboxLayout.onSensorChanged(-x,y*2);
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
         }
     };

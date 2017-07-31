@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
                 android:orientation="vertical"
@@ -23,5 +24,49 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/white"
         android:textSize="16sp"/>
+
+    <com.example.well.ndemo.widget.globule_jbox2d.JboxLayout
+        android:id="@+id/jboxl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerHorizontal="true"
+            android:src="@mipmap/circle_body"
+            app:globule_body="true"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerHorizontal="true"
+            android:src="@mipmap/circle_body"
+            android:tint="#00FF7F"
+            app:globule_body="true"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentBottom="true"
+            android:src="@mipmap/circle_body"
+            app:globule_body="false"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentBottom="true"
+            android:src="@mipmap/ball"
+            app:globule_body="true"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentBottom="true"
+            android:src="@mipmap/ball"
+            android:tint="#00FFFF"
+            app:globule_body="true"/>
+
+    </com.example.well.ndemo.widget.globule_jbox2d.JboxLayout>
 
 </RelativeLayout>
