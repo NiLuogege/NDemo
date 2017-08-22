@@ -119,12 +119,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme_BigImageActivity"/>
 
-        <!--KotlinActivity -->
-        <activity
-            android:name=".ui.activity.KotlinActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme_KotlinActivity"/>
-
         <!-- demo -->
         <activity
             android:name=".ui.activity.DemoActivity"
